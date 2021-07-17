@@ -3,7 +3,7 @@
 //! These are also used in the ArcDPS API, but may be useful outside.
 
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use strum_macros::{AsRefStr, Display};
+use strum_macros::{AsRefStr, Display, EnumProperty};
 
 /// GW2 client language.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive, Display, AsRefStr)]
@@ -69,21 +69,8 @@ pub enum Attribute {
     Unknown = 65535,
 }
 
-// TODO: add non-boon buffs
-/// Buff.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, AsRefStr)]
-#[repr(u32)]
-pub enum Buff {
-    Might = 740,
-    Fury = 725,
-    Quickness = 1187,
-    Alacrity = 30328,
-    Resolution = 873,
-    Protection = 717,
-    Regeneration = 718,
-    Swiftness = 719,
-    Vigor = 726,
-    Stability = 1122,
-    Resistance = 26980,
-    Aegis = 743,
-}
+// buff enums generated from data
+include!(concat!(env!("OUT_DIR"), "/buff.rs"));
+include!(concat!(env!("OUT_DIR"), "/boon.rs"));
+include!(concat!(env!("OUT_DIR"), "/food.rs"));
+include!(concat!(env!("OUT_DIR"), "/util.rs"));

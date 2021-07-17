@@ -1,0 +1,29 @@
+# GENERAL
+Diminished:
+  id: 46668
+
+# POWER
+SharpeningStone:
+  id: 9963
+  name: Superior Sharpening Stone
+  stats: [3% Power from Precision, 6% Power from Ferocity]
+  category: PWR
+
+# CONDI
+ToxicCrystal:
+  id: 21828
+  name: Toxic Focusing Crystal
+  stats: [3% Condition Damage from Power, 3% Condition Damage from Precision]
+  category: CND
+Icicle:
+  id: 34206
+  name: Tuning Icicle
+  stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
+  category: CND
+
+# HEAL
+BountifulOil:
+  id: 25879
+  name: Bountiful Maintenance Oil
+  stats: [0.6% Outgoing Healing for 100 Healing Power, 0.8% Outgoing Healing for 100 Concentration]
+  category: HEAL

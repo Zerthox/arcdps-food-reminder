@@ -1,5 +1,8 @@
 use crate::{
-    arc_util::api::StateChange,
+    arc_util::{
+        api::{BuffRemove, StateChange},
+        game::{Food, Utility},
+    },
     log::DebugLog,
     tracking::{player::Player, Tracker},
     ui::{Component, Window, WindowProps},
@@ -9,7 +12,7 @@ use arcdps::{
     imgui::{im_str, Ui},
     Agent, CombatEvent,
 };
-use std::time::Duration;
+use std::{convert::TryFrom, time::Duration};
 
 /// Main plugin struct.
 #[derive(Debug)]
@@ -26,7 +29,12 @@ impl Plugin {
                 WindowProps::new("Food Reminder Debug Log").visible(true),
                 (),
             )),
-            tracker: Window::create((WindowProps::new("Food Reminder").visible(false).auto_resize(true), ())),
+            tracker: Window::create((
+                WindowProps::new("Food Reminder")
+                    .visible(false)
+                    .auto_resize(true),
+                (),
+            )),
         }
     }
 
@@ -54,6 +62,8 @@ impl Plugin {
             if let Some(event) = event {
                 match event.is_statechange.into() {
                     StateChange::EnterCombat => {
+                        // combat enter
+
                         let now = Duration::from_millis(unsafe { win::timeGetTime() } as u64);
                         let event_time = Duration::from_millis(event.time);
                         let delta = now.saturating_sub(event_time);
@@ -69,12 +79,55 @@ impl Plugin {
                         }
                     }
                     StateChange::ExitCombat => {
+                        // combat exit
+
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
                             player.exit_combat();
                             self.debug.log(format!("Combat exit for {:?}", player));
                         }
                     }
-                    _ => {}
+                    _ => {
+                        let buff_remove = BuffRemove::from(event.is_buff_remove);
+                        if buff_remove == BuffRemove::None {
+                            if event.buff != 0 && event.buff_dmg == 0 {
+                                // buff apply
+
+                                // check for tracker player
+                                if let Some(dest) = dest {
+                                    if let Some(player) = self.tracker.get_player(dest.id) {
+                                        let buff_id = event.skill_id;
+
+                                        // check for food & util
+                                        if let Ok(food) = Food::try_from(buff_id) {
+                                            if food == Food::Malnourished {
+                                                self.debug.log(format!(
+                                                    "Malnourished applied to {:?}",
+                                                    player
+                                                ));
+                                            } else {
+                                                self.debug.log(format!(
+                                                    "Food {} applied to {:?}",
+                                                    food, player
+                                                ));
+                                            }
+                                        } else if let Ok(util) = Utility::try_from(buff_id) {
+                                            if util == Utility::Diminished {
+                                                self.debug.log(format!(
+                                                    "Diminished applied to {:?}",
+                                                    player
+                                                ));
+                                            } else {
+                                                self.debug.log(format!(
+                                                    "Utility {} applied to {:?}",
+                                                    util, player
+                                                ));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             } else {
                 // check for player tracking change

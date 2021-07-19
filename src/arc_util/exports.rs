@@ -5,7 +5,7 @@ use arcdps::{e6 as ui_settings_raw, e7 as modifiers_raw};
 // FIXME: these do not return what we want
 
 /// Current UI settings.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct UISettings {
     pub hidden: bool,
     pub draw_always: bool,
@@ -27,7 +27,7 @@ pub fn get_ui_settings() -> UISettings {
 }
 
 /// Set of modifier keybinds as virtual key ids.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct Modifiers {
     pub modifier1: u16,
     pub modifier2: u16,

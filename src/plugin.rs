@@ -1,38 +1,51 @@
 use crate::{
     arc_util::{
         api::{BuffRemove, StateChange},
+        exports::{self, Modifiers, UISettings},
         game::{Food, Utility},
     },
-    log::DebugLog,
     tracking::{player::Player, Tracker},
     ui::{Component, Window, WindowProps},
-    win,
 };
 use arcdps::{
     imgui::{im_str, Ui},
     Agent, CombatEvent,
 };
-use std::{convert::TryFrom, time::Duration};
+use std::convert::TryFrom;
 
-/// Main plugin struct.
+#[cfg(feature = "log")]
+use crate::{arc_util::api, log::DebugLog};
+
+/// Main plugin instance.
 #[derive(Debug)]
 pub struct Plugin {
-    debug: Window<DebugLog>,
+    ui_settings: UISettings,
+    modifiers: Modifiers,
     tracker: Window<Tracker>,
+
+    #[cfg(feature = "log")]
+    debug: Window<DebugLog>,
 }
 
 impl Plugin {
-    /// Creates a new plugin struct.
+    /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            debug: Window::create((
-                WindowProps::new("Food Reminder Debug Log").visible(true),
-                (),
-            )),
+            // arc exports are initialized as default and set later
+            ui_settings: UISettings::default(),
+            modifiers: Modifiers::default(),
+
+            // tracker window
             tracker: Window::create((
-                WindowProps::new("Food Reminder")
+                WindowProps::new("Food Tracker")
                     .visible(false)
                     .auto_resize(true),
+                (),
+            )),
+
+            #[cfg(feature = "log")]
+            debug: Window::create((
+                WindowProps::new("Food Reminder Debug Log").visible(true),
                 (),
             )),
         }
@@ -40,7 +53,18 @@ impl Plugin {
 
     /// Loads the plugin.
     pub fn load(&mut self) {
-        self.debug.log("Load");
+        #[cfg(feature = "log")]
+        self.debug.log("Plugin load");
+
+        self.ui_settings = exports::get_ui_settings();
+
+        #[cfg(feature = "log")]
+        self.debug.log(format!("Imported {:?}", self.ui_settings));
+
+        self.modifiers = exports::get_modifiers();
+
+        #[cfg(feature = "log")]
+        self.debug.log(format!("Imported {:?}", self.modifiers));
     }
 
     /// Unloads the plugin.
@@ -52,7 +76,7 @@ impl Plugin {
         event: Option<&CombatEvent>,
         src: Option<Agent>,
         dest: Option<Agent>,
-        _skill_name: Option<&str>,
+        skill_name: Option<&str>,
         _id: u64,
         _revision: u64,
     ) {
@@ -63,19 +87,18 @@ impl Plugin {
                 match event.is_statechange.into() {
                     StateChange::EnterCombat => {
                         // combat enter
-
-                        let now = Duration::from_millis(unsafe { win::timeGetTime() } as u64);
-                        let event_time = Duration::from_millis(event.time);
-                        let delta = now.saturating_sub(event_time);
+                        #[cfg(feature = "log")]
+                        let delta = api::calc_delta(event);
 
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
                             // TODO: update subgroup
-                            player.enter_combat();
-                            self.debug.log(format!("Combat enter for {:?}", player));
-                            self.debug.log(format!(
-                                "Delta {:?}, received time {:?} at {:?}",
-                                delta, event_time, now,
-                            ));
+                            player.enter_combat(Some(event.dst_agent));
+
+                            #[cfg(feature = "log")]
+                            {
+                                self.debug.log(format!("Combat enter for {:?}", player));
+                                self.debug.log(format!("Delta to combat {:?}", delta));
+                            }
                         }
                     }
                     StateChange::ExitCombat => {
@@ -83,6 +106,8 @@ impl Plugin {
 
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
                             player.exit_combat();
+
+                            #[cfg(feature = "log")]
                             self.debug.log(format!("Combat exit for {:?}", player));
                         }
                     }
@@ -90,40 +115,69 @@ impl Plugin {
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
                         if buff_remove == BuffRemove::None {
                             if event.buff != 0 && event.buff_dmg == 0 {
-                                // buff apply
+                                // buff applied
 
                                 // check for tracker player
                                 if let Some(dest) = dest {
-                                    if let Some(player) = self.tracker.get_player(dest.id) {
+                                    if let Some(player) = self.tracker.get_player_mut(dest.id) {
                                         let buff_id = event.skill_id;
 
                                         // check for food & util
+
                                         if let Ok(food) = Food::try_from(buff_id) {
-                                            if food == Food::Malnourished {
-                                                self.debug.log(format!(
-                                                    "Malnourished applied to {:?}",
-                                                    player
-                                                ));
-                                            } else {
-                                                self.debug.log(format!(
-                                                    "Food {} applied to {:?}",
-                                                    food, player
-                                                ));
-                                            }
+                                            player.apply_food(food);
+
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Food {} applied to {:?}",
+                                                food, player
+                                            ));
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
-                                            if util == Utility::Diminished {
-                                                self.debug.log(format!(
-                                                    "Diminished applied to {:?}",
-                                                    player
-                                                ));
-                                            } else {
-                                                self.debug.log(format!(
-                                                    "Utility {} applied to {:?}",
-                                                    util, player
-                                                ));
-                                            }
+                                            player.apply_util(util);
+
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Utility {} applied to {:?}",
+                                                util, player
+                                            ));
+                                        } else if let Some("Nourishment") = skill_name {
+                                            player.apply_unknown_food();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Unknown Food with id {} applied to {:?}",
+                                                buff_id, player
+                                            ));
+                                        } else if let Some("Enhancement") = skill_name {
+                                            player.apply_unknown_util();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Unknown Utility with id {} applied to {:?}",
+                                                buff_id, player
+                                            ));
                                         }
                                     }
+                                }
+                            }
+                        } else {
+                            // buff removed
+
+                            // check for tracked player
+                            if let Some(player) = self.tracker.get_player_mut(src.id) {
+                                let buff_id = event.skill_id;
+
+                                // check for food &
+                                if Food::try_from(buff_id).is_ok() {
+                                    player.remove_food();
+
+                                    #[cfg(feature = "log")]
+                                    self.debug.log(format!("Food removed from {:?}", player));
+                                } else if Utility::try_from(buff_id).is_ok() {
+                                    player.remove_util();
+
+                                    #[cfg(feature = "log")]
+                                    self.debug.log(format!("Utility removed from {:?}", player));
                                 }
                             }
                         }
@@ -139,22 +193,37 @@ impl Plugin {
                             Some(char_name),
                             Some(Agent {
                                 name: Some(dest_name),
-                                team: sub,
                                 prof,
+                                elite,
+                                team: sub,
                                 ..
                             }),
                         ) = (src.name, dest)
                         {
                             let acc_name = dest_name.strip_prefix(":").unwrap_or(dest_name);
-                            let player = Player::new(src.id, char_name, acc_name, prof.into(), sub);
-                            self.debug.log(format!("Added player {:?}", player));
+                            let player = Player::new(
+                                src.id,
+                                char_name,
+                                acc_name,
+                                prof.into(),
+                                elite.into(),
+                                sub as usize,
+                            );
+
+                            #[cfg(feature = "log")]
+                            self.debug.log(format!("Added {:?}", player));
+
                             self.tracker.add_player(player);
                         }
                     } else {
                         // player removed
 
-                        if let Some(player) = self.tracker.remove_player(src.id) {
-                            self.debug.log(format!("Removed player {:?}", player));
+                        #[cfg_attr(not(feature = "log"), allow(unused))]
+                        let removed = self.tracker.remove_player(src.id);
+
+                        #[cfg(feature = "log")]
+                        if let Some(player) = removed {
+                            self.debug.log(format!("Removed {:?}", player));
                         }
                     }
                 }
@@ -171,6 +240,7 @@ impl Plugin {
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // log renders always
+        #[cfg(feature = "log")]
         self.debug.render(ui);
 
         // other ui renders conditionally
@@ -183,7 +253,9 @@ impl Plugin {
     /// Callback for ArcDPS option checkboxes.
     pub fn render_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox(im_str!("Food Reminder"), &mut self.tracker.shown);
+            ui.checkbox(im_str!("Food Tracker"), &mut self.tracker.shown);
+
+            #[cfg(feature = "log")]
             ui.checkbox(im_str!("Food Reminder Debug Log"), &mut self.debug.shown);
         }
         false

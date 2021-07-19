@@ -1,7 +1,15 @@
+pub mod buff;
 pub mod player;
 
-use crate::ui::Component;
+use crate::{
+    tracking::{
+        buff::Categorize,
+        player::{Food, Utility},
+    },
+    ui::{color, Component},
+};
 use arcdps::imgui::{im_str, Ui};
+use buff::Buff;
 use player::Player;
 use std::collections::HashMap;
 
@@ -65,7 +73,18 @@ impl Component for Tracker {
             ui.text("No tracked players...");
         } else {
             // create table
-            ui.begin_table(im_str!("food-reminder-tracker-table"), 2);
+            ui.begin_table(im_str!("food-reminder-tracker-table"), 4);
+
+            // header
+            ui.table_headers_row();
+            ui.table_next_column();
+            ui.table_header(im_str!("Sub"));
+            ui.table_next_column();
+            ui.table_header(im_str!("Player"));
+            ui.table_next_column();
+            ui.table_header(im_str!("Food"));
+            ui.table_next_column();
+            ui.table_header(im_str!("Util"));
 
             // iterate over tracked players
             for player in self.get_players() {
@@ -79,6 +98,75 @@ impl Component for Tracker {
                 // name
                 ui.table_next_column();
                 ui.text(&player.character_name);
+                if ui.is_item_hovered() {
+                    ui.tooltip_text(&player.account_name);
+                }
+
+                // food
+                ui.table_next_column();
+                match player.food {
+                    Buff::Unset => {
+                        ui.text("???");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("Uncertain");
+                        }
+                    }
+                    Buff::None | Buff::Known(Food::Malnourished) => {
+                        ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("No Food");
+                        }
+                    }
+                    Buff::Unknown => {
+                        ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("Unknown Food");
+                        }
+                    }
+                    Buff::Known(food) => {
+                        ui.text_colored(color::GREEN.to_rgba_f32s(), food.categorize());
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(format!(
+                                "{}\n{}",
+                                food.name(),
+                                food.stats().join("\n")
+                            ));
+                        }
+                    }
+                }
+
+                // util
+                ui.table_next_column();
+                match player.util {
+                    Buff::Unset => {
+                        ui.text("???");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("Uncertain");
+                        }
+                    }
+                    Buff::None | Buff::Known(Utility::Diminished) => {
+                        ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("No Utility");
+                        }
+                    }
+                    Buff::Unknown => {
+                        ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text("Unknown Utility");
+                        }
+                    }
+                    Buff::Known(util) => {
+                        ui.text_colored(color::GREEN.to_rgba_f32s(), util.categorize());
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(format!(
+                                "{}\n{}",
+                                util.name(),
+                                util.stats().join("\n")
+                            ));
+                        }
+                    }
+                }
             }
 
             // end table

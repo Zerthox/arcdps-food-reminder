@@ -1,9 +1,11 @@
 mod arc_util;
-mod log;
 mod plugin;
 mod tracking;
 mod ui;
 mod win;
+
+#[cfg(feature = "log")]
+mod log;
 
 use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
 use lazy_static::lazy_static;

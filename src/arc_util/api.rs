@@ -3,9 +3,24 @@
 // we wont use all enum kinds here but keeping them makes sense
 #![allow(unused)]
 
+use crate::win;
 use arcdps::CombatEvent;
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use std::mem;
+use std::{mem, time::Duration};
+
+/// Calculates the time difference (deltatime) between an event happening and now.
+pub fn calc_delta(event: &CombatEvent) -> Duration {
+    let now = Duration::from_millis(unsafe { win::timeGetTime() } as u64);
+    let event_time = Duration::from_millis(event.time);
+    now.saturating_sub(event_time)
+}
+
+/// Reads a buff duration from an event.
+///
+/// This should only be used once the event is clearly a buff event.
+pub fn read_buff_duration(event: &CombatEvent) -> u32 {
+    unsafe { mem::transmute::<i32, u32>(event.value) }
+}
 
 /// Reads a buff **instance** id from an event.
 ///
@@ -14,17 +29,10 @@ pub fn read_buff_instance_id(event: &CombatEvent) -> u32 {
     unsafe { mem::transmute::<[u8; 4], u32>([event.pad61, event.pad62, event.pad63, event.pad64]) }
 }
 
-/// Reads a buff duration from an event.
-///
-/// This should only be used once the event is clearly a buff apply event.
-pub fn read_buff_duration(event: &CombatEvent) -> u32 {
-    unsafe { mem::transmute::<i32, u32>(event.value) }
-}
-
 /// Whether the entity is an ally or enemy.
 ///
 /// *Arc calls this "iff" for if friend/foe.*
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum Team {
     /// Allied entity.
@@ -41,7 +49,7 @@ pub enum Team {
 /// Strike types.
 ///
 /// *Arc calls this "combat result".*
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum Strike {
     /// Normal damage strike.
@@ -106,7 +114,7 @@ pub enum Strike {
 }
 
 /// Combat state change.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum Activation {
     /// Not used, different kind of event.
@@ -133,7 +141,7 @@ pub enum Activation {
 }
 
 /// Combat state change.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum StateChange {
     /// Not used, different kind of event.
@@ -405,7 +413,7 @@ pub enum StateChange {
 }
 
 /// Combat buff remove.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum BuffRemove {
     /// Not used, different kind of event.
@@ -436,7 +444,7 @@ pub enum BuffRemove {
 }
 
 /// Combat buff cycle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum BuffCycle {
     /// Damage happened on tick timer.
@@ -462,7 +470,7 @@ pub enum BuffCycle {
 }
 
 /// ArcDPS custom skill ids.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive)]
 #[repr(u16)]
 pub enum CustomSkill {
     /// Resurrect skill.
@@ -482,7 +490,7 @@ pub enum CustomSkill {
 }
 
 /// Buff info category.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive)]
 #[repr(u8)]
 pub enum BuffCategory {
     Boon = 0,

@@ -1,5 +1,6 @@
 pub use super::buff::{Buff, Food, Utility};
 pub use crate::arc_util::game::{Profession, Specialization};
+use std::cmp;
 
 /// Struct representing a player.
 #[derive(Debug, Clone)]
@@ -102,3 +103,15 @@ impl PartialEq for Player {
 }
 
 impl Eq for Player {}
+
+impl cmp::PartialOrd for Player {
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+        self.id.partial_cmp(&other.id)
+    }
+}
+
+impl cmp::Ord for Player {
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
+        self.id.cmp(&other.id)
+    }
+}

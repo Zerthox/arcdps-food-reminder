@@ -5,7 +5,10 @@ use crate::{
         game::{Food, Utility},
     },
     tracking::{player::Player, Tracker},
-    ui::{Component, Window, WindowProps},
+    ui::{
+        window::{Window, WindowProps},
+        Component,
+    },
 };
 use arcdps::{
     imgui::{im_str, Ui},
@@ -91,7 +94,7 @@ impl Plugin {
                         let delta = api::calc_delta(event);
 
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
-                            // TODO: update subgroup
+                            // FIXME: is this the right subgroup?
                             player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]

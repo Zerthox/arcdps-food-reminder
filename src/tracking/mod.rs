@@ -6,9 +6,9 @@ use crate::{
         buff::Categorize,
         player::{Food, Utility},
     },
-    ui::{color, Component},
+    ui::{align, color, Component},
 };
-use arcdps::imgui::{im_str, Ui};
+use arcdps::imgui::{im_str, ImString, TableColumnFlags, TableFlags, Ui};
 use buff::Buff;
 use player::Player;
 use std::collections::HashMap;
@@ -16,7 +16,7 @@ use std::collections::HashMap;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
-    /// Currently tracked players sorted by id.
+    /// Currently tracked players mapped by their id.
     players: HashMap<usize, Player>,
 }
 
@@ -48,15 +48,15 @@ impl Tracker {
         self.players.get_mut(&id)
     }
 
-    /// Returns all tracked players.
-    pub fn get_players(&self) -> Vec<&Player> {
+    /// Returns all tracked players sorted by subgroup.
+    pub fn get_players_by_sub(&self) -> Vec<&Player> {
         let mut players = self.players.values().collect::<Vec<_>>();
         players.sort_by_key(|player| player.subgroup);
         players
     }
 
     /// Returns an unsorted iterator over all tracked players.
-    pub fn get_players_unsorted(&self) -> impl Iterator<Item = &Player> {
+    pub fn get_players(&self) -> impl Iterator<Item = &Player> {
         self.players.values()
     }
 }
@@ -73,104 +73,107 @@ impl Component for Tracker {
             ui.text("No tracked players...");
         } else {
             // create table
-            ui.begin_table(im_str!("food-reminder-tracker-table"), 4);
+            if ui.begin_table_with_flags(
+                im_str!("food-reminder-tracker-table"),
+                4,
+                TableFlags::NONE,
+            ) {
+                // declare columns
+                ui.table_setup_column_with_flags(im_str!("Sub"), TableColumnFlags::DEFAULT_SORT);
+                ui.table_setup_column_with_flags(im_str!("Player"), TableColumnFlags::NO_SORT);
+                ui.table_setup_column_with_flags(im_str!("Food"), TableColumnFlags::NO_SORT);
+                ui.table_setup_column_with_flags(im_str!("Util"), TableColumnFlags::NO_SORT);
 
-            // header
-            ui.table_headers_row();
-            ui.table_next_column();
-            ui.table_header(im_str!("Sub"));
-            ui.table_next_column();
-            ui.table_header(im_str!("Player"));
-            ui.table_next_column();
-            ui.table_header(im_str!("Food"));
-            ui.table_next_column();
-            ui.table_header(im_str!("Util"));
+                // render header
+                ui.table_headers_row();
 
-            // iterate over tracked players
-            for player in self.get_players() {
-                // new row for each player
-                ui.table_next_row();
+                // TODO: sorting, imgui-rs currently has no wrapping, need to use imgui::sys directly
 
-                // subgroup
-                ui.table_next_column();
-                ui.text(player.subgroup.to_string());
+                // iterate over tracked players
+                for player in self.get_players_by_sub() {
+                    // new row for each player
+                    ui.table_next_row();
 
-                // name
-                ui.table_next_column();
-                ui.text(&player.character_name);
-                if ui.is_item_hovered() {
-                    ui.tooltip_text(&player.account_name);
+                    // render subgroup cell
+                    ui.table_next_column();
+                    ui.text(format!("{:>2}", player.subgroup));
+
+                    // render name cell
+                    ui.table_next_column();
+                    ui.text(&player.character_name);
+                    if ui.is_item_hovered() {
+                        ui.tooltip_text(&player.account_name);
+                    }
+
+                    // render food cell
+                    ui.table_next_column();
+                    match player.food {
+                        Buff::Unset => {
+                            ui.text("???");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Uncertain");
+                            }
+                        }
+                        Buff::None | Buff::Known(Food::Malnourished) => {
+                            ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("No Food");
+                            }
+                        }
+                        Buff::Unknown => {
+                            ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Unknown Food");
+                            }
+                        }
+                        Buff::Known(food) => {
+                            ui.text_colored(color::GREEN.to_rgba_f32s(), food.categorize());
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text(format!(
+                                    "{}\n{}",
+                                    food.name(),
+                                    food.stats().join("\n")
+                                ));
+                            }
+                        }
+                    }
+
+                    // render util cell
+                    ui.table_next_column();
+                    match player.util {
+                        Buff::Unset => {
+                            ui.text("???");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Uncertain");
+                            }
+                        }
+                        Buff::None | Buff::Known(Utility::Diminished) => {
+                            ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("No Utility");
+                            }
+                        }
+                        Buff::Unknown => {
+                            ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Unknown Utility");
+                            }
+                        }
+                        Buff::Known(util) => {
+                            ui.text_colored(color::GREEN.to_rgba_f32s(), util.categorize());
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text(format!(
+                                    "{}\n{}",
+                                    util.name(),
+                                    util.stats().join("\n")
+                                ));
+                            }
+                        }
+                    }
                 }
 
-                // food
-                ui.table_next_column();
-                match player.food {
-                    Buff::Unset => {
-                        ui.text("???");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("Uncertain");
-                        }
-                    }
-                    Buff::None | Buff::Known(Food::Malnourished) => {
-                        ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("No Food");
-                        }
-                    }
-                    Buff::Unknown => {
-                        ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("Unknown Food");
-                        }
-                    }
-                    Buff::Known(food) => {
-                        ui.text_colored(color::GREEN.to_rgba_f32s(), food.categorize());
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text(format!(
-                                "{}\n{}",
-                                food.name(),
-                                food.stats().join("\n")
-                            ));
-                        }
-                    }
-                }
-
-                // util
-                ui.table_next_column();
-                match player.util {
-                    Buff::Unset => {
-                        ui.text("???");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("Uncertain");
-                        }
-                    }
-                    Buff::None | Buff::Known(Utility::Diminished) => {
-                        ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("No Utility");
-                        }
-                    }
-                    Buff::Unknown => {
-                        ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text("Unknown Utility");
-                        }
-                    }
-                    Buff::Known(util) => {
-                        ui.text_colored(color::GREEN.to_rgba_f32s(), util.categorize());
-                        if ui.is_item_hovered() {
-                            ui.tooltip_text(format!(
-                                "{}\n{}",
-                                util.name(),
-                                util.stats().join("\n")
-                            ));
-                        }
-                    }
-                }
+                ui.end_table();
             }
-
-            // end table
-            ui.end_table();
         }
     }
 }

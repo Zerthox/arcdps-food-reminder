@@ -63,8 +63,6 @@ struct Entry {
 
     #[serde(default)]
     stats: Vec<String>,
-
-    category: Option<String>,
 }
 
 fn parse_data<P>(path: P) -> io::Result<HashMap<String, Entry>>
@@ -75,43 +73,63 @@ where
 }
 
 fn generate_enum(doc: &str, name: &str, entries: &HashMap<String, Entry>) -> String {
+    // TODO: simplify match with helper function
     format!(
-"/// {}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, AsRefStr, EnumProperty)]
+        "/// {}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, AsRefStr)]
 #[repr(u32)]
 pub enum {} {{
     {}
 }}
+
+impl {} {{
+    /// Returns the display name of the buff.
+    pub fn name(&self) -> &'static str {{
+        match self {{
+            {}
+        }}
+    }}
+
+    /// Returns the stats applied by the buff.
+    ///
+    /// The returned slice will be empty if no stats are applied or the stats are not known.
+    pub fn stats(&self) -> &[&'static str] {{
+        match self {{
+            {}
+        }}
+    }}
+}}
 ",
-        doc, name,
-        entries.iter()
-            .map(|(name, entry)| generate_entry(name, entry))
+        doc,
+        name,
+        entries
+            .iter()
+            .map(|(name, entry)| format!("{} = {}", name, entry.id))
             .collect::<Vec<_>>()
-            .join(",\n\n    "),
+            .join(",\n    "),
+        name,
+        entries
+            .iter()
+            .map(|(name, entry)| format!(
+                "Self::{} => \"{}\",",
+                name,
+                entry.name.as_deref().unwrap_or(name)
+            ))
+            .collect::<Vec<_>>()
+            .join("\n            "),
+        entries
+            .iter()
+            .map(|(name, entry)| format!(
+                "Self::{} => &[{}],",
+                name,
+                entry
+                    .stats
+                    .iter()
+                    .map(|stat| format!("\"{}\"", stat))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ))
+            .collect::<Vec<_>>()
+            .join("\n            "),
     )
-}
-
-fn generate_entry(name: &str, entry: &Entry) -> String {
-    let mut attributes = Vec::new();
-
-    if let Some(display_name) = &entry.name {
-        attributes.push(format!("name = \"{}\"", display_name));
-    }
-    if !entry.stats.is_empty() {
-        attributes.push(format!("stats = \"{}\"", entry.stats.join(", ")));
-    }
-    if let Some(category) = &entry.category {
-        attributes.push(format!("category = \"{}\"", category))
-    }
-
-    if attributes.is_empty() {
-        format!("{} = {}", name, entry.id)
-    } else {
-        format!(
-            "#[strum(props({}))]\n    {} = {}",
-            attributes.join(", "),
-            name,
-            entry.id
-        )
-    }
 }

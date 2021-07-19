@@ -7,38 +7,32 @@ CilantroSousVideSteak:
   id: 57244
   name: Cilantro Lime Sous-Vide Steak
   stats: [66% Life Steal Chance, 100 Power, 70 Ferocity]
-  category: PWR
 SweetSpicyButternut:
   id: 17825
   name: Bowl of Sweet and Spicy Butternut Squash Soup
   stats: [100 Power, 70 Ferocity]
-  category: PWR
 CurryButternut:
   id: 9829
   name: Bowl of Curry Butternut Squash Soup
+  category: Precision
   stats: [100 Precision, 70 Power]
-  category: PREC
 TruffleSteak:
   id: 9769
   name: Plate of Truffle Steak
   stats: [100 Power, 70 Precision]
-  category: PWR
 
 # CONDI
 RedLentil:
   id: 46273
   name: Red Lentil Saobosa
   stats: [100 Expertise, 70 Condition Damage]
-  category: EXP
 VeggiePizza:
   id: 10009
   name: Rare Veggie Pizza # Koi Cake uses the same id
   stats: [100 Expertise, 70 Condition Damage]
-  category: EXP
 
 # HEAL
 RiceBall:
   id: 26529
   name: Delicious Rice Ball
   stats: [100 Healing Power, 10% Outgoing Healing]
-  category: HEAL

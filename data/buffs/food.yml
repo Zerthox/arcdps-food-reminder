@@ -6,32 +6,88 @@ Malnourished:
 CilantroSousVideSteak:
   id: 57244
   name: Cilantro Lime Sous-Vide Steak
-  stats: [66% Life Steal Chance, 100 Power, 70 Ferocity]
+  stats: [66% Life Steal Chance, +100 Power, +70 Ferocity]
+PeppercornSousVideSteak:
+  id: 57051
+  name: Peppercorn-Crusted Sous-Vide Steak
+  stats: [-10% Incoming Damage, +100 Power, +70 Ferocity]
 SweetSpicyButternut:
   id: 17825
   name: Bowl of Sweet and Spicy Butternut Squash Soup
-  stats: [100 Power, 70 Ferocity]
+  stats: [+100 Power, +70 Ferocity]
 CurryButternut:
   id: 9829
   name: Bowl of Curry Butternut Squash Soup
-  stats: [100 Precision, 70 Power]
+  stats: [+100 Precision, +70 Power]
 TruffleSteak:
   id: 9769
   name: Plate of Truffle Steak
-  stats: [100 Power, 70 Precision]
+  stats: [+100 Power, +70 Precision]
 
 # CONDI
+CilantroMeatFlatbread:
+  id: 57409
+  name: Cilantro and Cured Meat Flatbread
+  stats: [66% Life Steal Chance, +100 Condition Damage, + 70 Expertise]
+PepperedMeatFlatbread:
+  id: 57127
+  name: Peppered Cured Meat Flatbread
+  stats: [-10% Incoming Damage, +100 Condition Damage, + 70 Expertise]
+SalsaVeggieFlatbread:
+  id: 57269
+  name: Salsa-Topped Veggie Flatbread
+  stats: [66% Life Steal Chance, +100 Expertise, +70 Condition Damage]
+PeppercornVeggieFlatbread:
+  id: 57382
+  name: Peppercorn and Veggie Flatbread
+  stats: [-10% Incoming Damage, +100 Expertise, +70 Condition Damage]
+BeefRendang:
+  id: 49686
+  name: Plate of Beef Rendang
+  stats: [+100 Condition Damage, +70 Expertise]
 RedLentil:
   id: 46273
   name: Red Lentil Saobosa
-  stats: [100 Expertise, 70 Condition Damage]
+  stats: [+100 Expertise, +70 Condition Damage]
 VeggiePizza:
-  id: 10009
-  name: Rare Veggie Pizza # Koi Cake uses the same id
-  stats: [100 Expertise, 70 Condition Damage]
+  id: 10009 # koi cake uses the same id
+  name: Rare Veggie Pizza
+  stats: [+100 Expertise, +70 Condition Damage]
+FireMeatChili:
+  id: 10119
+  name: Bowl of Fire Meat Chili
+  stats: [+15% Burning Duration, +70 Precision]
+
+# CONC
+SalsaEggsBenedict:
+  id: 57117
+  name: Salsa Eggs Benedict
+  stats: [66% Life Steal Chance, +100 Concentration, +70 Expertise]
+SesameEggsBenedict:
+  id: 57084
+  name: Sesame Eggs Benedict
+  stats: [Health every second, +100 Concentration, +70 Expertise]
+SoulPastry:
+  id: 53222
+  name: Soul Pastry
+  stats: [+100 Concentration, +70 Power]
+EggsBenedict:
+  id: 57187
+  name: Plage of Eggs Benedict
+  stats: [+100 Concentration, +70 Expertise]
 
 # HEAL
+MintFruitSalad:
+  id: 57100
+  name: Bowl of Fruit Salad with Mint Garnish
+  stats: [+10% Outgoing Healing, +100 Healing Power, +70 Concentration]
 RiceBall:
   id: 26529
   name: Delicious Rice Ball
-  stats: [100 Healing Power, 10% Outgoing Healing]
+  stats: [+10% Outgoing Healing, 100 Healing Power]
+
+# OTHER
+Starcake:
+  id: 19451
+  name: Dragon's Revelry Starcake
+  stats: [+45 All Attributes]

@@ -3,23 +3,63 @@ Diminished:
   id: 46668
 
 # POWER
-SharpeningStone:
+SuperiorStone:
   id: 9963 # potent version uses same id
   name: Superior Sharpening Stone
   stats: [3% Power from Precision, 6% Power from Ferocity]
+Fruitcake:
+  id: 34211
+  name: Tin of Fruitcake
+  stats: [3% Power from Precision, 6% Power from Ferocity]
+FuriousStone:
+  id: 25882
+  name: Furious Sharpening Stone
+  stats: [3% Power from Precision, 3% Ferocity from Precision]
 
 # CONDI
 ToxicCrystal:
   id: 21828
   name: Toxic Focusing Crystal
   stats: [3% Condition Damage from Power, 3% Condition Damage from Precision]
+MasterCrystal:
+  id: 9967
+  name: Master Tuning Crystal
+  stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
 TuningIcicle:
   id: 34206
   name: Tuning Icicle
   stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
+
+# CONC
+PotentOil:
+  id: 53374
+  name: Potent Lucent Oil
+  stats: [3% Concentration from Power, 3% Concentration from Precision]
+EnhancedOil:
+  id: 53304
+  name: Enhanced Lucent Oil
+  stats: [6% Concentration from Condition Damage, 3% Concentration from Precision]
+ToxicOil:
+  id: 21827
+  name: Toxic Maintenance Oil
+  stats: [3% Concentration from Power, 6% Concentration from Condition Damage]
+PeppermintOil:
+  id: 34187
+  name: Peppermint Oil
+  stats: [3% Concentration from Precision, 6% Concentration from Healing Power]
 
 # HEAL
 BountifulOil:
   id: 25879
   name: Bountiful Maintenance Oil
   stats: [0.6% Outgoing Healing for 100 Healing Power, 0.8% Outgoing Healing for 100 Concentration]
+
+# OTHER
+SharpeningSkull:
+  id: 25630
+  name: Sharpening Skull
+  stats: [+75 All Attributes after reviving]
+ScarletSlaying:
+  id: 23228
+  name: Powerful Potion of Slaying Scarlet's Armies
+  stats: [+10% Damage against Scarlet's Armies, -10% Damage from Scarlet's Armies]

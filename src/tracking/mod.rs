@@ -6,9 +6,9 @@ use crate::{
         buff::Categorize,
         player::{Food, Utility},
     },
-    ui::{align, color, Component},
+    ui::{color, Component},
 };
-use arcdps::imgui::{im_str, ImString, TableColumnFlags, TableFlags, Ui};
+use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::Buff;
 use player::Player;
 use std::collections::HashMap;
@@ -70,7 +70,7 @@ impl Component for Tracker {
 
     fn render(&mut self, ui: &Ui) {
         if self.players.is_empty() {
-            ui.text("No tracked players...");
+            ui.text("No players in range");
         } else {
             // create table
             if ui.begin_table_with_flags(

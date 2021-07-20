@@ -1,7 +1,7 @@
 use crate::{
     arc_util::{
         api::{BuffRemove, StateChange},
-        exports::{self, Modifiers, UISettings},
+        exports,
         game::{Food, Utility},
     },
     tracking::{player::Player, Tracker},
@@ -22,8 +22,7 @@ use crate::{arc_util::api, log::DebugLog};
 /// Main plugin instance.
 #[derive(Debug)]
 pub struct Plugin {
-    ui_settings: UISettings,
-    modifiers: Modifiers,
+    /// Food tracker window.
     tracker: Window<Tracker>,
 
     #[cfg(feature = "log")]
@@ -34,10 +33,6 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            // arc exports are initialized as default and set later
-            ui_settings: UISettings::default(),
-            modifiers: Modifiers::default(),
-
             // tracker window
             tracker: Window::create((
                 WindowProps::new("Food Tracker")
@@ -58,20 +53,10 @@ impl Plugin {
     pub fn load(&mut self) {
         #[cfg(feature = "log")]
         self.debug.log("Plugin load");
-
-        self.ui_settings = exports::get_ui_settings();
-
-        #[cfg(feature = "log")]
-        self.debug.log(format!("Imported {:?}", self.ui_settings));
-
-        self.modifiers = exports::get_modifiers();
-
-        #[cfg(feature = "log")]
-        self.debug.log(format!("Imported {:?}", self.modifiers));
     }
 
     /// Unloads the plugin.
-    pub fn unload(&self) {}
+    pub fn unload(&mut self) {}
 
     /// Handles a combat event.
     pub fn combat_event(
@@ -240,6 +225,11 @@ impl Plugin {
         true
     }
 
+    /// Checks whether both modifiers are currently pressed.
+    fn modifiers_pressed(&self) -> bool {
+        self.presses.modifier1 && self.presses.modifier2
+    }
+
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // log renders always
@@ -247,8 +237,8 @@ impl Plugin {
         self.debug.render(ui);
 
         // other ui renders conditionally
-        // TODO: respect arc settings
-        if not_loading {
+        let ui_settings = exports::get_ui_settings();
+        if !ui_settings.hidden && (not_loading || ui_settings.draw_always) {
             self.tracker.render(ui);
         }
     }

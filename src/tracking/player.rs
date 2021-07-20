@@ -2,43 +2,63 @@ pub use super::buff::{Buff, Food, Utility};
 pub use crate::arc_util::game::{Profession, Specialization};
 use std::cmp;
 
+// TODO: track buff duration & reset to unset when duration runs out
+// TODO: timestamps for buff apply to avoid out of order
+
 /// Struct representing a player.
 #[derive(Debug, Clone)]
 pub struct Player {
+    /// Player id given by the game.
     pub id: usize,
-    pub character_name: String,
-    pub account_name: String,
+
+    /// Player character name.
+    pub character: String,
+
+    /// Player account name.
+    pub account: String,
+
+    /// Profession (class) of the player character.
     pub profession: Profession,
+
+    /// Current elite specialization the player has equipped.
     pub elite: Specialization,
+
+    /// Current squad subgroup the player is in.
     pub subgroup: usize,
+
+    /// Whether the player is currently in combat.
     pub combat: bool,
+
+    /// Current food buff applied to the player.
     pub food: Buff<Food>,
+
+    /// Current utility buff applied to the player.
     pub util: Buff<Utility>,
 }
 
 impl Player {
     /// Creates a new player.
-    pub fn new<N, A>(
+    pub fn new<C, A>(
         id: usize,
-        name: N,
-        account_name: A,
+        character: C,
+        account: A,
         profession: Profession,
         elite: Specialization,
         subgroup: usize,
     ) -> Self
     where
-        N: Into<String>,
+        C: Into<String>,
         A: Into<String>,
     {
         Self {
             id,
-            character_name: name.into(),
-            account_name: account_name.into(),
+            character: character.into(),
+            account: account.into(),
             profession,
             elite,
             subgroup,
             combat: false,
-            food: Buff::Unset, // TODO: track duration & reset to unset when duration runs out
+            food: Buff::Unset,
             util: Buff::Unset,
         }
     }
@@ -52,11 +72,12 @@ impl Player {
 
         // change unset buffs to none
         // if there is initial buffs, they will be set after
+        // FIXME: assumption not always correct, combat without target does not seem to report initial buffs!
         if self.food == Buff::Unset {
             self.food = Buff::None;
         }
         if self.util == Buff::Unset {
-            self.food = Buff::None;
+            self.util = Buff::None;
         }
     }
 
@@ -75,7 +96,7 @@ impl Player {
         self.food = Buff::Unknown;
     }
 
-    /// Removes the current food buff to the player.
+    /// Removes the food buff from the player.
     pub fn remove_food(&mut self) {
         self.food = Buff::None;
     }
@@ -90,7 +111,7 @@ impl Player {
         self.util = Buff::Unknown;
     }
 
-    /// Removes the current utility buff to the player.
+    /// Removes the utility buff from the player.
     pub fn remove_util(&mut self) {
         self.util = Buff::None;
     }

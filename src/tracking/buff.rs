@@ -17,7 +17,9 @@ pub enum Buff<T> {
     Known(T),
 }
 
+/// Helper trait to categorize buffs.
 pub trait Categorize {
+    /// Returns the buff category as a string.
     fn categorize(&self) -> &'static str;
 }
 

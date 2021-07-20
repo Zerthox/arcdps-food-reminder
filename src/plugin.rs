@@ -4,7 +4,10 @@ use crate::{
         exports,
         game::{Food, Utility},
     },
-    tracking::{player::Player, Tracker},
+    tracking::{
+        player::{Buff, Player},
+        Tracker,
+    },
     ui::{
         window::{Window, WindowProps},
         Component,
@@ -117,7 +120,6 @@ impl Plugin {
                                         let buff_id = event.skill_id;
 
                                         // check for food & util
-
                                         if let Ok(food) = Food::try_from(buff_id) {
                                             player.apply_food(food);
 
@@ -161,17 +163,49 @@ impl Plugin {
                             if let Some(player) = self.tracker.get_player_mut(src.id) {
                                 let buff_id = event.skill_id;
 
-                                // check for food &
-                                if Food::try_from(buff_id).is_ok() {
-                                    player.remove_food();
+                                // check for food & util
+                                if let Ok(food) = Food::try_from(buff_id) {
+                                    // check for same as applied
+                                    if player.food == Buff::Known(food) {
+                                        #[cfg(feature = "log")]
+                                        self.debug.log(format!(
+                                            "Food {:?} removed from {:?}",
+                                            food, player
+                                        ));
+                                    }
+                                } else if let Ok(util) = Utility::try_from(buff_id) {
+                                    // check for same as applied
+                                    if player.util == Buff::Known(util) {
+                                        player.remove_util();
 
-                                    #[cfg(feature = "log")]
-                                    self.debug.log(format!("Food removed from {:?}", player));
-                                } else if Utility::try_from(buff_id).is_ok() {
-                                    player.remove_util();
+                                        #[cfg(feature = "log")]
+                                        self.debug.log(format!(
+                                            "Utility {:?} removed from {:?}",
+                                            util, player
+                                        ));
+                                    }
+                                } else if let Some("Nourishment") = skill_name {
+                                    // check for same as applied
+                                    if player.food == Buff::Unknown {
+                                        player.remove_food();
 
-                                    #[cfg(feature = "log")]
-                                    self.debug.log(format!("Utility removed from {:?}", player));
+                                        #[cfg(feature = "log")]
+                                        self.debug.log(format!(
+                                            "Unknown Food with id {} removed from {:?}",
+                                            buff_id, player
+                                        ));
+                                    }
+                                } else if let Some("Enhancement") = skill_name {
+                                    // check for same as applied
+                                    if player.util == Buff::Unknown {
+                                        player.remove_util();
+
+                                        #[cfg(feature = "log")]
+                                        self.debug.log(format!(
+                                            "Unknown Utility with id {} removed from {:?}",
+                                            buff_id, player
+                                        ));
+                                    }
                                 }
                             }
                         }

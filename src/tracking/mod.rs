@@ -2,10 +2,7 @@ pub mod buff;
 pub mod player;
 
 use crate::{
-    tracking::{
-        buff::Categorize,
-        player::{Food, Utility},
-    },
+    tracking::buff::{Categorize, Food, Utility},
     ui::{color, Component},
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
@@ -100,9 +97,9 @@ impl Component for Tracker {
 
                     // render name cell
                     ui.table_next_column();
-                    ui.text(&player.character_name);
+                    ui.text(&player.character);
                     if ui.is_item_hovered() {
-                        ui.tooltip_text(&player.account_name);
+                        ui.tooltip_text(&player.account);
                     }
 
                     // render food cell

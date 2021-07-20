@@ -56,6 +56,7 @@ fn main() -> io::Result<()> {
 }
 
 #[derive(Debug, Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Entry {
     id: u32,
 

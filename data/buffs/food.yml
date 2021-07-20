@@ -14,7 +14,6 @@ SweetSpicyButternut:
 CurryButternut:
   id: 9829
   name: Bowl of Curry Butternut Squash Soup
-  category: Precision
   stats: [100 Precision, 70 Power]
 TruffleSteak:
   id: 9769

@@ -25,6 +25,10 @@ pub struct Plugin {
     /// Food tracker window.
     tracker: Window<Tracker>,
 
+    /// Pressed keys.
+    presses: KeyPresses,
+
+    /// Debug log window.
     #[cfg(feature = "log")]
     debug: Window<DebugLog>,
 }
@@ -40,6 +44,8 @@ impl Plugin {
                     .auto_resize(true),
                 (),
             )),
+
+            presses: KeyPresses::default(),
 
             #[cfg(feature = "log")]
             debug: Window::create((
@@ -220,8 +226,23 @@ impl Plugin {
     }
 
     /// Handles a key event.
-    pub fn key_event(&mut self, _key: usize, _down: bool, _prev_down: bool) -> bool {
-        // TODO: open/close tracker window
+    pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
+        const KEY_F: usize = 0x46;
+
+        // check for change
+        if down != prev_down {
+            let modifiers = exports::get_modifiers();
+
+            // check for keys
+            if key == modifiers.modifier1 as usize {
+                self.presses.modifier1 = down;
+            } else if key == modifiers.modifier2 as usize {
+                self.presses.modifier2 = down;
+            } else if down && self.modifiers_pressed() && key == KEY_F {
+                self.tracker.toggle_visibility();
+                return false;
+            }
+        }
         true
     }
 
@@ -253,4 +274,10 @@ impl Plugin {
         }
         false
     }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+struct KeyPresses {
+    modifier1: bool,
+    modifier2: bool,
 }

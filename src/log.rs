@@ -9,6 +9,8 @@ const FORMAT: &str = "%b %d %H:%M:%S.%3f";
 #[derive(Debug, Clone)]
 pub struct DebugLog {
     contents: ImString,
+    size: usize,
+    clear_button_width: f32,
     copy_button_width: f32,
 }
 
@@ -16,7 +18,9 @@ impl DebugLog {
     pub fn new() -> Self {
         Self {
             contents: ImString::default(),
-            copy_button_width: 120.0,
+            size: 1, // imgui string has an implicit null at the end
+            clear_button_width: 60.0,
+            copy_button_width: 60.0,
         }
     }
 
@@ -25,9 +29,25 @@ impl DebugLog {
     where
         S: AsRef<str>,
     {
+        // generate line
         let now = Local::now();
-        self.contents
-            .push_str(&format!("{}: {}\n", now.format(FORMAT), output.as_ref()));
+        let line = format!("{}: {}\n", now.format(FORMAT), output.as_ref());
+
+        // clear on overflow
+        if let Some(new) = self.size.checked_add(line.len()) {
+            self.size = new;
+        } else {
+            self.clear();
+        }
+
+        // append line
+        self.contents.push_str(&line);
+    }
+
+    /// Clears the debug log.
+    pub fn clear(&mut self) {
+        self.size = 1;
+        self.contents.clear();
     }
 }
 
@@ -44,14 +64,22 @@ impl Component for DebugLog {
         // time
         ui.text(format!("Time: {}", Local::now().format(FORMAT)));
 
-        // copy button
+        // get window size
         let [window_size_x, _] = ui.window_content_region_max();
+
+        // clear button
+        ui.same_line(window_size_x - self.clear_button_width - self.copy_button_width - 5.0);
+        if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+            self.clear();
+        }
+        let [button_size_x, _] = ui.item_rect_size();
+        self.clear_button_width = button_size_x;
+
+        // copy button
         ui.same_line(window_size_x - self.copy_button_width);
-        if ui.button(im_str!("Copy to clipboard"), [0.0, 0.0]) {
+        if ui.button(im_str!("Copy"), [0.0, 0.0]) {
             ui.set_clipboard_text(&self.contents);
         }
-
-        // update button width
         let [button_size_x, _] = ui.item_rect_size();
         self.copy_button_width = button_size_x;
 

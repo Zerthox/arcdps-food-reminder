@@ -4,7 +4,7 @@ Diminished:
 
 # POWER
 SharpeningStone:
-  id: 9963
+  id: 9963 # potent version uses same id
   name: Superior Sharpening Stone
   stats: [3% Power from Precision, 6% Power from Ferocity]
 

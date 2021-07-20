@@ -88,7 +88,6 @@ impl Plugin {
                         let delta = api::calc_delta(event);
 
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
-                            // FIXME: is this the right subgroup?
                             player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]
@@ -107,6 +106,17 @@ impl Plugin {
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Combat exit for {:?}", player));
                         }
+                    }
+                    StateChange::LogStart => {
+                        // log start
+
+                        for player in self.tracker.get_players_mut() {
+                            // initial buffs should be reported right after
+                            player.unset_to_none();
+                        }
+
+                        #[cfg(feature = "log")]
+                        self.debug.log("Log recoding started");
                     }
                     _ => {
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
@@ -167,6 +177,8 @@ impl Plugin {
                                 if let Ok(food) = Food::try_from(buff_id) {
                                     // check for same as applied
                                     if player.food == Buff::Known(food) {
+                                        player.remove_food();
+
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Food {:?} removed from {:?}",
@@ -254,6 +266,12 @@ impl Plugin {
                             self.debug.log(format!("Removed {:?}", player));
                         }
                     }
+                } else {
+                    // target change
+
+                    #[cfg(feature = "log")]
+                    self.debug
+                        .log(format!("Target change {:?} {:?} {:?}", src, dest, event));
                 }
             }
         }

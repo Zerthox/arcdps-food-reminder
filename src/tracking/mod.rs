@@ -45,16 +45,21 @@ impl Tracker {
         self.players.get_mut(&id)
     }
 
-    /// Returns all tracked players sorted by subgroup.
-    pub fn get_players_by_sub(&self) -> Vec<&Player> {
-        let mut players = self.players.values().collect::<Vec<_>>();
-        players.sort_by_key(|player| player.subgroup);
-        players
-    }
-
     /// Returns an unsorted iterator over all tracked players.
     pub fn get_players(&self) -> impl Iterator<Item = &Player> {
         self.players.values()
+    }
+
+    /// Returns an unsorted mutable iterator over all tracked players.
+    pub fn get_players_mut(&mut self) -> impl Iterator<Item = &mut Player> {
+        self.players.values_mut()
+    }
+
+    /// Returns all tracked players sorted by subgroup.
+    pub fn get_players_by_sub(&self) -> Vec<&Player> {
+        let mut players = self.get_players().collect::<Vec<_>>();
+        players.sort_by_key(|player| player.subgroup);
+        players
     }
 }
 

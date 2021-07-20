@@ -63,16 +63,8 @@ impl Player {
         }
     }
 
-    /// Enters the player into combat.
-    pub fn enter_combat(&mut self, new_subgroup: Option<usize>) {
-        self.combat = true;
-        if let Some(sub) = new_subgroup {
-            self.subgroup = sub;
-        }
-
-        // change unset buffs to none
-        // if there is initial buffs, they will be set after
-        // FIXME: assumption not always correct, combat without target does not seem to report initial buffs!
+    /// Sets all unset buffs to none.
+    pub fn unset_to_none(&mut self) {
         if self.food == Buff::Unset {
             self.food = Buff::None;
         }
@@ -81,9 +73,20 @@ impl Player {
         }
     }
 
+    /// Enters the player into combat.
+    pub fn enter_combat(&mut self, new_subgroup: Option<usize>) {
+        self.combat = true;
+        if let Some(sub) = new_subgroup {
+            self.subgroup = sub;
+        }
+    }
+
     /// Exits the player from combat.
     pub fn exit_combat(&mut self) {
         self.combat = false;
+
+        // buffs should be already set or will be set right after
+        self.unset_to_none();
     }
 
     /// Applies a food buff to the player.

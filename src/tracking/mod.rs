@@ -2,8 +2,9 @@ pub mod buff;
 pub mod player;
 
 use crate::{
+    arc_util::{api::CoreColor, exports},
     tracking::buff::{Categorize, Food, Utility},
-    ui::{color, Component},
+    ui::Component,
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::Buff;
@@ -91,6 +92,18 @@ impl Component for Tracker {
 
                 // TODO: sorting, imgui-rs currently has no wrapping, need to use imgui::sys directly
 
+                // grab arc colors
+                let colors = exports::get_colors();
+                let red = colors
+                    .get_core(CoreColor::LightRed)
+                    .unwrap_or([1.0, 0.0, 0.0, 1.0]);
+                let green = colors
+                    .get_core(CoreColor::LightGreen)
+                    .unwrap_or([0.0, 1.0, 0.0, 1.0]);
+                let yellow = colors
+                    .get_core(CoreColor::LightYellow)
+                    .unwrap_or([1.0, 1.0, 0.0, 1.0]);
+
                 // iterate over tracked players
                 for player in self.get_players_by_sub() {
                     // new row for each player
@@ -98,11 +111,18 @@ impl Component for Tracker {
 
                     // render subgroup cell
                     ui.table_next_column();
-                    ui.text(format!("{:>2}", player.subgroup));
+                    let sub = format!("{:>2}", player.subgroup);
+                    match colors.get_sub_highlight(player.subgroup) {
+                        Some(color) => ui.text_colored(color, sub),
+                        None => ui.text(sub),
+                    }
 
                     // render name cell
                     ui.table_next_column();
-                    ui.text(&player.character);
+                    match colors.get_prof_highlight(player.profession) {
+                        Some(color) => ui.text_colored(color, &player.character),
+                        None => ui.text(&player.character),
+                    }
                     if ui.is_item_hovered() {
                         ui.tooltip_text(&player.account);
                     }
@@ -117,19 +137,19 @@ impl Component for Tracker {
                             }
                         }
                         Buff::None | Buff::Known(Food::Malnourished) => {
-                            ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                            ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Food");
                             }
                         }
                         Buff::Unknown => {
-                            ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                            ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Food");
                             }
                         }
                         Buff::Known(food) => {
-                            ui.text_colored(color::GREEN.to_rgba_f32s(), food.categorize());
+                            ui.text_colored(green, food.categorize());
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",
@@ -150,19 +170,19 @@ impl Component for Tracker {
                             }
                         }
                         Buff::None | Buff::Known(Utility::Diminished) => {
-                            ui.text_colored(color::RED.to_rgba_f32s(), "NONE");
+                            ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Utility");
                             }
                         }
                         Buff::Unknown => {
-                            ui.text_colored(color::YELLOW.to_rgba_f32s(), "SOME");
+                            ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Utility");
                             }
                         }
                         Buff::Known(util) => {
-                            ui.text_colored(color::GREEN.to_rgba_f32s(), util.categorize());
+                            ui.text_colored(green, util.categorize());
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",

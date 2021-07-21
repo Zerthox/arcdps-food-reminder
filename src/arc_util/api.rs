@@ -1,4 +1,4 @@
-//! ArcDPS combat API utilities.
+//! ArcDPS API utilities.
 
 // we wont use all enum kinds here but keeping them makes sense
 #![allow(unused)]
@@ -502,4 +502,21 @@ pub enum BuffCategory {
     Trait = 11,
     Enhancement = 13,
     Stance = 16,
+}
+
+/// Core UI color.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(C)]
+pub enum CoreColor {
+    Transparent,
+    White,
+    LightWhite,
+    LightGrey,
+    LightYellow,
+    LightGreen,
+    LightRed,
+    LightTeal,
+    MediumGrey,
+    DarkGrey,
+    Num,
 }

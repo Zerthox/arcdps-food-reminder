@@ -6,7 +6,7 @@ authors = ["Zerthox <zerthox@gmail.com>"]
 repository = "https://github.com/zerthox/gw2-arcdps-food-reminder"
 
 [dependencies]
-arcdps = { git = "https://github.com/greaka/arcdps_bindings", rev = "7272bf6" }
+arcdps = { git = "https://github.com/greaka/arcdps_bindings", branch = "master" }
 chrono = { version = "0.4", optional = true }
 lazy_static = "1.4"
 num_enum = "0.5"

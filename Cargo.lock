@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "arcdps"
 version = "0.5.1"
-source = "git+https://github.com/greaka/arcdps_bindings?rev=7272bf6#7272bf63dd93d5ae5e2a123eb61aa1e7d2f5a3ac"
+source = "git+https://github.com/greaka/arcdps_bindings?branch=master#8263a311622644a9de25ac862be475b89025d13a"
 dependencies = [
  "arcdps_codegen",
  "imgui",
@@ -16,7 +16,7 @@ dependencies = [
 [[package]]
 name = "arcdps_codegen"
 version = "0.1.0"
-source = "git+https://github.com/greaka/arcdps_bindings?rev=7272bf6#7272bf63dd93d5ae5e2a123eb61aa1e7d2f5a3ac"
+source = "git+https://github.com/greaka/arcdps_bindings?branch=master#8263a311622644a9de25ac862be475b89025d13a"
 dependencies = [
  "proc-macro2",
  "quote",

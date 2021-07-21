@@ -1,5 +1,4 @@
 pub mod align;
-pub mod color;
 pub mod window;
 
 use arcdps::imgui::Ui;

@@ -19,14 +19,14 @@ pub fn calc_delta(event: &CombatEvent) -> Duration {
 ///
 /// This should only be used once the event is clearly a buff event.
 pub fn read_buff_duration(event: &CombatEvent) -> u32 {
-    unsafe { mem::transmute::<i32, u32>(event.value) }
+    unsafe { mem::transmute(event.value) }
 }
 
 /// Reads a buff **instance** id from an event.
 ///
 /// This should only be used once the event is clearly a buff event.
 pub fn read_buff_instance_id(event: &CombatEvent) -> u32 {
-    unsafe { mem::transmute::<[u8; 4], u32>([event.pad61, event.pad62, event.pad63, event.pad64]) }
+    unsafe { mem::transmute([event.pad61, event.pad62, event.pad63, event.pad64]) }
 }
 
 /// Whether the entity is an ally or enemy.

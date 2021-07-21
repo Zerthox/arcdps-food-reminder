@@ -67,21 +67,21 @@ impl Component for DebugLog {
         // get window size
         let [window_size_x, _] = ui.window_content_region_max();
 
-        // clear button
-        ui.same_line(window_size_x - self.clear_button_width - self.copy_button_width - 5.0);
-        if ui.button(im_str!("Clear"), [0.0, 0.0]) {
-            self.clear();
-        }
-        let [button_size_x, _] = ui.item_rect_size();
-        self.clear_button_width = button_size_x;
-
         // copy button
-        ui.same_line(window_size_x - self.copy_button_width);
+        ui.same_line(window_size_x - self.copy_button_width - self.clear_button_width - 5.0);
         if ui.button(im_str!("Copy"), [0.0, 0.0]) {
             ui.set_clipboard_text(&self.contents);
         }
         let [button_size_x, _] = ui.item_rect_size();
         self.copy_button_width = button_size_x;
+
+        // clear button
+        ui.same_line(window_size_x - self.clear_button_width);
+        if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+            self.clear();
+        }
+        let [button_size_x, _] = ui.item_rect_size();
+        self.clear_button_width = button_size_x;
 
         ui.separator();
 

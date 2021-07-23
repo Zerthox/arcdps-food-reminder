@@ -96,12 +96,15 @@ impl Component for Tracker {
                 let colors = exports::get_colors();
                 let red = colors
                     .get_core(CoreColor::LightRed)
+                    .map(|vec| vec.into())
                     .unwrap_or([1.0, 0.0, 0.0, 1.0]);
                 let green = colors
                     .get_core(CoreColor::LightGreen)
+                    .map(|vec| vec.into())
                     .unwrap_or([0.0, 1.0, 0.0, 1.0]);
                 let yellow = colors
                     .get_core(CoreColor::LightYellow)
+                    .map(|vec| vec.into())
                     .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
                 // iterate over tracked players
@@ -112,15 +115,15 @@ impl Component for Tracker {
                     // render subgroup cell
                     ui.table_next_column();
                     let sub = format!("{:>2}", player.subgroup);
-                    match colors.get_sub_highlight(player.subgroup) {
-                        Some(color) => ui.text_colored(color, sub),
+                    match colors.get_sub_base(player.subgroup) {
+                        Some(color) => ui.text_colored(color.into(), sub),
                         None => ui.text(sub),
                     }
 
                     // render name cell
                     ui.table_next_column();
-                    match colors.get_prof_highlight(player.profession) {
-                        Some(color) => ui.text_colored(color, &player.character),
+                    match colors.get_prof_base(player.profession) {
+                        Some(color) => ui.text_colored(color.into(), &player.character),
                         None => ui.text(&player.character),
                     }
                     if ui.is_item_hovered() {

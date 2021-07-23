@@ -1,25 +1,20 @@
 //! ArcDPS exports.
 
 use super::{api::CoreColor, game::Profession};
-use arcdps::{e5 as e5_colors, e6 as e6_ui_settings, e7 as e7_modifiers};
-use std::{
-    mem::{self, MaybeUninit},
-    slice,
-};
-
-/// A color stored in an [`ImVec4`].
-pub type ColorVec = [f32; 4];
+use arcdps::{e5 as e5_colors, e6 as e6_ui_settings, e7 as e7_modifiers, imgui::sys::ImVec4};
+use std::{mem::MaybeUninit, slice};
 
 /// The array of color arrays returned by ArcDPS.
-type RawColorArray = [*mut [f32; 4]; 5];
+type RawColorArray = [*mut ImVec4; 5];
 
 /// Current color settings.
 ///
-/// This holds color information in memory until dropped.
-/// Use the associated methods to access individual colors.
+/// Use the associated functions to access individual colors.
+///
+/// This holds pointers to color information in memory until dropped.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Colors {
-    pub raw: RawColorArray,
+    raw: RawColorArray,
 }
 
 impl Colors {
@@ -32,7 +27,7 @@ impl Colors {
     ///
     /// This is unsafe since indexing the raw color array is only valid with specific indices.
     /// Incorrect indices may cause undefined behavior.
-    unsafe fn read_color(&self, first_index: usize, second_index: usize) -> Option<ColorVec> {
+    unsafe fn read_color(&self, first_index: usize, second_index: usize) -> Option<ImVec4> {
         let ptr = self.raw[first_index];
         if !ptr.is_null() {
             // we do no need the full length slice
@@ -46,21 +41,21 @@ impl Colors {
     /// Returns the base color for a specific [`CoreColor`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_core(&self, color: CoreColor) -> Option<ColorVec> {
+    pub fn get_core(&self, color: CoreColor) -> Option<ImVec4> {
         unsafe { self.read_color(0, color as usize) }
     }
 
     /// Returns the base color for a specific [`Profession`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_prof_base(&self, prof: Profession) -> Option<ColorVec> {
+    pub fn get_prof_base(&self, prof: Profession) -> Option<ImVec4> {
         unsafe { self.read_color(1, prof as usize) }
     }
 
     /// Returns the highlight color for a specific [`Profession`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_prof_highlight(&self, prof: Profession) -> Option<ColorVec> {
+    pub fn get_prof_highlight(&self, prof: Profession) -> Option<ImVec4> {
         unsafe { self.read_color(2, prof as usize) }
     }
 
@@ -68,7 +63,7 @@ impl Colors {
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
     /// Also returns [`None`] if the subgroup is out of the game subgroup range.
-    pub fn get_sub_base(&self, sub: usize) -> Option<ColorVec> {
+    pub fn get_sub_base(&self, sub: usize) -> Option<ImVec4> {
         // range check
         if sub != 0 && sub <= 15 {
             unsafe { self.read_color(3, sub) }
@@ -81,7 +76,7 @@ impl Colors {
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
     /// Also returns [`None`] if the subgroup is out of the game subgroup range.
-    pub fn get_sub_highlight(&self, sub: usize) -> Option<ColorVec> {
+    pub fn get_sub_highlight(&self, sub: usize) -> Option<ImVec4> {
         // range check
         if sub != 0 && sub <= 15 {
             unsafe { self.read_color(4, sub) }
@@ -93,15 +88,9 @@ impl Colors {
 
 /// Retrieves the color settings from ArcDPS.
 pub fn get_colors() -> Colors {
-    // greaka's bindings currently use a wrongly sized type, we have to transmute the function again
-    // TODO: remove once bindings are fixed
-    type FuncType = unsafe fn(*mut RawColorArray);
-    let transmuted = unsafe { mem::transmute::<_, FuncType>(e5_colors as *const ()) };
-
-    // zeroing this is important!
-    // we cannot trust arc to write the whole array
+    // zeroing this is important for our null pointer checks later
     let mut colors = MaybeUninit::<RawColorArray>::zeroed();
-    unsafe { transmuted(colors.as_mut_ptr()) };
+    unsafe { e5_colors(colors.as_mut_ptr()) };
     Colors {
         raw: unsafe { colors.assume_init() },
     }

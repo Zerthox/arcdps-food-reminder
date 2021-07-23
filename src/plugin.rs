@@ -119,6 +119,8 @@ impl Plugin {
                         self.debug.log("Log recoding started");
                     }
                     _ => {
+                        // TODO: can we reliably set unset to none on strike damage?
+
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
                         if buff_remove == BuffRemove::None {
                             if event.buff != 0 && event.buff_dmg == 0 {

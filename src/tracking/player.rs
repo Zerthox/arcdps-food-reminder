@@ -84,9 +84,6 @@ impl Player {
     /// Exits the player from combat.
     pub fn exit_combat(&mut self) {
         self.combat = false;
-
-        // buffs should be already set or will be set right after
-        self.unset_to_none();
     }
 
     /// Applies a food buff to the player.

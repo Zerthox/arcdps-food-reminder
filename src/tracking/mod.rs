@@ -14,6 +14,8 @@ use std::collections::HashMap;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
+    // TODO: keep self id stored
+    // TODO: keep self food cached until readd? should be loading screen
     /// Currently tracked players mapped by their id.
     players: HashMap<usize, Player>,
 }
@@ -33,6 +35,7 @@ impl Tracker {
 
     /// Removes a tracked player, returning the removed player if they were tracked.
     pub fn remove_player(&mut self, id: usize) -> Option<Player> {
+        // TODO: would it be fine to keep player characters cached a bit?
         self.players.remove(&id)
     }
 

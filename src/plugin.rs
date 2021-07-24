@@ -123,7 +123,19 @@ impl Plugin {
                                 .log(format!("Log for {} started with {:?} delta", name, delta));
                         }
                     }
+                    StateChange::LogEnd => {
+                        // log end
+                        #[cfg(feature = "log")]
+                        {
+                            let target_id = event.src_agent;
+                            let name = Boss::try_from(target_id)
+                                .map(Into::into)
+                                .unwrap_or("Unknown");
+                            self.debug.log(format!("Log for {} ended", name))
+                        }
+                    }
                     _ => {
+                        // TODO: should we restrict this to specific state change kinds?
                         // TODO: can we reliably set unset to none on strike damage?
 
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
@@ -131,7 +143,7 @@ impl Plugin {
                             if event.buff != 0 && event.buff_dmg == 0 {
                                 // buff applied
 
-                                // check for tracker player
+                                // check for tracked player
                                 if let Some(dest) = dest {
                                     if let Some(player) = self.tracker.get_player_mut(dest.id) {
                                         let buff_id = event.skill_id;

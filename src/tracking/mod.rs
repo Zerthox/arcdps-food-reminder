@@ -14,10 +14,11 @@ use std::collections::HashMap;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
-    // TODO: keep self id stored
-    // TODO: keep self food cached until readd? should be loading screen
     /// Currently tracked players mapped by their id.
     players: HashMap<usize, Player>,
+
+    /// Current local player (self) id.
+    self_id: usize,
 }
 
 impl Tracker {
@@ -25,6 +26,7 @@ impl Tracker {
     pub fn new() -> Self {
         Self {
             players: HashMap::new(),
+            self_id: 0,
         }
     }
 
@@ -37,6 +39,26 @@ impl Tracker {
     pub fn remove_player(&mut self, id: usize) -> Option<Player> {
         // TODO: would it be fine to keep player characters cached a bit?
         self.players.remove(&id)
+    }
+
+    /// Checks whether the given id is the local player (self).
+    pub fn is_self(&self, id: usize) -> bool {
+        self.self_id == id
+    }
+
+    /// Sets the player id for the local player (self).
+    pub fn set_self_id(&mut self, id: usize) {
+        self.self_id = id;
+    }
+
+    /// Returns a reference to the local player (self).
+    pub fn get_self(&self) -> Option<&Player> {
+        self.players.get(&self.self_id)
+    }
+
+    /// Returns a mutable reference to the local player (self).
+    pub fn get_self_mut(&mut self) -> Option<&mut Player> {
+        self.players.get_mut(&self.self_id)
     }
 
     /// Returns a reference to a tracked player.

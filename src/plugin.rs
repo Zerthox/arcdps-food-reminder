@@ -256,6 +256,7 @@ impl Plugin {
                                 prof,
                                 elite,
                                 team: sub,
+                                self_: is_self,
                                 ..
                             }),
                         ) = (src.name, dest)
@@ -270,20 +271,35 @@ impl Plugin {
                                 sub as usize,
                             );
 
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Added {:?}", player));
+                            // check for self
+                            if is_self != 0 {
+                                self.tracker.set_self_id(player.id);
+
+                                #[cfg(feature = "log")]
+                                self.debug.log(format!("Added self {:?}", player));
+                            } else {
+                                #[cfg(feature = "log")]
+                                self.debug.log(format!("Added {:?}", player));
+                            }
 
                             self.tracker.add_player(player);
                         }
                     } else {
                         // player removed
 
+                        // TODO: keep food cached if self, is loading screen, could stay on same character after
+                        let id = src.id;
+
                         #[cfg_attr(not(feature = "log"), allow(unused))]
-                        let removed = self.tracker.remove_player(src.id);
+                        let removed = self.tracker.remove_player(id);
 
                         #[cfg(feature = "log")]
                         if let Some(player) = removed {
-                            self.debug.log(format!("Removed {:?}", player));
+                            if self.tracker.is_self(id) {
+                                self.debug.log(format!("Removed self {:?}", player));
+                            } else {
+                                self.debug.log(format!("Removed {:?}", player));
+                            }
                         }
                     }
                 }

@@ -3,10 +3,10 @@
 //! These are also used in the ArcDPS API, but may be useful outside.
 
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use strum_macros::{AsRefStr, Display};
+use strum_macros::{Display, IntoStaticStr};
 
 /// GW2 client language.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, AsRefStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
 #[repr(u8)]
 pub enum Language {
     English = 0,
@@ -17,7 +17,7 @@ pub enum Language {
 }
 
 /// Player profession.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, AsRefStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
 #[repr(u32)]
 pub enum Profession {
     /// Unknown or invalid.
@@ -36,7 +36,7 @@ pub enum Profession {
 }
 
 /// Player specializations.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, AsRefStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
 #[repr(u32)]
 pub enum Specialization {
     /// Unknown or invalid.
@@ -127,7 +127,7 @@ pub enum Specialization {
 
 // TODO: document unclear attributes
 /// Buff formula attributes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
 #[repr(u16)]
 pub enum Attribute {
     None,
@@ -157,6 +157,66 @@ pub enum Attribute {
     /// Unknown or invalid.
     #[num_enum(default)]
     Unknown = 65535,
+}
+
+/// Boss from raids, fractals etc.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
+#[repr(usize)]
+pub enum Boss {
+    // w1
+    ValeGuardian = 15438,
+    Gorseval = 15429,
+    Sabetha = 15375,
+
+    // w2
+    Slothasor = 16123,
+    Berg = 16088,
+    Zane = 16137,
+    Narella = 16125,
+    Matthias = 16115,
+
+    // w3
+    MacLeod = 16253,
+    KeepConstruct = 16235,
+    Xera = 16246,
+
+    // w4
+    Cairn = 17194,
+    MursaatOverseer = 17172,
+    Samarog = 17188,
+    Deimos = 17154,
+
+    // w5
+    SoullessHorror = 19767,
+    Desmina = 19828,
+    BrokenKing = 19691,
+    SoulEater = 19536,
+    EyeOfJudgement = 19651,
+    EyeOfFate = 19844,
+    Dhuum = 19450,
+
+    // w6
+    ConjuredAmalgamate = 43974,
+    ConjuredAmalgamateRightArm = 10142,
+    ConjuredAmalgamateLeftArm = 37464,
+    Nikare = 21105,
+    Kenut = 21089,
+    Qadim = 20934,
+
+    // w7
+    Adina = 22006,
+    Sabir = 21964,
+    QadimThePeerless = 22000,
+
+    // fractals
+    Mama = 17021,
+    Siax = 17028,
+    Ensolyss = 16948,
+    Skorvald = 17632,
+    Artsariiv = 17949,
+    Arkk = 17759,
+    Ai = 23254,
+    // TODO: training area golems
 }
 
 // buff enums generated from data

@@ -2,7 +2,7 @@ use crate::{
     arc_util::{
         api::{BuffRemove, StateChange},
         exports,
-        game::{Food, Utility},
+        game::{Boss, Food, Utility},
     },
     tracking::{
         player::{Buff, Player},
@@ -84,17 +84,12 @@ impl Plugin {
                 match event.is_statechange.into() {
                     StateChange::EnterCombat => {
                         // combat enter
-                        #[cfg(feature = "log")]
-                        let delta = api::calc_delta(event);
 
                         if let Some(player) = self.tracker.get_player_mut(src.id) {
                             player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]
-                            {
-                                self.debug.log(format!("Combat enter for {:?}", player));
-                                self.debug.log(format!("Delta to combat {:?}", delta));
-                            }
+                            self.debug.log(format!("Combat enter for {:?}", player));
                         }
                     }
                     StateChange::ExitCombat => {
@@ -110,13 +105,23 @@ impl Plugin {
                     StateChange::LogStart => {
                         // log start
 
+                        #[cfg(feature = "log")]
+                        let delta = api::calc_delta(event);
+
                         for player in self.tracker.get_players_mut() {
                             // initial buffs should be reported right after
                             player.unset_to_none();
                         }
 
                         #[cfg(feature = "log")]
-                        self.debug.log("Log recoding started");
+                        {
+                            let target_id = event.src_agent;
+                            let name = Boss::try_from(target_id)
+                                .map(Into::into)
+                                .unwrap_or("Unknown");
+                            self.debug
+                                .log(format!("Log for {} started with {:?} delta", name, delta));
+                        }
                     }
                     _ => {
                         // TODO: can we reliably set unset to none on strike damage?

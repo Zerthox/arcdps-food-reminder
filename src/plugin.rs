@@ -125,6 +125,7 @@ impl Plugin {
                     }
                     StateChange::LogEnd => {
                         // log end
+
                         #[cfg(feature = "log")]
                         {
                             let target_id = event.src_agent;
@@ -285,12 +286,6 @@ impl Plugin {
                             self.debug.log(format!("Removed {:?}", player));
                         }
                     }
-                } else {
-                    // target change
-
-                    #[cfg(feature = "log")]
-                    self.debug
-                        .log(format!("Target change {:?} {:?} {:?}", src, dest, event));
                 }
             }
         }

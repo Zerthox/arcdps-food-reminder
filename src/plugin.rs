@@ -266,28 +266,20 @@ impl Plugin {
                                 src.id,
                                 char_name,
                                 acc_name,
+                                is_self != 0,
                                 prof.into(),
                                 elite.into(),
                                 sub as usize,
                             );
 
-                            // check for self
-                            if is_self != 0 {
-                                self.tracker.set_self_id(player.id);
-
-                                #[cfg(feature = "log")]
-                                self.debug.log(format!("Added self {:?}", player));
-                            } else {
-                                #[cfg(feature = "log")]
-                                self.debug.log(format!("Added {:?}", player));
-                            }
+                            #[cfg(feature = "log")]
+                            self.debug.log(format!("Added {:?}", player));
 
                             self.tracker.add_player(player);
                         }
                     } else {
                         // player removed
 
-                        // TODO: keep food cached if self, is loading screen, could stay on same character after
                         let id = src.id;
 
                         #[cfg_attr(not(feature = "log"), allow(unused))]
@@ -295,11 +287,7 @@ impl Plugin {
 
                         #[cfg(feature = "log")]
                         if let Some(player) = removed {
-                            if self.tracker.is_self(id) {
-                                self.debug.log(format!("Removed self {:?}", player));
-                            } else {
-                                self.debug.log(format!("Removed {:?}", player));
-                            }
+                            self.debug.log(format!("Removed {:?}", player));
                         }
                     }
                 }

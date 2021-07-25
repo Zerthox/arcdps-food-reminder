@@ -52,7 +52,7 @@ pub enum Specialization {
     Chaos = 45,
     Mirage = 59,
 
-    // necro
+    // necromancer
     DeathMagic = 2,
     BloodMagic = 19,
     Reaper = 34,
@@ -61,7 +61,7 @@ pub enum Specialization {
     Spite = 53,
     Scourge = 60,
 
-    // rev
+    // revenant
     Invocation = 3,
     Retribution = 9,
     Corruption = 14,
@@ -88,7 +88,7 @@ pub enum Specialization {
     WildernessSurvival = 33,
     Soulbeast = 55,
 
-    // engi
+    // engineer
     Explosives = 6,
     Tools = 21,
     Alchemy = 29,
@@ -115,7 +115,7 @@ pub enum Specialization {
     Honor = 49,
     Firebrand = 62,
 
-    // ele
+    // elementalist
     Water = 17,
     Earth = 26,
     Fire = 31,

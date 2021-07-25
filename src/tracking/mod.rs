@@ -19,6 +19,9 @@ pub struct Tracker {
 
     /// Current local player (self) id.
     self_id: usize,
+
+    /// Cache for temporarily saved buffs on last character of local player (self).
+    pub cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 }
 
 impl Tracker {
@@ -27,18 +30,48 @@ impl Tracker {
         Self {
             players: HashMap::new(),
             self_id: 0,
+            cache: None,
         }
     }
 
     /// Adds a new tracked player.
-    pub fn add_player(&mut self, player: Player) {
+    pub fn add_player(&mut self, mut player: Player) {
+        // check for self
+        if player.is_self {
+            // update self id
+            self.self_id = player.id;
+
+            // check & reset cache
+            if let Some((character, food, util)) = self.cache.take() {
+                // check for same character
+                if character == player.character {
+                    // use cached food
+                    player.food = food;
+                    player.util = util;
+                }
+            }
+        }
+
+        // insert player
         self.players.insert(player.id, player);
     }
 
     /// Removes a tracked player, returning the removed player if they were tracked.
     pub fn remove_player(&mut self, id: usize) -> Option<Player> {
-        // TODO: would it be fine to keep player characters cached a bit?
-        self.players.remove(&id)
+        // remove player
+        let removed = self.players.remove(&id);
+
+        // check for self
+        if id == self.self_id {
+            if let Some(player) = &removed {
+                // TODO: set cache timeout
+                // cache character buffs
+                self.cache = Some((player.character.clone(), player.food, player.util));
+            }
+        }
+
+        // return removed player
+        removed
     }
 
     /// Checks whether the given id is the local player (self).

@@ -17,6 +17,9 @@ pub struct Player {
     /// Player account name.
     pub account: String,
 
+    /// Whether the player is the local player.
+    pub is_self: bool,
+
     /// Profession (class) of the player character.
     pub profession: Profession,
 
@@ -42,6 +45,7 @@ impl Player {
         id: usize,
         character: C,
         account: A,
+        is_self: bool,
         profession: Profession,
         elite: Specialization,
         subgroup: usize,
@@ -54,6 +58,7 @@ impl Player {
             id,
             character: character.into(),
             account: account.into(),
+            is_self,
             profession,
             elite,
             subgroup,

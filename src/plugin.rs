@@ -26,6 +26,10 @@ use crate::{arc_util::api, log::DebugLog};
 /// Hotkey for the tracker.
 const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
 
+/// Hotkey for the log.
+#[cfg(feature = "log")]
+const LOG_KEY: usize = VirtualKey::L.0 as usize;
+
 /// Main plugin instance.
 #[derive(Debug)]
 pub struct Plugin {
@@ -51,7 +55,6 @@ impl Plugin {
                     .auto_resize(true),
                 (),
             )),
-
             presses: KeyPresses::default(),
 
             #[cfg(feature = "log")]
@@ -331,16 +334,27 @@ impl Plugin {
         if down != prev_down {
             let modifiers = exports::get_modifiers();
 
-            // check for keys
+            // check for modifiers
             if key == modifiers.modifier1 as usize {
                 self.presses.modifier1 = down;
             } else if key == modifiers.modifier2 as usize {
                 self.presses.modifier2 = down;
-            } else if down && self.modifiers_pressed() && key == TRACKER_KEY {
-                self.tracker.toggle_visibility();
-                return false;
+            } else if down && self.modifiers_pressed() {
+                // check for hotkeys
+                match key {
+                    TRACKER_KEY => {
+                        self.tracker.toggle_visibility();
+                        return false;
+                    }
+                    LOG_KEY => {
+                        self.debug.toggle_visibility();
+                        return false;
+                    }
+                    _ => {}
+                }
             }
         }
+
         true
     }
 

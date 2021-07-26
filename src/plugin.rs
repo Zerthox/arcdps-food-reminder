@@ -12,6 +12,7 @@ use crate::{
         window::{Window, WindowProps},
         Component,
     },
+    win::VirtualKey,
 };
 use arcdps::{
     imgui::{im_str, Ui},
@@ -21,6 +22,9 @@ use std::convert::TryFrom;
 
 #[cfg(feature = "log")]
 use crate::{arc_util::api, log::DebugLog};
+
+/// Hotkey for the tracker.
+const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
 
 /// Main plugin instance.
 #[derive(Debug)]
@@ -297,8 +301,6 @@ impl Plugin {
 
     /// Handles a key event.
     pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
-        const KEY_F: usize = 0x46;
-
         // check for change
         if down != prev_down {
             let modifiers = exports::get_modifiers();
@@ -308,7 +310,7 @@ impl Plugin {
                 self.presses.modifier1 = down;
             } else if key == modifiers.modifier2 as usize {
                 self.presses.modifier2 = down;
-            } else if down && self.modifiers_pressed() && key == KEY_F {
+            } else if down && self.modifiers_pressed() && key == TRACKER_KEY {
                 self.tracker.toggle_visibility();
                 return false;
             }

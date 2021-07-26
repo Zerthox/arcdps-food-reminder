@@ -13,7 +13,7 @@ fn main() -> io::Result<()> {
 
     // windows bindings
     windows::build! {
-        Windows::Win32::Media::Multimedia::timeGetTime,
+        Windows::{System::VirtualKey, Win32::Media::Multimedia::timeGetTime},
     }
 
     // parse buff data

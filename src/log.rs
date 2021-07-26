@@ -8,8 +8,17 @@ const FORMAT: &str = "%b %d %H:%M:%S.%3f";
 /// Debug log component.
 #[derive(Debug, Clone)]
 pub struct DebugLog {
+    /// Whether the log is active.
+    active: bool,
+
+    /// Current contents of the log.
     contents: ImString,
+
+    /// Current size of contents string.
     size: usize,
+
+    // button widths used for ui rendering
+    toggle_button_width: f32,
     clear_button_width: f32,
     copy_button_width: f32,
 }
@@ -17,8 +26,10 @@ pub struct DebugLog {
 impl DebugLog {
     pub fn new() -> Self {
         Self {
+            active: true,
             contents: ImString::default(),
             size: 1, // imgui string has an implicit null at the end
+            toggle_button_width: 60.0,
             clear_button_width: 60.0,
             copy_button_width: 60.0,
         }
@@ -29,19 +40,21 @@ impl DebugLog {
     where
         S: AsRef<str>,
     {
-        // generate line
-        let now = Local::now();
-        let line = format!("{}: {}\n", now.format(FORMAT), output.as_ref());
+        if self.active {
+            // generate line
+            let now = Local::now();
+            let line = format!("{}: {}\n", now.format(FORMAT), output.as_ref());
 
-        // clear on overflow
-        if let Some(new) = self.size.checked_add(line.len()) {
-            self.size = new;
-        } else {
-            self.clear();
+            // clear on overflow
+            if let Some(new) = self.size.checked_add(line.len()) {
+                self.size = new;
+            } else {
+                self.clear();
+            }
+
+            // append line
+            self.contents.push_str(&line);
         }
-
-        // append line
-        self.contents.push_str(&line);
     }
 
     /// Clears the debug log.
@@ -59,29 +72,44 @@ impl Component for DebugLog {
     }
 
     fn render(&mut self, ui: &Ui) {
-        ui.align_text_to_frame_padding();
+        // get window size
+        let [window_width, _] = ui.window_content_region_max();
 
         // time
+        ui.align_text_to_frame_padding();
         ui.text(format!("Time: {}", Local::now().format(FORMAT)));
 
-        // get window size
-        let [window_size_x, _] = ui.window_content_region_max();
+        // activity toggle button
+        ui.same_line(
+            window_width
+                - self.toggle_button_width
+                - self.clear_button_width
+                - self.clear_button_width
+                - 5.0,
+        );
+        let toggle_button_text = if !self.active {
+            im_str!("Enable")
+        } else {
+            im_str!("Disable")
+        };
+        if ui.button(toggle_button_text, [0.0, 0.0]) {
+            self.active = !self.active;
+        }
+        self.toggle_button_width = ui.item_rect_size()[0];
 
         // copy button
-        ui.same_line(window_size_x - self.copy_button_width - self.clear_button_width - 5.0);
+        ui.same_line(window_width - self.copy_button_width - self.clear_button_width - 5.0);
         if ui.button(im_str!("Copy"), [0.0, 0.0]) {
             ui.set_clipboard_text(&self.contents);
         }
-        let [button_size_x, _] = ui.item_rect_size();
-        self.copy_button_width = button_size_x;
+        self.copy_button_width = ui.item_rect_size()[0];
 
         // clear button
-        ui.same_line(window_size_x - self.clear_button_width);
+        ui.same_line(window_width - self.clear_button_width);
         if ui.button(im_str!("Clear"), [0.0, 0.0]) {
             self.clear();
         }
-        let [button_size_x, _] = ui.item_rect_size();
-        self.clear_button_width = button_size_x;
+        self.clear_button_width = ui.item_rect_size()[0];
 
         ui.separator();
 

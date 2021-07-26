@@ -21,7 +21,7 @@ pub struct Tracker {
     self_id: usize,
 
     /// Cache for temporarily saved buffs on last character of local player (self).
-    pub cache: Option<(String, Buff<Food>, Buff<Utility>)>,
+    cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 }
 
 impl Tracker {

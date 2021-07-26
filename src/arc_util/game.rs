@@ -159,7 +159,7 @@ pub enum Attribute {
     Unknown = 65535,
 }
 
-/// Boss from raids, fractals etc.
+/// Boss from raids & fractals.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
 #[repr(usize)]
 pub enum Boss {
@@ -216,7 +216,6 @@ pub enum Boss {
     Artsariiv = 17949,
     Arkk = 17759,
     Ai = 23254,
-    // TODO: training area golems
 }
 
 // buff enums generated from data

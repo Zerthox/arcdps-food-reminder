@@ -2,16 +2,21 @@
 ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
 
 ## Development progress
-- [ ] Food reminder
-  - [ ] On combat enter with Malnourished/Diminished
-  - [ ] After combat exit with Malnourished/Diminished
-  - [ ] After death with Malnourished/Diminished
-  - [ ] Custom reminder delay
+- [ ] Food reminder when Malnourished/Diminished
+  - [ ] On combat enter
+  - [ ] After combat exit
+  - [ ] After death
 - [x] Food tracking
   - [x] Food/Utility tracker table
   - [x] Tooltips with Food/Utility details
-  - [x] Classification of Food/Utility (`PWR`, `PREC`, `CND`, `EXP`, `CONC`, `HEAL` etc.)
-- [ ] Food database
+  - [x] Classification of Food/Utility
+- [ ] Settings
+  - [ ] Save window states
+  - [ ] Custom reminder delay
+  - [ ] Custom Food/Utility definitions
+
+## Buff database
+Known Food & Utility buffs are currently collected in [data/buffs](./data/buffs).
 
 ## Building from source
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.

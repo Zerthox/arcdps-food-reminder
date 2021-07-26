@@ -117,31 +117,43 @@ impl Plugin {
                             player.unset_to_none();
                         }
 
-                        #[cfg(feature = "log")]
-                        {
-                            let target_id = event.src_agent;
-                            let name = Boss::try_from(target_id)
-                                .map(Into::into)
-                                .unwrap_or("Unknown");
+                        // check for known boss
+                        let target_id = event.src_agent;
+                        if let Ok(boss) = Boss::try_from(target_id) {
+                            #[cfg(feature = "log")]
                             self.debug
-                                .log(format!("Log for {} started with {:?} delta", name, delta));
+                                .log(format!("Log for {} started with {:?} delta", boss, delta));
+
+                            // check self buffs
+                            self.check_self_buffs();
+                        } else {
+                            #[cfg(feature = "log")]
+                            self.debug.log(format!(
+                                "Log for {} started with {:?} delta",
+                                target_id, delta
+                            ))
                         }
                     }
                     StateChange::LogEnd => {
                         // log end
 
-                        #[cfg(feature = "log")]
-                        {
-                            let target_id = event.src_agent;
-                            let name = Boss::try_from(target_id)
-                                .map(Into::into)
-                                .unwrap_or("Unknown");
-                            self.debug.log(format!("Log for {} ended", name))
+                        // check for known boss
+                        let target_id = event.src_agent;
+                        if let Ok(boss) = Boss::try_from(target_id) {
+                            #[cfg(feature = "log")]
+                            self.debug.log(format!("Log for {} ended", boss));
+
+                            // check self buffs
+                            self.check_self_buffs();
+                        } else {
+                            #[cfg(feature = "log")]
+                            self.debug.log(format!("Log for {} ended", target_id));
                         }
                     }
                     _ => {
                         // TODO: should we restrict this to specific state change kinds?
                         // TODO: can we reliably set unset to none on strike damage?
+                        // FIXME: tracking "nourishment" & "enhancement" buff names may need adjustment for other client languages
 
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
                         if buff_remove == BuffRemove::None {
@@ -295,6 +307,20 @@ impl Plugin {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /// Checks for Malnourished/Diminished on the local player (self).
+    fn check_self_buffs(&mut self) {
+        if let Some(player) = self.tracker.get_self() {
+            if player.food == Buff::Known(Food::Malnourished) {
+                #[cfg(feature = "log")]
+                self.debug.log("Food reminder for self!");
+            }
+            if player.util == Buff::Known(Utility::Diminished) {
+                #[cfg(feature = "log")]
+                self.debug.log("Utility reminder for self!");
             }
         }
     }

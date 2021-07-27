@@ -4,6 +4,7 @@ use crate::{
         exports,
         game::{Boss, Food, Utility},
     },
+    reminder::Reminder,
     tracking::{
         player::{Buff, Player},
         Tracker,
@@ -37,6 +38,9 @@ const LOG_KEY: usize = VirtualKey::L.0 as usize;
 /// Main plugin instance.
 #[derive(Debug)]
 pub struct Plugin {
+    /// Food reminder.
+    reminder: Reminder,
+
     /// Food tracker window.
     tracker: Window<Tracker>,
 
@@ -56,7 +60,7 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            // tracker window
+            reminder: Reminder::new(),
             tracker: Window::<Tracker>::with_default("Food Tracker")
                 .visible(false)
                 .auto_resize(true),
@@ -332,12 +336,16 @@ impl Plugin {
     fn check_self_buffs(&mut self) {
         if let Some(player) = self.tracker.get_self() {
             if player.food == Buff::Known(Food::Malnourished) {
+                self.reminder.trigger_food();
+
                 #[cfg(feature = "log")]
-                self.debug.log("Food reminder for self!");
+                self.debug.log("Food reminder triggered for self");
             }
             if player.util == Buff::Known(Utility::Diminished) {
+                self.reminder.trigger_util();
+
                 #[cfg(feature = "log")]
-                self.debug.log("Utility reminder for self!");
+                self.debug.log("Utility reminder triggered for self");
             }
         }
     }

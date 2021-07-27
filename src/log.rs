@@ -70,12 +70,6 @@ impl DebugLog {
 }
 
 impl Component for DebugLog {
-    type Props = ();
-
-    fn create(_props: Self::Props) -> Self {
-        Self::new()
-    }
-
     fn render(&mut self, ui: &Ui) {
         // time
         ui.align_text_to_frame_padding();
@@ -114,5 +108,11 @@ impl Component for DebugLog {
                 ui.text(&self.contents);
                 ui.set_scroll_here_y_with_ratio(1.0);
             })
+    }
+}
+
+impl Default for DebugLog {
+    fn default() -> Self {
+        Self::new()
     }
 }

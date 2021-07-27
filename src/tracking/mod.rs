@@ -123,12 +123,6 @@ impl Tracker {
 }
 
 impl Component for Tracker {
-    type Props = ();
-
-    fn create(_props: Self::Props) -> Self {
-        Self::new()
-    }
-
     fn render(&mut self, ui: &Ui) {
         if self.players.is_empty() {
             ui.text("No players in range");
@@ -258,5 +252,11 @@ impl Component for Tracker {
                 ui.end_table();
             }
         }
+    }
+}
+
+impl Default for Tracker {
+    fn default() -> Self {
+        Self::new()
     }
 }

@@ -8,10 +8,7 @@ use crate::{
         player::{Buff, Player},
         Tracker,
     },
-    ui::{
-        window::{Window, WindowProps},
-        Component,
-    },
+    ui::{window::Window, Component},
     win::VirtualKey,
 };
 use arcdps::{
@@ -49,19 +46,13 @@ impl Plugin {
     pub fn new() -> Self {
         Self {
             // tracker window
-            tracker: Window::create((
-                WindowProps::new("Food Tracker")
-                    .visible(false)
-                    .auto_resize(true),
-                (),
-            )),
+            tracker: Window::<Tracker>::with_default("Food Tracker")
+                .visible(false)
+                .auto_resize(true),
             presses: KeyPresses::default(),
 
             #[cfg(feature = "log")]
-            debug: Window::create((
-                WindowProps::new("Food Reminder Debug Log").visible(true),
-                (),
-            )),
+            debug: Window::<DebugLog>::with_default("Food Reminder Log").visible(true),
         }
     }
 
@@ -122,6 +113,8 @@ impl Plugin {
 
                         // check for known boss
                         let target_id = event.src_agent;
+
+                        #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
                             #[cfg(feature = "log")]
                             self.debug
@@ -142,6 +135,8 @@ impl Plugin {
 
                         // check for known boss
                         let target_id = event.src_agent;
+
+                        #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Log for {} ended", boss));
@@ -346,6 +341,7 @@ impl Plugin {
                         self.tracker.toggle_visibility();
                         return false;
                     }
+                    #[cfg(feature = "log")]
                     LOG_KEY => {
                         self.debug.toggle_visibility();
                         return false;
@@ -385,6 +381,12 @@ impl Plugin {
             ui.checkbox(im_str!("Food Reminder Debug Log"), &mut self.debug.shown);
         }
         false
+    }
+}
+
+impl Default for Plugin {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

@@ -1,12 +1,13 @@
 # GW2 ArcDPS Food Reminder
 ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
 
+![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
 
 ## Development progress
-- [ ] Food reminder
-  - [ ] On combat enter
-  - [ ] After combat exit
+- [x] Food reminder
+  - [x] On encounter start
+  - [x] After encounter end
   - [ ] After death
 - [x] Food tracking
   - [x] Food/Utility tracker table

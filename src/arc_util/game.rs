@@ -3,7 +3,7 @@
 //! These are also used in the ArcDPS API, but may be useful outside.
 
 use num_enum::{FromPrimitive, TryFromPrimitive};
-use strum_macros::{Display, IntoStaticStr};
+use strum_macros::{Display, EnumIter, IntoStaticStr};
 
 /// GW2 client language.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]

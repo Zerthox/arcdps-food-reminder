@@ -77,7 +77,7 @@ fn generate_enum(doc: &str, name: &str, entries: &HashMap<String, Entry>) -> Str
     // TODO: simplify match with helper function
     format!(
         "/// {}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr, EnumIter)]
 #[repr(u32)]
 pub enum {} {{
     {}

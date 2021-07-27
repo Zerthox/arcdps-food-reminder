@@ -129,7 +129,7 @@ impl Component for Tracker {
         } else {
             // create table
             if ui.begin_table_with_flags(
-                im_str!("food-reminder-tracker-table"),
+                im_str!("##food-reminder-tracker-table"),
                 4,
                 TableFlags::NONE,
             ) {

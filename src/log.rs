@@ -101,7 +101,7 @@ impl Component for DebugLog {
         ui.separator();
 
         // log contents
-        ChildWindow::new(im_str!("food-reminder-log-scroller"))
+        ChildWindow::new(im_str!("##food-reminder-log-scroller"))
             .scrollable(true)
             .horizontal_scrollbar(true)
             .build(ui, || {

@@ -1,5 +1,5 @@
 use super::Component;
-use arcdps::imgui::{ImString, Ui, Window as ImGuiWindow};
+use arcdps::imgui::{Condition, ImString, Ui, Window as ImGuiWindow};
 use std::ops::{Deref, DerefMut};
 
 /// Window component.
@@ -9,11 +9,13 @@ where
     T: Component,
 {
     inner: T,
-    pub shown: bool,
     name: String,
+    width: f32,
+    height: f32,
     resize: bool,
     auto_resize: bool,
     scroll: bool,
+    pub shown: bool,
 }
 
 impl<T> Window<T>
@@ -27,12 +29,26 @@ where
     {
         Self {
             name: name.into(),
+            width: 0.0,
+            height: 0.0,
             resize: true,
             auto_resize: false,
             scroll: true,
             inner,
             shown: true,
         }
+    }
+
+    /// Sets the default window width.
+    pub fn width(mut self, width: f32) -> Self {
+        self.width = width;
+        self
+    }
+
+    /// Sets the default window height.
+    pub fn height(mut self, height: f32) -> Self {
+        self.height = height;
+        self
     }
 
     /// Sets whether the window is visible.
@@ -110,6 +126,7 @@ where
                 .title_bar(true)
                 .draw_background(true)
                 .collapsible(false)
+                .size([self.width, self.height], Condition::FirstUseEver)
                 .always_auto_resize(self.auto_resize)
                 .resizable(self.resize)
                 .scroll_bar(self.scroll)

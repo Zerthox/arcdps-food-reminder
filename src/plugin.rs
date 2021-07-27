@@ -52,7 +52,10 @@ impl Plugin {
             presses: KeyPresses::default(),
 
             #[cfg(feature = "log")]
-            debug: Window::<DebugLog>::with_default("Food Reminder Log").visible(true),
+            debug: Window::<DebugLog>::with_default("Food Debug Log")
+                .visible(true)
+                .width(600.0)
+                .height(300.0),
         }
     }
 

@@ -25,4 +25,5 @@ crate-type = ["cdylib"]
 
 [features]
 default = []
+demo = []
 log = ["chrono"]

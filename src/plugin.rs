@@ -17,11 +17,18 @@ use arcdps::{
 };
 use std::convert::TryFrom;
 
+#[cfg(feature = "demo")]
+use crate::demo::Demo;
+
 #[cfg(feature = "log")]
 use crate::{arc_util::api, log::DebugLog};
 
 /// Hotkey for the tracker.
 const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
+
+/// Hotkey for the demo.
+#[cfg(feature = "demo")]
+const DEMO_KEY: usize = VirtualKey::D.0 as usize;
 
 /// Hotkey for the log.
 #[cfg(feature = "log")]
@@ -35,6 +42,10 @@ pub struct Plugin {
 
     /// Pressed keys.
     presses: KeyPresses,
+
+    /// Demo window.
+    #[cfg(feature = "demo")]
+    demo: Window<Demo>,
 
     /// Debug log window.
     #[cfg(feature = "log")]
@@ -50,6 +61,11 @@ impl Plugin {
                 .visible(false)
                 .auto_resize(true),
             presses: KeyPresses::default(),
+
+            #[cfg(feature = "demo")]
+            demo: Window::<Demo>::with_default("Food Demo")
+                .visible(true)
+                .auto_resize(true),
 
             #[cfg(feature = "log")]
             debug: Window::<DebugLog>::with_default("Food Debug Log")
@@ -344,6 +360,11 @@ impl Plugin {
                         self.tracker.toggle_visibility();
                         return false;
                     }
+                    #[cfg(feature = "demo")]
+                    DEMO_KEY => {
+                        self.demo.toggle_visibility();
+                        return false;
+                    }
                     #[cfg(feature = "log")]
                     LOG_KEY => {
                         self.debug.toggle_visibility();
@@ -364,7 +385,10 @@ impl Plugin {
 
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
-        // log renders always
+        // log & demo render always
+        #[cfg(feature = "demo")]
+        self.demo.render(ui);
+
         #[cfg(feature = "log")]
         self.debug.render(ui);
 
@@ -380,8 +404,11 @@ impl Plugin {
         if option_name.is_none() {
             ui.checkbox(im_str!("Food Tracker"), &mut self.tracker.shown);
 
+            #[cfg(feature = "demo")]
+            ui.checkbox(im_str!("Food Demo"), &mut self.demo.shown);
+
             #[cfg(feature = "log")]
-            ui.checkbox(im_str!("Food Reminder Debug Log"), &mut self.debug.shown);
+            ui.checkbox(im_str!("Food Debug Log"), &mut self.debug.shown);
         }
         false
     }

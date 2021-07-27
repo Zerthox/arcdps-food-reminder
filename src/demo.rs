@@ -1,6 +1,7 @@
 //! Dummy windows for demo.
 
 use crate::{
+    reminder::Reminder,
     tracking::{
         buff::{Buff, Food, Utility},
         player::{Player, Profession, Specialization},
@@ -15,9 +16,10 @@ use strum::IntoEnumIterator;
 /// Features demo.
 #[derive(Debug)]
 pub struct Demo {
+    reminder: Reminder,
     next_id: usize,
-    foods: Vec<Buff<Food>>,
-    utils: Vec<Buff<Utility>>,
+    all_foods: Vec<Buff<Food>>,
+    all_utils: Vec<Buff<Utility>>,
     tracker: Window<Tracker>,
 }
 
@@ -25,13 +27,14 @@ impl Demo {
     /// Creates a new demo.
     pub fn new() -> Self {
         Self {
+            reminder: Reminder::new(),
             next_id: 0,
-            foods: [Buff::Unset, Buff::None, Buff::Unknown]
+            all_foods: [Buff::Unset, Buff::None, Buff::Unknown]
                 .iter()
                 .copied()
                 .chain(Food::iter().map(|food| Buff::Known(food)))
                 .collect(),
-            utils: [Buff::Unset, Buff::None, Buff::Unknown]
+            all_utils: [Buff::Unset, Buff::None, Buff::Unknown]
                 .iter()
                 .copied()
                 .chain(Utility::iter().map(|util| Buff::Known(util)))
@@ -74,13 +77,13 @@ impl Component for Demo {
 
         ui.same_line(text_width + 10.0);
         if ui.button(im_str!("Trigger Food"), [0.0, 0.0]) {
-            // TODO: reminder ui
+            self.reminder.trigger_food();
         }
         let [button_width, _] = ui.item_rect_size();
 
         ui.same_line(text_width + button_width + 20.0);
         if ui.button(im_str!("Trigger Util"), [0.0, 0.0]) {
-            // TODO: reminder ui
+            self.reminder.trigger_util();
         }
 
         ui.spacing();
@@ -167,7 +170,7 @@ impl Component for Demo {
                 // food
                 ui.table_next_column();
                 let mut food_id = self
-                    .foods
+                    .all_foods
                     .iter()
                     .position(|buff| *buff == player.food)
                     .unwrap();
@@ -175,15 +178,15 @@ impl Component for Demo {
                 ComboBox::new(&im_str!("##food-reminder-demo-food-{}", id)).build_simple(
                     ui,
                     &mut food_id,
-                    &self.foods,
+                    &self.all_foods,
                     &|buff| Self::food_name(*buff),
                 );
-                player.food = self.foods[food_id];
+                player.food = self.all_foods[food_id];
 
                 // utility
                 ui.table_next_column();
                 let mut util_id = self
-                    .utils
+                    .all_utils
                     .iter()
                     .position(|buff| *buff == player.util)
                     .unwrap();
@@ -191,10 +194,10 @@ impl Component for Demo {
                 ComboBox::new(&im_str!("##food-reminder-demo-util-{}", id)).build_simple(
                     ui,
                     &mut util_id,
-                    &self.utils,
+                    &self.all_utils,
                     &|buff| Self::util_name(*buff),
                 );
-                player.util = self.utils[util_id];
+                player.util = self.all_utils[util_id];
             }
 
             ui.end_table();
@@ -222,7 +225,8 @@ impl Component for Demo {
             self.tracker.remove_player(self.next_id);
         }
 
-        // render tracker window
+        // render children
+        self.reminder.render(ui);
         if self.tracker.shown {
             self.tracker.render(ui);
         }

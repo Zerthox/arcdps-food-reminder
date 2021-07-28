@@ -18,7 +18,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: check
-          flags: --all-features
+          args: --all-features
   clippy:
     name: Clippy
     runs-on: windows-latest
@@ -32,8 +32,7 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: check
-          flags: --all-features
+          command: clippy
   fmt:
     name: Rustfmt
     runs-on: windows-latest
@@ -48,4 +47,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          flags: -- --check
+          args: -- --check

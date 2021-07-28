@@ -51,9 +51,6 @@ pub struct Plugin {
     /// Food tracker window.
     tracker: Window<Tracker>,
 
-    /// Pressed keys.
-    presses: KeyPresses,
-
     /// Demo window.
     #[cfg(feature = "demo")]
     demo: Window<Demo>,
@@ -70,7 +67,6 @@ impl Plugin {
             settings: Settings::initial(),
             reminder: Reminder::new(),
             tracker: Tracker::create_window(),
-            presses: KeyPresses::default(),
 
             #[cfg(feature = "demo")]
             demo: Demo::create_window(),
@@ -371,43 +367,28 @@ impl Plugin {
 
     /// Handles a key event.
     pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
-        // check for change
-        if down != prev_down {
-            let modifiers = exports::get_modifiers();
-
-            // check for modifiers
-            if key == modifiers.modifier1 as usize {
-                self.presses.modifier1 = down;
-            } else if key == modifiers.modifier2 as usize {
-                self.presses.modifier2 = down;
-            } else if down && self.modifiers_pressed() {
-                // check for hotkeys
-                match key {
-                    TRACKER_KEY => {
-                        self.tracker.toggle_visibility();
-                        return false;
-                    }
-                    #[cfg(feature = "demo")]
-                    DEMO_KEY => {
-                        self.demo.toggle_visibility();
-                        return false;
-                    }
-                    #[cfg(feature = "log")]
-                    LOG_KEY => {
-                        self.debug.toggle_visibility();
-                        return false;
-                    }
-                    _ => {}
+        // check for down
+        if down && !prev_down {
+            // check for hotkeys
+            match key {
+                TRACKER_KEY => {
+                    self.tracker.toggle_visibility();
+                    return false;
                 }
+                #[cfg(feature = "demo")]
+                DEMO_KEY => {
+                    self.demo.toggle_visibility();
+                    return false;
+                }
+                #[cfg(feature = "log")]
+                LOG_KEY => {
+                    self.debug.toggle_visibility();
+                    return false;
+                }
+                _ => {}
             }
         }
-
         true
-    }
-
-    /// Checks whether both modifiers are currently pressed.
-    fn modifiers_pressed(&self) -> bool {
-        self.presses.modifier1 && self.presses.modifier2
     }
 
     /// Callback for standalone UI creation.
@@ -445,10 +426,4 @@ impl Default for Plugin {
     fn default() -> Self {
         Self::new()
     }
-}
-
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-struct KeyPresses {
-    modifier1: bool,
-    modifier2: bool,
 }

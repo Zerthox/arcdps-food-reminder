@@ -1,4 +1,8 @@
-use crate::ui::{align::RightAlign, Component};
+use crate::ui::{
+    align::RightAlign,
+    window::{WindowProps, Windowed},
+    Component,
+};
 use arcdps::imgui::{im_str, ChildWindow, ImString, Ui};
 use chrono::Local;
 
@@ -108,6 +112,15 @@ impl Component for DebugLog {
                 ui.text(&self.contents);
                 ui.set_scroll_here_y_with_ratio(1.0);
             })
+    }
+}
+
+impl Windowed for DebugLog {
+    fn props() -> WindowProps {
+        WindowProps::new("Food Debug Log")
+            .visible(true)
+            .width(600.0)
+            .height(300.0)
     }
 }
 

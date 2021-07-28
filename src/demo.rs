@@ -7,7 +7,10 @@ use crate::{
         player::{Player, Profession, Specialization},
         Tracker,
     },
-    ui::{window::Window, Component},
+    ui::{
+        window::{Window, WindowProps, Windowed},
+        Component, Hideable,
+    },
 };
 use arcdps::imgui::{im_str, ComboBox, ImStr, ImString, Ui};
 use std::borrow::Cow;
@@ -39,9 +42,7 @@ impl Demo {
                 .copied()
                 .chain(Utility::iter().map(|util| Buff::Known(util)))
                 .collect(),
-            tracker: Window::<Tracker>::with_default("Food Tracker Demo")
-                .visible(false)
-                .auto_resize(true),
+            tracker: Tracker::create(),
         }
     }
 
@@ -68,6 +69,7 @@ impl Demo {
 
 impl Component for Demo {
     fn render(&mut self, ui: &Ui) {
+        // main window
         // TODO: left align helper
 
         // reminder buttons
@@ -90,7 +92,7 @@ impl Component for Demo {
         ui.separator();
         ui.spacing();
 
-        ui.checkbox(im_str!("Tracker"), &mut self.tracker.shown);
+        ui.checkbox(im_str!("Tracker"), self.tracker.visibility());
 
         // player editor
         if ui.begin_table(im_str!("##food-reminder-demo-table"), 6) {
@@ -227,9 +229,15 @@ impl Component for Demo {
 
         // render children
         self.reminder.render(ui);
-        if self.tracker.shown {
-            self.tracker.render(ui);
-        }
+        self.tracker.render(ui);
+    }
+}
+
+impl Windowed for Demo {
+    fn props() -> WindowProps {
+        WindowProps::new("Food Demo")
+            .visible(true)
+            .auto_resize(true)
     }
 }
 

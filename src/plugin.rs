@@ -10,7 +10,10 @@ use crate::{
         player::{Buff, Player},
         Tracker,
     },
-    ui::{window::Window, Component},
+    ui::{
+        window::{Window, Windowed},
+        Component, Hideable,
+    },
     win::VirtualKey,
 };
 use arcdps::{
@@ -66,21 +69,14 @@ impl Plugin {
         Self {
             settings: Settings::initial(),
             reminder: Reminder::new(),
-            tracker: Window::<Tracker>::with_default("Food Tracker")
-                .visible(false)
-                .auto_resize(true),
+            tracker: Tracker::create(),
             presses: KeyPresses::default(),
 
             #[cfg(feature = "demo")]
-            demo: Window::<Demo>::with_default("Food Demo")
-                .visible(true)
-                .auto_resize(true),
+            demo: Demo::create(),
 
             #[cfg(feature = "log")]
-            debug: Window::<DebugLog>::with_default("Food Debug Log")
-                .visible(true)
-                .width(600.0)
-                .height(300.0),
+            debug: DebugLog::create(),
         }
     }
 
@@ -105,7 +101,7 @@ impl Plugin {
     pub fn unload(&mut self) {
         // update settings
         // TODO: handle this differently
-        self.settings.tracker_open = self.tracker.shown;
+        // self.settings.tracker_open = self.tracker.shown;
 
         // save settings
         self.settings.save();
@@ -433,13 +429,13 @@ impl Plugin {
     /// Callback for ArcDPS option checkboxes.
     pub fn render_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox(im_str!("Food Tracker"), &mut self.tracker.shown);
+            ui.checkbox(im_str!("Food Tracker"), self.tracker.visibility());
 
             #[cfg(feature = "demo")]
-            ui.checkbox(im_str!("Food Demo"), &mut self.demo.shown);
+            ui.checkbox(im_str!("Food Demo"), self.demo.visibility());
 
             #[cfg(feature = "log")]
-            ui.checkbox(im_str!("Food Debug Log"), &mut self.debug.shown);
+            ui.checkbox(im_str!("Food Debug Log"), self.debug.visibility());
         }
         false
     }

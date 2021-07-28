@@ -4,7 +4,10 @@ pub mod player;
 use crate::{
     arc_util::{api::CoreColor, exports},
     tracking::buff::{Categorize, Food, Utility},
-    ui::Component,
+    ui::{
+        window::{WindowProps, Windowed},
+        Component,
+    },
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::Buff;
@@ -252,6 +255,14 @@ impl Component for Tracker {
                 ui.end_table();
             }
         }
+    }
+}
+
+impl Windowed for Tracker {
+    fn props() -> WindowProps {
+        WindowProps::new("Food Tracker")
+            .visible(false)
+            .auto_resize(true)
     }
 }
 

@@ -1,6 +1,20 @@
-use super::Component;
+use super::{Component, Hideable};
 use arcdps::imgui::{Condition, ImString, Ui, Window as ImGuiWindow};
 use std::ops::{Deref, DerefMut};
+
+/// A component which may render in a window.
+pub trait Windowed
+where
+    Self: Component + Default + Sized,
+{
+    /// Returns the default window props.
+    fn props() -> WindowProps;
+
+    /// Creates the window component.
+    fn create() -> Window<Self> {
+        Window::with_default(Self::props())
+    }
+}
 
 /// Window component.
 #[derive(Debug)]
@@ -8,14 +22,9 @@ pub struct Window<T>
 where
     T: Component,
 {
+    props: WindowProps,
     inner: T,
-    name: String,
-    width: f32,
-    height: f32,
-    resize: bool,
-    auto_resize: bool,
-    scroll: bool,
-    pub shown: bool,
+    shown: bool,
 }
 
 impl<T> Window<T>
@@ -23,61 +32,13 @@ where
     T: Component,
 {
     /// Creates a new window with a given inner [`Component`].
-    pub fn with_inner<S>(name: S, inner: T) -> Self
-    where
-        S: Into<String>,
-    {
+    pub fn with_inner(props: WindowProps, inner: T) -> Self {
+        let shown = props.visible;
         Self {
-            name: name.into(),
-            width: 0.0,
-            height: 0.0,
-            resize: true,
-            auto_resize: false,
-            scroll: true,
+            props,
             inner,
-            shown: true,
+            shown,
         }
-    }
-
-    /// Sets the default window width.
-    pub fn width(mut self, width: f32) -> Self {
-        self.width = width;
-        self
-    }
-
-    /// Sets the default window height.
-    pub fn height(mut self, height: f32) -> Self {
-        self.height = height;
-        self
-    }
-
-    /// Sets whether the window is visible.
-    pub fn visible(mut self, value: bool) -> Self {
-        self.shown = value;
-        self
-    }
-
-    /// Sets whether the window is resizable.
-    pub fn resize(mut self, value: bool) -> Self {
-        self.resize = value;
-        self
-    }
-
-    /// Sets whether the window automatically resizes.
-    pub fn auto_resize(mut self, value: bool) -> Self {
-        self.auto_resize = value;
-        self
-    }
-
-    /// Sets whether the window is scrollable.
-    pub fn scroll(mut self, value: bool) -> Self {
-        self.scroll = value;
-        self
-    }
-
-    /// Toggles the visibility of the window.
-    pub fn toggle_visibility(&mut self) {
-        self.shown = !self.shown;
     }
 }
 
@@ -86,11 +47,8 @@ where
     T: Component + Default,
 {
     /// Creates a new window with the [`Default`] of the inner [`Component`].
-    pub fn with_default<S>(name: S) -> Self
-    where
-        S: Into<String>,
-    {
-        Self::with_inner(name, T::default())
+    pub fn with_default(props: WindowProps) -> Self {
+        Self::with_inner(props, T::default())
     }
 }
 
@@ -120,20 +78,100 @@ where
 {
     fn render(&mut self, ui: &Ui) {
         if self.shown {
-            let name = ImString::new(&self.name);
             let inner = &mut self.inner;
-            ImGuiWindow::new(&name)
-                .title_bar(true)
-                .draw_background(true)
-                .collapsible(false)
-                .size([self.width, self.height], Condition::FirstUseEver)
-                .always_auto_resize(self.auto_resize)
-                .resizable(self.resize)
-                .scroll_bar(self.scroll)
-                .scrollable(self.scroll)
-                .focus_on_appearing(false)
+            self.props
+                .create_window()
                 .opened(&mut self.shown)
                 .build(ui, || inner.render(ui))
         }
+    }
+}
+
+impl<T> Hideable for Window<T>
+where
+    T: Component,
+{
+    fn visibility(&mut self) -> &mut bool {
+        &mut self.shown
+    }
+}
+
+/// Window props.
+#[derive(Debug, Clone)]
+pub struct WindowProps {
+    name: ImString,
+    width: f32,
+    height: f32,
+    visible: bool,
+    resize: bool,
+    auto_resize: bool,
+    scroll: bool,
+}
+
+impl WindowProps {
+    /// Creates a new set of window props.
+    pub fn new<S>(name: S) -> Self
+    where
+        S: Into<String>,
+    {
+        Self {
+            name: ImString::new(name.into()),
+            width: 0.0,
+            height: 0.0,
+            resize: true,
+            visible: true,
+            auto_resize: false,
+            scroll: true,
+        }
+    }
+
+    /// Sets the default window width.
+    pub const fn width(mut self, width: f32) -> Self {
+        self.width = width;
+        self
+    }
+
+    /// Sets the default window height.
+    pub const fn height(mut self, height: f32) -> Self {
+        self.height = height;
+        self
+    }
+
+    /// Sets whether the window is visible.
+    pub const fn visible(mut self, value: bool) -> Self {
+        self.visible = value;
+        self
+    }
+
+    /// Sets whether the window is resizable.
+    pub const fn resize(mut self, value: bool) -> Self {
+        self.resize = value;
+        self
+    }
+
+    /// Sets whether the window automatically resizes.
+    pub const fn auto_resize(mut self, value: bool) -> Self {
+        self.auto_resize = value;
+        self
+    }
+
+    /// Sets whether the window is scrollable.
+    pub const fn scroll(mut self, value: bool) -> Self {
+        self.scroll = value;
+        self
+    }
+
+    /// Creates the [`ImGuiWindow`] corresponding to the props.
+    fn create_window(&self) -> ImGuiWindow {
+        ImGuiWindow::new(&self.name)
+            .title_bar(true)
+            .draw_background(true)
+            .collapsible(false)
+            .size([self.width, self.height], Condition::FirstUseEver)
+            .always_auto_resize(self.auto_resize)
+            .resizable(self.resize)
+            .scroll_bar(self.scroll)
+            .scrollable(self.scroll)
+            .focus_on_appearing(false)
     }
 }

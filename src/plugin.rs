@@ -5,6 +5,7 @@ use crate::{
         game::{Boss, Food, Utility},
     },
     reminder::Reminder,
+    settings::Settings,
     tracking::{
         player::{Buff, Player},
         Tracker,
@@ -38,6 +39,9 @@ const LOG_KEY: usize = VirtualKey::L.0 as usize;
 /// Main plugin instance.
 #[derive(Debug)]
 pub struct Plugin {
+    /// Settings.
+    settings: Settings,
+
     /// Food reminder.
     reminder: Reminder,
 
@@ -60,6 +64,7 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
+            settings: Settings::initial(),
             reminder: Reminder::new(),
             tracker: Window::<Tracker>::with_default("Food Tracker")
                 .visible(false)
@@ -83,10 +88,28 @@ impl Plugin {
     pub fn load(&mut self) {
         #[cfg(feature = "log")]
         self.debug.log("Plugin load");
+
+        #[cfg(feature = "log")]
+        self.debug
+            .log(format!("Config {:?}", Settings::config_path()));
+
+        if let Some(settings) = Settings::load() {
+            self.settings = settings;
+
+            #[cfg(feature = "log")]
+            self.debug.log(format!("Loaded {:?}", self.settings))
+        }
     }
 
     /// Unloads the plugin.
-    pub fn unload(&mut self) {}
+    pub fn unload(&mut self) {
+        // update settings
+        // TODO: handle this differently
+        self.settings.tracker_open = self.tracker.shown;
+
+        // save settings
+        self.settings.save();
+    }
 
     /// Handles a combat event.
     pub fn combat_event(

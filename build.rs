@@ -75,6 +75,7 @@ where
 
 fn generate_enum(doc: &str, name: &str, entries: &HashMap<String, Entry>) -> String {
     // TODO: simplify match with helper function
+    // TODO: switch to proc macro?
     format!(
         "/// {}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr, EnumIter)]

@@ -10,14 +10,16 @@ arcdps = { git = "https://github.com/greaka/arcdps_bindings", branch = "master" 
 chrono = { version = "0.4", optional = true }
 lazy_static = "1.4"
 num_enum = "0.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 strum = "0.21"
 strum_macros = "0.21"
-windows = "0.17"
+windows = "0.18"
 
 [build-dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
-windows = "0.17"
+windows = "0.18"
 
 [lib]
 name = "arcdps_food_reminder"

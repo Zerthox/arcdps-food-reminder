@@ -1,6 +1,7 @@
 pub mod arc_util;
 pub mod plugin;
 pub mod reminder;
+pub mod settings;
 pub mod tracking;
 pub mod ui;
 pub mod win;

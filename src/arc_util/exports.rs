@@ -1,8 +1,30 @@
 //! ArcDPS exports.
 
 use super::{api::CoreColor, game::Profession};
-use arcdps::{e5 as e5_colors, e6 as e6_ui_settings, e7 as e7_modifiers, imgui::sys::ImVec4};
-use std::{mem::MaybeUninit, slice};
+use arcdps::{
+    e0 as e0_config_path, e5 as e5_colors, e6 as e6_ui_settings, e7 as e7_modifiers,
+    imgui::sys::ImVec4,
+};
+use std::{ffi::OsString, mem::MaybeUninit, os::windows::prelude::*, path::PathBuf, slice};
+
+/// Retrieves the config path from ArcDPS.
+pub fn get_config_path() -> Option<PathBuf> {
+    let ptr = unsafe { e0_config_path() };
+    if !ptr.is_null() {
+        // calculate length
+        let mut len = 0;
+        while unsafe { *ptr.offset(len) } != 0 {
+            len += 1;
+        }
+
+        // transform data
+        let slice = unsafe { slice::from_raw_parts(ptr, len as usize) };
+        let string = OsString::from_wide(slice);
+        Some(PathBuf::from(string))
+    } else {
+        None
+    }
+}
 
 /// The array of color arrays returned by ArcDPS.
 type RawColorArray = [*mut ImVec4; 5];
@@ -96,8 +118,6 @@ pub fn get_colors() -> Colors {
     }
 }
 
-// TODO: do we want these to lazily evaluate via functions as well?
-
 /// Set of UI settings.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct UISettings {
@@ -108,7 +128,7 @@ pub struct UISettings {
     pub close_with_esc: bool,
 }
 
-/// Returns the UI settings from ArcDPS.
+/// Retrieves the UI settings from ArcDPS.
 pub fn get_ui_settings() -> UISettings {
     let raw = unsafe { e6_ui_settings() };
     UISettings {
@@ -128,7 +148,7 @@ pub struct Modifiers {
     pub modifier_multi: u16,
 }
 
-/// Returns the modifier keybinds from ArcDPS.
+/// Retrieves the modifier keybinds from ArcDPS.
 pub fn get_modifiers() -> Modifiers {
     let raw = unsafe { e7_modifiers() };
     Modifiers {

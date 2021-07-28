@@ -39,7 +39,7 @@ impl Demo {
                 .copied()
                 .chain(Utility::iter().map(|util| Buff::Known(util)))
                 .collect(),
-            tracker: Window::<Tracker>::with_default("Food Tracker")
+            tracker: Window::<Tracker>::with_default("Food Tracker Demo")
                 .visible(false)
                 .auto_resize(true),
         }

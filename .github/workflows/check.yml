@@ -4,13 +4,6 @@ on:
   - push
   - pull_request
 
-env:
-  rustup-settings:
-    profile: minimal
-    toolchain: stable
-    target: x86_64-pc-windows-msvc
-    override: true
-
 jobs:
   check:
     name: Check
@@ -18,7 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
-        with: ${{ env.rustup-settings }}
+          with:
+          profile: minimal
+          toolchain: stable
+          override: true
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -29,8 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
-        with: ${{ env.rustup-settings }}
-      - run: rustup component add clippy
+        with:
+          profile: minimal
+          toolchain: stable
+          components: clippy
+          override: true
       - uses: actions-rs/cargo@v1
         with:
           command: check
@@ -41,9 +40,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
-        with: ${{ env.rustup-settings }}
-      - run: rustup component add clippy
+          with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+          override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: check
-          flags: --all-features
+          command: fmt
+          flags: -- --check

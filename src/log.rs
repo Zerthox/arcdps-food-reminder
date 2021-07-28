@@ -116,7 +116,7 @@ impl Component for DebugLog {
 }
 
 impl Windowed for DebugLog {
-    fn props() -> WindowProps {
+    fn window_props() -> WindowProps {
         WindowProps::new("Food Debug Log")
             .visible(true)
             .width(600.0)

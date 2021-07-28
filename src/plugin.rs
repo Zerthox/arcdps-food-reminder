@@ -69,14 +69,14 @@ impl Plugin {
         Self {
             settings: Settings::initial(),
             reminder: Reminder::new(),
-            tracker: Tracker::create(),
+            tracker: Tracker::create_window(),
             presses: KeyPresses::default(),
 
             #[cfg(feature = "demo")]
-            demo: Demo::create(),
+            demo: Demo::create_window(),
 
             #[cfg(feature = "log")]
-            debug: DebugLog::create(),
+            debug: DebugLog::create_window(),
         }
     }
 

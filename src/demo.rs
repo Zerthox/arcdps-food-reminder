@@ -42,7 +42,7 @@ impl Demo {
                 .copied()
                 .chain(Utility::iter().map(Buff::Known))
                 .collect(),
-            tracker: Tracker::create(),
+            tracker: Tracker::create_window(),
         }
     }
 
@@ -234,7 +234,7 @@ impl Component for Demo {
 }
 
 impl Windowed for Demo {
-    fn props() -> WindowProps {
+    fn window_props() -> WindowProps {
         WindowProps::new("Food Demo")
             .visible(true)
             .auto_resize(true)

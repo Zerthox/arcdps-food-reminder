@@ -7,12 +7,12 @@ pub trait Windowed
 where
     Self: Component + Default + Sized,
 {
-    /// Returns the default window props.
-    fn props() -> WindowProps;
+    /// Returns the default props for the component's window.
+    fn window_props() -> WindowProps;
 
-    /// Creates the window component.
-    fn create() -> Window<Self> {
-        Window::with_default(Self::props())
+    /// Creates a window containing the component.
+    fn create_window() -> Window<Self> {
+        Window::with_default(Self::window_props())
     }
 }
 
@@ -80,7 +80,7 @@ where
         if self.shown {
             let inner = &mut self.inner;
             self.props
-                .create_window()
+                .new_window()
                 .opened(&mut self.shown)
                 .build(ui, || inner.render(ui))
         }
@@ -162,7 +162,7 @@ impl WindowProps {
     }
 
     /// Creates the [`ImGuiWindow`] corresponding to the props.
-    fn create_window(&self) -> ImGuiWindow {
+    fn new_window(&self) -> ImGuiWindow {
         ImGuiWindow::new(&self.name)
             .title_bar(true)
             .draw_background(true)

@@ -259,7 +259,7 @@ impl Component for Tracker {
 }
 
 impl Windowed for Tracker {
-    fn props() -> WindowProps {
+    fn window_props() -> WindowProps {
         WindowProps::new("Food Tracker")
             .visible(false)
             .auto_resize(true)

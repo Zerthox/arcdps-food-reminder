@@ -33,6 +33,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
+          args: --all-features -- --deny warnings
   fmt:
     name: Rustfmt
     runs-on: windows-latest

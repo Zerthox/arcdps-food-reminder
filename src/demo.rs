@@ -35,12 +35,12 @@ impl Demo {
             all_foods: [Buff::Unset, Buff::None, Buff::Unknown]
                 .iter()
                 .copied()
-                .chain(Food::iter().map(|food| Buff::Known(food)))
+                .chain(Food::iter().map(Buff::Known))
                 .collect(),
             all_utils: [Buff::Unset, Buff::None, Buff::Unknown]
                 .iter()
                 .copied()
-                .chain(Utility::iter().map(|util| Buff::Known(util)))
+                .chain(Utility::iter().map(Buff::Known))
                 .collect(),
             tracker: Tracker::create(),
         }

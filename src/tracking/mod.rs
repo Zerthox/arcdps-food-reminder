@@ -194,7 +194,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        Buff::None | Buff::Known(Food::Malnourished) => {
+                        Buff::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Food");
@@ -204,6 +204,12 @@ impl Component for Tracker {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Food");
+                            }
+                        }
+                        Buff::Known(Food::Malnourished) => {
+                            ui.text_colored(red, "NONE");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Malnourished");
                             }
                         }
                         Buff::Known(food) => {
@@ -227,7 +233,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        Buff::None | Buff::Known(Utility::Diminished) => {
+                        Buff::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Utility");
@@ -237,6 +243,12 @@ impl Component for Tracker {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Utility");
+                            }
+                        }
+                        Buff::Known(Utility::Diminished) => {
+                            ui.text_colored(red, "NONE");
+                            if ui.is_item_hovered() {
+                                ui.tooltip_text("Diminished");
                             }
                         }
                         Buff::Known(util) => {

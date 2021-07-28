@@ -1,0 +1,49 @@
+name: Commit CI
+
+on:
+  - push
+  - pull_request
+
+env:
+  rustup-settings:
+    profile: minimal
+    toolchain: stable
+    target: x86_64-pc-windows-msvc
+    override: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with: ${{ env.rustup-settings }}
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          flags: --all-features
+  clippy:
+    name: Clippy
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with: ${{ env.rustup-settings }}
+      - run: rustup component add clippy
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          flags: --all-features
+  fmt:
+    name: Rustfmt
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with: ${{ env.rustup-settings }}
+      - run: rustup component add clippy
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          flags: --all-features

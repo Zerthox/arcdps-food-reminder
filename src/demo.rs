@@ -8,6 +8,7 @@ use crate::{
         Tracker,
     },
     ui::{
+        align::LeftAlign,
         window::{Window, WindowProps, Windowed},
         Component, Hideable,
     },
@@ -70,23 +71,21 @@ impl Demo {
 impl Component for Demo {
     fn render(&mut self, ui: &Ui) {
         // main window
-        // TODO: left align helper
 
         // reminder buttons
+        let mut align = LeftAlign::build();
         ui.align_text_to_frame_padding();
-        ui.text(im_str!("Reminders:"));
-        let [text_width, _] = ui.item_rect_size();
-
-        ui.same_line(text_width + 10.0);
-        if ui.button(im_str!("Trigger Food"), [0.0, 0.0]) {
-            self.reminder.trigger_food();
-        }
-        let [button_width, _] = ui.item_rect_size();
-
-        ui.same_line(text_width + button_width + 20.0);
-        if ui.button(im_str!("Trigger Util"), [0.0, 0.0]) {
-            self.reminder.trigger_util();
-        }
+        align.item_with_margin(ui, 10.0, || ui.text(im_str!("Reminders:")));
+        align.item(ui, || {
+            if ui.button(im_str!("Trigger Food"), [0.0, 0.0]) {
+                self.reminder.trigger_food();
+            }
+        });
+        align.item(ui, || {
+            if ui.button(im_str!("Trigger Util"), [0.0, 0.0]) {
+                self.reminder.trigger_util();
+            }
+        });
 
         ui.spacing();
         ui.separator();

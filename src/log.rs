@@ -21,9 +21,6 @@ pub struct DebugLog {
     /// Current size of contents string.
     size: usize,
 
-    /// Alignment helper
-    right_align: RightAlign,
-
     // button widths used for ui rendering
     toggle_width: f32,
     clear_button_width: f32,
@@ -37,7 +34,6 @@ impl DebugLog {
             active: true,
             contents: ImString::default(),
             size: 1, // imgui string has an implicit null at the end
-            right_align: RightAlign::new(),
             toggle_width: 60.0,
             clear_button_width: 60.0,
             copy_button_width: 60.0,
@@ -80,27 +76,29 @@ impl Component for DebugLog {
         ui.text(format!("Time: {}", Local::now().format(FORMAT)));
 
         // buttons from right to left
-        let mut align = self.right_align.begin_render();
+        let mut align = RightAlign::build();
 
         // clear button
-        align.next_item(ui, self.clear_button_width);
-        if ui.button(im_str!("Clear"), [0.0, 0.0]) {
-            self.clear();
-        }
-        self.clear_button_width = ui.item_rect_size()[0];
+        align.item(ui, self.clear_button_width, || {
+            if ui.button(im_str!("Clear"), [0.0, 0.0]) {
+                self.clear();
+            }
+            self.clear_button_width = ui.item_rect_size()[0];
+        });
 
         // copy button
-        align.next_item(ui, self.copy_button_width);
-        if ui.button(im_str!("Copy"), [0.0, 0.0]) {
-            ui.set_clipboard_text(&self.contents);
-        }
-        self.copy_button_width = ui.item_rect_size()[0];
+        align.item(ui, self.copy_button_width, || {
+            if ui.button(im_str!("Copy"), [0.0, 0.0]) {
+                ui.set_clipboard_text(&self.contents);
+            }
+            self.copy_button_width = ui.item_rect_size()[0];
+        });
 
         // activity toggle
-        align.next_margin(10.0);
-        align.next_item(ui, self.toggle_width);
-        ui.checkbox(im_str!("Active"), &mut self.active);
-        self.toggle_width = ui.item_rect_size()[0];
+        align.item_with_margin(ui, 10.0, self.toggle_width, || {
+            ui.checkbox(im_str!("Active"), &mut self.active);
+            self.toggle_width = ui.item_rect_size()[0];
+        });
 
         ui.separator();
 

@@ -2,66 +2,119 @@
 
 use arcdps::imgui::Ui;
 
-/// Helper struct to align items right.
-///
-/// Memorizes previous items and aligns them from right to left.
+/// Render state for left alignment.
 #[derive(Debug, Clone, Copy)]
-pub struct RightAlign {
-    margin: f32,
-    // TODO: memoize item widths here
-}
-
-impl RightAlign {
-    /// Creates a new right align helper with the default margin.
-    pub fn new() -> Self {
-        Self::with_margin(5.0)
-    }
-
-    /// Creates a new right align helper with a custom margin.
-    pub fn with_margin(margin: f32) -> Self {
-        Self { margin }
-    }
-
-    /// Starts the next render cycle.
-    pub fn begin_render(&mut self) -> RightAlignRender {
-        RightAlignRender {
-            margin: self.margin,
-            temp_margin: None,
-            accumulated: 0.0,
-        }
-    }
-}
-
-impl Default for RightAlign {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Render state for a [`RightAlign`].
-#[derive(Debug, Clone, Copy)]
-pub struct RightAlignRender {
-    margin: f32,
-    temp_margin: Option<f32>,
+pub struct LeftAlign {
+    default_margin: f32,
     accumulated: f32,
 }
 
-impl RightAlignRender {
-    /// Aligns the next item.
+impl LeftAlign {
+    /// Starts rendering items in left alignment.
+    ///
+    /// Items are passed from **left to right**.
+    pub fn build() -> Self {
+        Self::with_margin(5.0)
+    }
+
+    /// Starts rendering items in left alignment with a custom margin.
+    ///
+    /// Items are passed from **left to right**.
+    pub fn with_margin(margin: f32) -> Self {
+        Self {
+            default_margin: margin,
+            accumulated: f32::NAN, // placeholder to identify first render
+        }
+    }
+
+    /// Renders the next item.
+    ///
+    /// Items are passed from **left to right**.
+    pub fn item<F>(&mut self, ui: &Ui, render: F)
+    where
+        F: FnOnce(),
+    {
+        self.item_with_margin(ui, self.default_margin, render);
+    }
+
+    /// Renders the next item with a temporary margin override.
+    ///
+    /// Items are passed from **left to right**.
+    pub fn item_with_margin<F>(&mut self, ui: &Ui, margin: f32, render: F)
+    where
+        F: FnOnce(),
+    {
+        // prepare
+        if self.accumulated.is_nan() {
+            // first render is normal
+            self.accumulated = 0.0;
+        } else {
+            // successive renders on same line
+            ui.same_line(self.accumulated);
+        }
+
+        // render item
+        render();
+
+        // update accumulated
+        let [last_width, _] = ui.item_rect_size();
+        self.accumulated += last_width + margin;
+    }
+}
+
+/// Render state for  right alignment.
+#[derive(Debug, Clone, Copy)]
+pub struct RightAlign {
+    margin: f32,
+    accumulated: f32,
+}
+
+impl RightAlign {
+    /// Starts rendering items in right alignment.
+    ///
+    /// Items are passed from **right to left**.
+    pub fn build() -> Self {
+        Self::with_margin(5.0)
+    }
+
+    /// Starts rendering items in right alignment with a custom margin.
+    ///
+    /// Items are passed from **right to left**.
+    pub fn with_margin(margin: f32) -> Self {
+        Self {
+            margin,
+            accumulated: 0.0,
+        }
+    }
+
+    /// Renders the next item.
     ///
     /// Items are passed from **right to left**.
     ///
-    /// The item width can be guessed on the first render and then read & saved for successive renders.
-    pub fn next_item(&mut self, ui: &Ui, item_width: f32) {
-        let [window_x, _] = ui.window_content_region_max();
-        self.accumulated += item_width + self.temp_margin.take().unwrap_or(self.margin);
-        ui.same_line(window_x - self.accumulated);
+    /// Currently, the item width should be guessed on the first render and then read & saved for successive renders.
+    pub fn item<F>(&mut self, ui: &Ui, item_width: f32, render: F)
+    where
+        F: FnOnce(),
+    {
+        self.item_with_margin(ui, self.margin, item_width, render)
     }
 
-    /// Sets the margin for the next item.
+    /// Renders the next item with a temporary margin override.
     ///
-    /// Margin is reset to default after.
-    pub fn next_margin(&mut self, margin: f32) {
-        self.temp_margin = Some(margin);
+    /// Items are passed from **right to left**.
+    pub fn item_with_margin<F>(&mut self, ui: &Ui, margin: f32, item_width: f32, render: F)
+    where
+        F: FnOnce(),
+    {
+        // prepare
+        let [window_x, _] = ui.window_content_region_max();
+        ui.same_line(window_x - self.accumulated - item_width);
+
+        // render item
+        render();
+
+        // update accumulated with actual size
+        let [last_width, _] = ui.item_rect_size();
+        self.accumulated += last_width + margin;
     }
 }

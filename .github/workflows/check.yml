@@ -1,4 +1,4 @@
-name: Commit CI
+name: Commit
 
 on:
   - push

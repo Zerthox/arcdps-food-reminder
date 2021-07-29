@@ -42,9 +42,6 @@ const LOG_KEY: usize = VirtualKey::L.0 as usize;
 /// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
-    /// Settings.
-    settings: Settings,
-
     /// Food reminder.
     reminder: Reminder,
 
@@ -64,7 +61,6 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            settings: Settings::new(),
             reminder: Reminder::new(),
             tracker: Tracker::create_window(),
 
@@ -81,41 +77,41 @@ impl Plugin {
         #[cfg(feature = "log")]
         self.debug.log("Plugin load");
 
-        // attempt to load settings
-        if let Some(settings) = Settings::load() {
-            self.settings = settings;
+        // load settings
+        let mut settings = Settings::load_or_initial();
 
-            #[cfg(feature = "log")]
-            self.debug.log(format!("Loaded {:?}", self.settings));
+        #[cfg(feature = "log")]
+        self.debug.log(format!("Loaded {:?}", settings));
 
-            // load tracker settings
-            self.settings.load_component(&mut self.tracker);
+        // load tracker settings
+        settings.load_component(&mut self.tracker);
 
-            // load demo settings
-            #[cfg(feature = "demo")]
-            self.settings.load_component(&mut self.demo);
+        // load demo settings
+        #[cfg(feature = "demo")]
+        settings.load_component(&mut self.demo);
 
-            // load log settings
-            #[cfg(feature = "log")]
-            self.settings.load_component(&mut self.debug);
-        }
+        // load log settings
+        #[cfg(feature = "log")]
+        settings.load_component(&mut self.debug);
     }
 
     /// Unloads the plugin.
     pub fn unload(&mut self) {
+        let mut settings = Settings::load_or_initial();
+
         // update tracker settings
-        self.settings.store_component(&self.tracker);
+        settings.store_component(&self.tracker);
 
         // update demo settings
         #[cfg(feature = "demo")]
-        self.settings.store_component(&self.demo);
+        settings.store_component(&self.demo);
 
         // update log settings
         #[cfg(feature = "log")]
-        self.settings.store_component(&self.debug);
+        settings.store_component(&self.debug);
 
         // save settings
-        self.settings.save();
+        settings.save();
     }
 
     /// Handles a combat event.

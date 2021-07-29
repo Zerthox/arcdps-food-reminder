@@ -48,6 +48,11 @@ impl Settings {
         Some(settings)
     }
 
+    /// Loads settings or defaults to the initial ones.
+    pub fn load_or_initial() -> Self {
+        Self::load().unwrap_or_default()
+    }
+
     /// Saves settings to the settings file.
     ///
     /// This may silently fail.

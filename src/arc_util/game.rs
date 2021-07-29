@@ -212,77 +212,11 @@ pub enum Attribute {
     Unknown = 65535,
 }
 
-/// Boss from raids & fractals.
-#[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    IntoPrimitive,
-    TryFromPrimitive,
-    Display,
-    IntoStaticStr,
-    Serialize,
-    Deserialize,
-)]
-#[repr(usize)]
-pub enum Boss {
-    // w1
-    ValeGuardian = 15438,
-    Gorseval = 15429,
-    Sabetha = 15375,
-
-    // w2
-    Slothasor = 16123,
-    Berg = 16088,
-    Zane = 16137,
-    Narella = 16125,
-    Matthias = 16115,
-
-    // w3
-    MacLeod = 16253,
-    KeepConstruct = 16235,
-    Xera = 16246,
-
-    // w4
-    Cairn = 17194,
-    MursaatOverseer = 17172,
-    Samarog = 17188,
-    Deimos = 17154,
-
-    // w5
-    SoullessHorror = 19767,
-    Desmina = 19828,
-    BrokenKing = 19691,
-    SoulEater = 19536,
-    EyeOfJudgement = 19651,
-    EyeOfFate = 19844,
-    Dhuum = 19450,
-
-    // w6
-    ConjuredAmalgamate = 43974,
-    ConjuredAmalgamateRightArm = 10142,
-    ConjuredAmalgamateLeftArm = 37464,
-    Nikare = 21105,
-    Kenut = 21089,
-    Qadim = 20934,
-
-    // w7
-    Adina = 22006,
-    Sabir = 21964,
-    QadimThePeerless = 22000,
-
-    // fractals
-    Mama = 17021,
-    Siax = 17028,
-    Ensolyss = 16948,
-    Skorvald = 17632,
-    Artsariiv = 17949,
-    Arkk = 17759,
-    Ai = 23254,
-}
+// entity enums generated from data
+include!(concat!(env!("OUT_DIR"), "/entity.rs"));
+include!(concat!(env!("OUT_DIR"), "/boss.rs"));
+include!(concat!(env!("OUT_DIR"), "/raidboss.rs"));
+include!(concat!(env!("OUT_DIR"), "/fractalboss.rs"));
 
 // buff enums generated from data
 include!(concat!(env!("OUT_DIR"), "/buff.rs"));

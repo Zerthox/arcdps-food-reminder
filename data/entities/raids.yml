@@ -1,0 +1,168 @@
+# w1
+ValeGuardian:
+  id: 15438
+  name: Vale Guardian
+  encounter: Vale Guardian
+  location: W1 Spirit Vale
+Gorseval:
+  id: 15429
+  name: Gorseval
+  encounter: Gorseval
+  location: W1 Spirit Vale
+Sabetha:
+  id: 15375
+  name: Sabetha
+  encounter: Sabetha
+  location: W1 Spirit Vale
+
+# w2
+Slothasor:
+  id: 16123
+  name: Slothasor
+  encounter: Slothasor
+  location: W2 Salvation Pass
+Berg:
+  id: 16088
+  name: Berg
+  encounter: Bandit Trio
+  location: W2 Salvation Pass
+Zane:
+  id: 16137
+  name: Zane
+  encounter: Bandit Trio
+  location: W2 Salvation Pass
+Narella:
+  id: 16125
+  name: Narella
+  encounter: Bandit Trio
+  location: W2 Salvation Pass
+Matthias:
+  id: 16115
+  name: Matthias
+  encounter: Matthias
+  location: W2 Salvation Pass
+
+# w3
+MacLeod:
+  id: 16253
+  name: MacLeod
+  encounter: Escort
+  location: W3 Stronghold of the Faithful
+KeepConstruct:
+  id: 16235
+  name: Keep Construct
+  encounter: Keep Construct
+  location: W3 Stronghold of the Faithful
+Xera:
+  id: 16246
+  name: Xera
+  encounter: Xera
+  location: W3 Stronghold of the Faithful
+
+# w4
+Cairn:
+  id: 17194
+  name: Cairn
+  encounter: Cairn
+  location: W4 Bastion of the Penitent
+MursaatOverseer:
+  id: 17172
+  name: Mursaat Overseer
+  encounter: Mursaat Overseer
+  location: W4 Bastion of the Penitent
+Samarog:
+  id: 17188
+  name: Samarog
+  encounter: Samarog
+  location: W4 Bastion of the Penitent
+Deimos:
+  id: 17154
+  name: Deimos
+  encounter: Deimos
+  location: W4 Bastion of the Penitent
+
+# w5
+SoullessHorror:
+  id: 19767
+  name: Soulless Horror
+  encounter: Soulless Horror
+  location: W5 Hall of Chains
+Desmina:
+  id: 19828
+  name: Desmina
+  encounter: River
+  location: W5 Hall of Chains
+BrokenKing:
+  id: 19691
+  name: Broken King
+  encounter: Broken King
+  location: W5 Hall of Chains
+SoulEater:
+  id: 19536
+  name: Soul Eater
+  encounter: Soul Eater
+  location: W5 Hall of Chains
+EyeOfJudgement:
+  id: 19651
+  name: Eye of Judgement
+  encounter: Eyes
+  location: W5 Hall of Chains
+EyeOfFate:
+  id: 19844
+  name: Eye of Fate
+  encounter: Eyes
+  location: W5 Hall of Chains
+Dhuum:
+  id: 19450
+  name: Dhuum
+  encounter: Dhuum
+  location: W5 Hall of Chains
+
+# w6
+ConjuredAmalgamate:
+  id: 43974
+  name: Conjured Amalgamate
+  encounter: Conjured Amalgamate
+  location: W6 Mythwright Gambit
+ConjuredAmalgamateRightArm:
+  id: 10142
+  name: Conjured Amalgamate Right Arm
+  encounter: Conjured Amalgamate
+  location: W6 Mythwright Gambit
+ConjuredAmalgamateLeftArm:
+  id: 37464
+  name: Conjured Amalgamate Left Arm
+  encounter: Conjured Amalgamate
+  location: W6 Mythwright Gambit
+Nikare:
+  id: 21105
+  name: Nikare
+  encounter: Twin Largos
+  location: W6 Mythwright Gambit
+Kenut:
+  id: 21089
+  name: Kenut
+  encounter: Twin Largos
+  location: W6 Mythwright Gambit
+Qadim:
+  id: 20934
+  name: Qadim
+  encounter: Qadim
+  location: W6 Mythwright Gambit
+
+# w7
+Adina:
+  id: 22006
+  name: Adina
+  encounter: Adina
+  location: W7 Key of Ahdashim
+Sabir:
+  id: 21964
+  name: Sabir
+  encounter: Sabir
+  location: W7 Key of Ahdashim
+QadimThePeerless:
+  id: 22000
+  name: Qadim the Peerless
+  encounter: Qadim the Peerless
+  location: W7 Key of Ahdashim

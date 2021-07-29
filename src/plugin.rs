@@ -155,14 +155,16 @@ impl Plugin {
                         #[cfg(feature = "log")]
                         let delta = api::calc_delta(event);
 
+                        // change unset buffs to none,
+                        // initial buffs should be reported right after
                         for player in self.tracker.get_players_mut() {
-                            // initial buffs should be reported right after
                             player.unset_to_none(event_id);
                         }
 
-                        // check for known boss
+                        // grab target id
                         let target_id = event.src_agent;
 
+                        // check for known boss
                         #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
                             #[cfg(feature = "log")]
@@ -174,7 +176,7 @@ impl Plugin {
                         } else {
                             #[cfg(feature = "log")]
                             self.debug.log(format!(
-                                "Log for {} started with {:?} delta",
+                                "Log for id {} started with {:?} delta",
                                 target_id, delta
                             ))
                         }
@@ -182,9 +184,10 @@ impl Plugin {
                     StateChange::LogEnd => {
                         // log end
 
-                        // check for known boss
+                        // grab target id
                         let target_id = event.src_agent;
 
+                        // check for known boss
                         #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
                             #[cfg(feature = "log")]
@@ -194,7 +197,7 @@ impl Plugin {
                             self.check_self_buffs();
                         } else {
                             #[cfg(feature = "log")]
-                            self.debug.log(format!("Log for {} ended", target_id));
+                            self.debug.log(format!("Log for id {} ended", target_id));
                         }
                     }
                     _ => {

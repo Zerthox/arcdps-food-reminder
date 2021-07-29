@@ -1,0 +1,40 @@
+# nightmare
+Mama:
+  id: 17021
+  name: MAMA
+  encounter: MAMA
+  location: 98CM Nightmare
+Siax:
+  id: 17028
+  name: Siax
+  encounter: Siax
+  location: 98CM Nightmare
+Ensolyss:
+  id: 16948
+  name: Ensolyss
+  encounter: Ensolyss
+  location: 98CM Nightmare
+
+# shattered
+Skorvald:
+  id: 17632
+  name: Skorvald
+  encounter: Skorvald
+  location: 99CM Shattered Observatory
+Artsariiv:
+  id: 17949
+  name: Artsariiv
+  encounter: Artsariiv
+  location: 99CM Shattered Observatory
+Arkk:
+  id: 17759
+  name: Arkk
+  encounter: Arkk
+  location: 99CM Shattered Observatory
+
+# sunqua
+Ai:
+  id: 23254
+  name: Ai
+  encounter: Ai
+  location: 100CM Sunqua Peak

@@ -39,7 +39,7 @@ const DEMO_KEY: usize = VirtualKey::D.0 as usize;
 #[cfg(feature = "log")]
 const LOG_KEY: usize = VirtualKey::L.0 as usize;
 
-/// Main plugin instance.
+/// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
     /// Settings.
@@ -64,7 +64,7 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            settings: Settings::initial(),
+            settings: Settings::new(),
             reminder: Reminder::new(),
             tracker: Tracker::create_window(),
 
@@ -81,23 +81,38 @@ impl Plugin {
         #[cfg(feature = "log")]
         self.debug.log("Plugin load");
 
-        #[cfg(feature = "log")]
-        self.debug
-            .log(format!("Config {:?}", Settings::config_path()));
-
+        // attempt to load settings
         if let Some(settings) = Settings::load() {
             self.settings = settings;
 
             #[cfg(feature = "log")]
-            self.debug.log(format!("Loaded {:?}", self.settings))
+            self.debug.log(format!("Loaded {:?}", self.settings));
+
+            // load tracker settings
+            self.settings.load_component(&mut self.tracker);
+
+            // load demo settings
+            #[cfg(feature = "demo")]
+            self.settings.load_component(&mut self.demo);
+
+            // load log settings
+            #[cfg(feature = "log")]
+            self.settings.load_component(&mut self.debug);
         }
     }
 
     /// Unloads the plugin.
     pub fn unload(&mut self) {
-        // update settings
-        // TODO: handle this differently
-        // self.settings.tracker_open = self.tracker.shown;
+        // update tracker settings
+        self.settings.store_component(&self.tracker);
+
+        // update demo settings
+        #[cfg(feature = "demo")]
+        self.settings.store_component(&self.demo);
+
+        // update log settings
+        #[cfg(feature = "log")]
+        self.settings.store_component(&self.debug);
 
         // save settings
         self.settings.save();

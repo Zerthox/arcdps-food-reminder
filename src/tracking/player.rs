@@ -1,12 +1,13 @@
 pub use super::buff::{Buff, Food, Utility};
 pub use crate::arc_util::game::{Profession, Specialization};
+use serde::{Deserialize, Serialize};
 use std::cmp;
 
 // TODO: track buff duration & reset to unset when duration runs out
 // TODO: timestamps for buff apply to avoid out of order
 
 /// Struct representing a player.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
     /// Player id given by the game.
     pub id: usize,

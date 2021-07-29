@@ -78,7 +78,7 @@ fn generate_enum(doc: &str, name: &str, entries: &HashMap<String, Entry>) -> Str
     // TODO: switch to proc macro?
     format!(
         "/// {}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr, EnumIter)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum {} {{
     {}

@@ -3,6 +3,7 @@ pub mod player;
 
 use crate::{
     arc_util::{api::CoreColor, exports},
+    settings::HasSettings,
     tracking::buff::{Categorize, Food, Utility},
     ui::{
         window::{WindowProps, Windowed},
@@ -12,18 +13,23 @@ use crate::{
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::Buff;
 use player::Player;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Player tracker.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Tracker {
     /// Currently tracked players mapped by their id.
+    #[serde(skip)]
     players: HashMap<usize, Player>,
 
     /// Current local player (self) id.
+    #[serde(skip)]
     self_id: usize,
 
     /// Cache for temporarily saved buffs on last character of local player (self).
+    #[serde(skip)]
     cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 }
 
@@ -122,6 +128,12 @@ impl Tracker {
         let mut players = self.get_players().collect::<Vec<_>>();
         players.sort_by_key(|player| player.subgroup);
         players
+    }
+}
+
+impl Default for Tracker {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -278,8 +290,11 @@ impl Windowed for Tracker {
     }
 }
 
-impl Default for Tracker {
-    fn default() -> Self {
-        Self::new()
+impl HasSettings for Tracker {
+    type Settings = ();
+    fn settings_name() -> &'static str {
+        "tracker"
     }
+    fn get_settings(&self) -> Self::Settings {}
+    fn load_settings(&mut self, _: Self::Settings) {}
 }

@@ -1,5 +1,7 @@
 use super::{Component, Hideable};
+use crate::settings::HasSettings;
 use arcdps::imgui::{Condition, ImString, Ui, Window as ImGuiWindow};
+use serde::{Deserialize, Serialize};
 use std::ops::{Deref, DerefMut};
 
 /// A component which may render in a window.
@@ -49,6 +51,15 @@ where
     /// Creates a new window with the [`Default`] of the inner [`Component`].
     pub fn with_default(props: WindowProps) -> Self {
         Self::with_inner(props, T::default())
+    }
+}
+
+impl<T> Default for Window<T>
+where
+    T: Windowed,
+{
+    fn default() -> Self {
+        T::create_window()
     }
 }
 
@@ -173,5 +184,34 @@ impl WindowProps {
             .scroll_bar(self.scroll)
             .scrollable(self.scroll)
             .focus_on_appearing(false)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WindowSettings<T>
+where
+    T: HasSettings,
+{
+    shown: bool,
+    settings: T::Settings,
+}
+
+impl<T> HasSettings for Window<T>
+where
+    T: Component + Windowed + HasSettings,
+{
+    type Settings = WindowSettings<T>;
+    fn settings_name() -> &'static str {
+        T::settings_name()
+    }
+    fn get_settings(&self) -> Self::Settings {
+        WindowSettings {
+            shown: self.shown,
+            settings: self.inner.get_settings(),
+        }
+    }
+    fn load_settings(&mut self, loaded: Self::Settings) {
+        self.shown = loaded.shown;
+        self.inner.load_settings(loaded.settings);
     }
 }

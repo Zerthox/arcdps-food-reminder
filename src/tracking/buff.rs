@@ -1,6 +1,7 @@
 pub use crate::arc_util::game::{Food, Utility};
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Buff<T> {
     /// Buff state is not set (yet).
     ///

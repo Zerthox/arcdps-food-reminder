@@ -2,11 +2,25 @@
 //!
 //! These are also used in the ArcDPS API, but may be useful outside.
 
-use num_enum::{FromPrimitive, TryFromPrimitive};
+use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
+use serde::{Deserialize, Serialize};
 use strum_macros::{Display, EnumIter, IntoStaticStr};
 
 /// GW2 client language.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    TryFromPrimitive,
+    Display,
+    IntoStaticStr,
+    Serialize,
+    Deserialize,
+)]
 #[repr(u8)]
 pub enum Language {
     English = 0,
@@ -17,7 +31,20 @@ pub enum Language {
 }
 
 /// Player profession.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    FromPrimitive,
+    Display,
+    IntoStaticStr,
+    Serialize,
+    Deserialize,
+)]
 #[repr(u32)]
 pub enum Profession {
     /// Unknown or invalid.
@@ -36,7 +63,20 @@ pub enum Profession {
 }
 
 /// Player specializations.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    FromPrimitive,
+    Display,
+    IntoStaticStr,
+    Serialize,
+    Deserialize,
+)]
 #[repr(u32)]
 pub enum Specialization {
     /// Unknown or invalid.
@@ -127,7 +167,20 @@ pub enum Specialization {
 
 // TODO: document unclear attributes
 /// Buff formula attributes.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive, Display, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    FromPrimitive,
+    Display,
+    IntoStaticStr,
+    Serialize,
+    Deserialize,
+)]
 #[repr(u16)]
 pub enum Attribute {
     None,
@@ -160,7 +213,20 @@ pub enum Attribute {
 }
 
 /// Boss from raids & fractals.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, Display, IntoStaticStr)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    TryFromPrimitive,
+    Display,
+    IntoStaticStr,
+    Serialize,
+    Deserialize,
+)]
 #[repr(usize)]
 pub enum Boss {
     // w1

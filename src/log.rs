@@ -1,29 +1,41 @@
-use crate::ui::{
-    align::RightAlign,
-    window::{WindowProps, Windowed},
-    Component,
+use crate::{
+    settings::HasSettings,
+    ui::{
+        align::RightAlign,
+        window::{WindowProps, Windowed},
+        Component,
+    },
 };
 use arcdps::imgui::{im_str, ChildWindow, ImString, Ui};
 use chrono::Local;
+use serde::{Deserialize, Serialize};
 
 /// Time format used for debug messages.
 const FORMAT: &str = "%b %d %H:%M:%S.%3f";
 
 /// Debug log component.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct DebugLog {
     /// Whether the log is active.
     active: bool,
 
     /// Current contents of the log.
+    #[serde(skip)]
     contents: ImString,
 
     /// Current size of contents string.
+    #[serde(skip)]
     size: usize,
 
     // button widths used for ui rendering
+    #[serde(skip)]
     toggle_width: f32,
+
+    #[serde(skip)]
     clear_button_width: f32,
+
+    #[serde(skip)]
     copy_button_width: f32,
 }
 
@@ -66,6 +78,12 @@ impl DebugLog {
     pub fn clear(&mut self) {
         self.size = 1;
         self.contents.clear();
+    }
+}
+
+impl Default for DebugLog {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -122,8 +140,11 @@ impl Windowed for DebugLog {
     }
 }
 
-impl Default for DebugLog {
-    fn default() -> Self {
-        Self::new()
+impl HasSettings for DebugLog {
+    type Settings = ();
+    fn settings_name() -> &'static str {
+        "log"
     }
+    fn get_settings(&self) -> Self::Settings {}
+    fn load_settings(&mut self, _: Self::Settings) {}
 }

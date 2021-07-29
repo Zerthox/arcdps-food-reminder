@@ -2,6 +2,7 @@
 
 use crate::{
     reminder::Reminder,
+    settings::HasSettings,
     tracking::{
         buff::{Buff, Food, Utility},
         player::{Player, Profession, Specialization},
@@ -14,6 +15,7 @@ use crate::{
     },
 };
 use arcdps::imgui::{im_str, ComboBox, ImStr, ImString, Ui};
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use strum::IntoEnumIterator;
 
@@ -65,6 +67,12 @@ impl Demo {
             Buff::Unknown => im_str!("Unknown").into(),
             Buff::Known(util) => im_str!("{}", util.name()).into(),
         }
+    }
+}
+
+impl Default for Demo {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -240,8 +248,27 @@ impl Windowed for Demo {
     }
 }
 
-impl Default for Demo {
-    fn default() -> Self {
-        Self::new()
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DemoSettings {
+    next_id: usize,
+    players: Vec<Player>,
+}
+
+impl HasSettings for Demo {
+    type Settings = DemoSettings;
+    fn settings_name() -> &'static str {
+        "demo"
+    }
+    fn get_settings(&self) -> Self::Settings {
+        DemoSettings {
+            next_id: self.next_id,
+            players: self.tracker.get_players().cloned().collect(),
+        }
+    }
+    fn load_settings(&mut self, loaded: Self::Settings) {
+        self.next_id = loaded.next_id;
+        for player in loaded.players {
+            self.tracker.add_player(player);
+        }
     }
 }

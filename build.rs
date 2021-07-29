@@ -235,7 +235,7 @@ impl {} {{
                     name,
                     match &entity.encounter {
                         Some(encounter) => format!("Some(\"{}\")", encounter),
-                        None => format!("none"),
+                        None => "None".into(),
                     }
                 )
             })
@@ -249,7 +249,7 @@ impl {} {{
                     name,
                     match &entity.location {
                         Some(location) => format!("Some(\"{}\")", location),
-                        None => format!("none"),
+                        None => "None".into(),
                     }
                 )
             })

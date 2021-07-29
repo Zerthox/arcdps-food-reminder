@@ -213,7 +213,6 @@ pub enum Attribute {
 }
 
 // entity enums generated from data
-include!(concat!(env!("OUT_DIR"), "/entity.rs"));
 include!(concat!(env!("OUT_DIR"), "/boss.rs"));
 include!(concat!(env!("OUT_DIR"), "/raidboss.rs"));
 include!(concat!(env!("OUT_DIR"), "/fractalboss.rs"));

@@ -4,14 +4,13 @@ pub mod player;
 use crate::{
     arc_util::{api::CoreColor, exports},
     settings::HasSettings,
-    tracking::buff::{Categorize, Food, Utility},
     ui::{
         window::{WindowProps, Windowed},
         Component,
     },
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
-use buff::Buff;
+use buff::{Buff, BuffState, Categorize, Food, Utility};
 use player::Player;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -199,32 +198,32 @@ impl Component for Tracker {
 
                     // render food cell
                     ui.table_next_column();
-                    match player.food {
-                        Buff::Unset => {
+                    match player.food.state {
+                        BuffState::Unset => {
                             ui.text("???");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        Buff::None => {
+                        BuffState::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Food");
                             }
                         }
-                        Buff::Unknown => {
+                        BuffState::Unknown => {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Food");
                             }
                         }
-                        Buff::Known(Food::Malnourished) => {
-                            ui.text_colored(red, "NONE");
+                        BuffState::Known(Food::Malnourished) => {
+                            ui.text_colored(red, "MAL");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Malnourished");
                             }
                         }
-                        Buff::Known(food) => {
+                        BuffState::Known(food) => {
                             ui.text_colored(green, food.categorize());
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
@@ -238,32 +237,32 @@ impl Component for Tracker {
 
                     // render util cell
                     ui.table_next_column();
-                    match player.util {
-                        Buff::Unset => {
+                    match player.util.state {
+                        BuffState::Unset => {
                             ui.text("???");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        Buff::None => {
+                        BuffState::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Utility");
                             }
                         }
-                        Buff::Unknown => {
+                        BuffState::Unknown => {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Utility");
                             }
                         }
-                        Buff::Known(Utility::Diminished) => {
-                            ui.text_colored(red, "NONE");
+                        BuffState::Known(Utility::Diminished) => {
+                            ui.text_colored(red, "DIM");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Diminished");
                             }
                         }
-                        Buff::Known(util) => {
+                        BuffState::Known(util) => {
                             ui.text_colored(green, util.categorize());
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(

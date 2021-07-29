@@ -4,7 +4,7 @@ use crate::{
     reminder::Reminder,
     settings::HasSettings,
     tracking::{
-        buff::{Buff, Food, Utility},
+        buff::{BuffState, Food, Utility},
         player::{Player, Profession, Specialization},
         Tracker,
     },
@@ -24,8 +24,8 @@ use strum::IntoEnumIterator;
 pub struct Demo {
     reminder: Reminder,
     next_id: usize,
-    all_foods: Vec<Buff<Food>>,
-    all_utils: Vec<Buff<Utility>>,
+    all_foods: Vec<BuffState<Food>>,
+    all_utils: Vec<BuffState<Utility>>,
     tracker: Window<Tracker>,
 }
 
@@ -35,37 +35,37 @@ impl Demo {
         Self {
             reminder: Reminder::new(),
             next_id: 0,
-            all_foods: [Buff::Unset, Buff::None, Buff::Unknown]
+            all_foods: [BuffState::Unset, BuffState::None, BuffState::Unknown]
                 .iter()
                 .copied()
-                .chain(Food::iter().map(Buff::Known))
+                .chain(Food::iter().map(BuffState::Known))
                 .collect(),
-            all_utils: [Buff::Unset, Buff::None, Buff::Unknown]
+            all_utils: [BuffState::Unset, BuffState::None, BuffState::Unknown]
                 .iter()
                 .copied()
-                .chain(Utility::iter().map(Buff::Known))
+                .chain(Utility::iter().map(BuffState::Known))
                 .collect(),
             tracker: Tracker::create_window(),
         }
     }
 
     /// Returns the display name for a given food buff.
-    fn food_name(buff: Buff<Food>) -> Cow<'static, ImStr> {
+    fn food_name(buff: BuffState<Food>) -> Cow<'static, ImStr> {
         match buff {
-            Buff::Unset => im_str!("Unset").into(),
-            Buff::None => im_str!("None").into(),
-            Buff::Unknown => im_str!("Unknown").into(),
-            Buff::Known(food) => im_str!("{}", food.name()).into(),
+            BuffState::Unset => im_str!("Unset").into(),
+            BuffState::None => im_str!("None").into(),
+            BuffState::Unknown => im_str!("Unknown").into(),
+            BuffState::Known(food) => im_str!("{}", food.name()).into(),
         }
     }
 
     /// Returns the display name for a given utility buff.
-    fn util_name(buff: Buff<Utility>) -> Cow<'static, ImStr> {
+    fn util_name(buff: BuffState<Utility>) -> Cow<'static, ImStr> {
         match buff {
-            Buff::Unset => im_str!("Unset").into(),
-            Buff::None => im_str!("None").into(),
-            Buff::Unknown => im_str!("Unknown").into(),
-            Buff::Known(util) => im_str!("{}", util.name()).into(),
+            BuffState::Unset => im_str!("Unset").into(),
+            BuffState::None => im_str!("None").into(),
+            BuffState::Unknown => im_str!("Unknown").into(),
+            BuffState::Known(util) => im_str!("{}", util.name()).into(),
         }
     }
 }
@@ -181,7 +181,7 @@ impl Component for Demo {
                 let mut food_id = self
                     .all_foods
                     .iter()
-                    .position(|buff| *buff == player.food)
+                    .position(|buff| *buff == player.food.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
                 ComboBox::new(&im_str!("##food-reminder-demo-food-{}", id)).build_simple(
@@ -190,14 +190,14 @@ impl Component for Demo {
                     &self.all_foods,
                     &|buff| Self::food_name(*buff),
                 );
-                player.food = self.all_foods[food_id];
+                player.food.state = self.all_foods[food_id];
 
                 // utility
                 ui.table_next_column();
                 let mut util_id = self
                     .all_utils
                     .iter()
-                    .position(|buff| *buff == player.util)
+                    .position(|buff| *buff == player.util.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
                 ComboBox::new(&im_str!("##food-reminder-demo-util-{}", id)).build_simple(
@@ -206,7 +206,7 @@ impl Component for Demo {
                     &self.all_utils,
                     &|buff| Self::util_name(*buff),
                 );
-                player.util = self.all_utils[util_id];
+                player.util.state = self.all_utils[util_id];
             }
 
             ui.end_table();

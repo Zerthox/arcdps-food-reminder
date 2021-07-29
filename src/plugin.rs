@@ -7,7 +7,7 @@ use crate::{
     reminder::Reminder,
     settings::Settings,
     tracking::{
-        player::{Buff, Player},
+        player::{BuffState, Player},
         Tracker,
     },
     ui::{
@@ -121,7 +121,7 @@ impl Plugin {
         src: Option<Agent>,
         dest: Option<Agent>,
         skill_name: Option<&str>,
-        _id: u64,
+        event_id: u64,
         _revision: u64,
     ) {
         // source should always be set, but we dont want to cause a crash
@@ -157,7 +157,7 @@ impl Plugin {
 
                         for player in self.tracker.get_players_mut() {
                             // initial buffs should be reported right after
-                            player.unset_to_none();
+                            player.unset_to_none(event_id);
                         }
 
                         // check for known boss
@@ -214,37 +214,37 @@ impl Plugin {
 
                                         // check for food & util
                                         if let Ok(food) = Food::try_from(buff_id) {
-                                            player.apply_food(food);
-
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Food {} applied to {:?}",
-                                                food, player
-                                            ));
+                                            if player.apply_food(food, event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Food {} applied to {:?}",
+                                                    food, player
+                                                ));
+                                            }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
-                                            player.apply_util(util);
-
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Utility {} applied to {:?}",
-                                                util, player
-                                            ));
+                                            if player.apply_util(util, event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Utility {} applied to {:?}",
+                                                    util, player
+                                                ));
+                                            }
                                         } else if let Some("Nourishment") = skill_name {
-                                            player.apply_unknown_food();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Unknown Food with id {} applied to {:?}",
-                                                buff_id, player
-                                            ));
+                                            if player.apply_unknown_food(event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Unknown Food with id {} applied to {:?}",
+                                                    buff_id, player
+                                                ));
+                                            }
                                         } else if let Some("Enhancement") = skill_name {
-                                            player.apply_unknown_util();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Unknown Utility with id {} applied to {:?}",
-                                                buff_id, player
-                                            ));
+                                            if player.apply_unknown_util(event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Unknown Utility with id {} applied to {:?}",
+                                                    buff_id, player
+                                                ));
+                                            }
                                         }
                                     }
                                 }
@@ -258,10 +258,7 @@ impl Plugin {
 
                                 // check for food & util
                                 if let Ok(food) = Food::try_from(buff_id) {
-                                    // check for same as applied
-                                    if player.food == Buff::Known(food) {
-                                        player.remove_food();
-
+                                    if player.remove_food(Some(food), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Food {:?} removed from {:?}",
@@ -269,10 +266,7 @@ impl Plugin {
                                         ));
                                     }
                                 } else if let Ok(util) = Utility::try_from(buff_id) {
-                                    // check for same as applied
-                                    if player.util == Buff::Known(util) {
-                                        player.remove_util();
-
+                                    if player.remove_util(Some(util), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Utility {:?} removed from {:?}",
@@ -280,10 +274,7 @@ impl Plugin {
                                         ));
                                     }
                                 } else if let Some("Nourishment") = skill_name {
-                                    // check for same as applied
-                                    if player.food == Buff::Unknown {
-                                        player.remove_food();
-
+                                    if player.remove_food(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Food with id {} removed from {:?}",
@@ -291,10 +282,7 @@ impl Plugin {
                                         ));
                                     }
                                 } else if let Some("Enhancement") = skill_name {
-                                    // check for same as applied
-                                    if player.util == Buff::Unknown {
-                                        player.remove_util();
-
+                                    if player.remove_util(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Utility with id {} removed from {:?}",
@@ -324,7 +312,7 @@ impl Plugin {
                             }),
                         ) = (src.name, dest)
                         {
-                            let acc_name = dest_name.strip_prefix(":").unwrap_or(dest_name);
+                            let acc_name = dest_name.strip_prefix(':').unwrap_or(dest_name);
                             let player = Player::new(
                                 src.id,
                                 char_name,
@@ -361,13 +349,13 @@ impl Plugin {
     /// Checks for Malnourished/Diminished on the local player (self).
     fn check_self_buffs(&mut self) {
         if let Some(player) = self.tracker.get_self() {
-            if player.food == Buff::Known(Food::Malnourished) {
+            if player.food.state == BuffState::Known(Food::Malnourished) {
                 self.reminder.trigger_food();
 
                 #[cfg(feature = "log")]
                 self.debug.log("Food reminder triggered for self");
             }
-            if player.util == Buff::Known(Utility::Diminished) {
+            if player.util.state == BuffState::Known(Utility::Diminished) {
                 self.reminder.trigger_util();
 
                 #[cfg(feature = "log")]

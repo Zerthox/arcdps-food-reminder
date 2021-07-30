@@ -97,6 +97,8 @@ dependencies = [
  "chrono",
  "lazy_static",
  "num_enum",
+ "proc-macro2",
+ "quote",
  "serde",
  "serde_json",
  "serde_yaml",

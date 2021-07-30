@@ -17,6 +17,8 @@ strum_macros = "0.21"
 windows = "0.18"
 
 [build-dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.8"
 windows = "0.18"

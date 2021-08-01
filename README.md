@@ -16,6 +16,7 @@ ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
   - [ ] Table sorting
 - [ ] Settings
   - [x] Save window states
+  - [ ] Custom hotkeys
   - [ ] Reminder on Malnourished/Diminished vs. none
   - [ ] Custom reminder delay
   - [ ] Custom Food/Utility definitions

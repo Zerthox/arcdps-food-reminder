@@ -26,17 +26,14 @@ pub fn get_config_path() -> Option<PathBuf> {
     }
 }
 
-/// The array of color arrays returned by ArcDPS.
-type RawColorArray = [*mut ImVec4; 5];
-
-/// Current color settings.
+/// Current ArcDPS color settings.
 ///
 /// Use the associated functions to access individual colors.
 ///
 /// This holds pointers to color information in memory until dropped.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Colors {
-    raw: RawColorArray,
+    raw: [*mut ImVec4; 5],
 }
 
 impl Colors {
@@ -111,20 +108,31 @@ impl Colors {
 /// Retrieves the color settings from ArcDPS.
 pub fn get_colors() -> Colors {
     // zeroing this is important for our null pointer checks later
-    let mut colors = MaybeUninit::<RawColorArray>::zeroed();
+    let mut colors = MaybeUninit::zeroed();
     unsafe { e5_colors(colors.as_mut_ptr()) };
     Colors {
         raw: unsafe { colors.assume_init() },
     }
 }
 
-/// Set of UI settings.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+/// Current ArcDPS UI settings.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct UISettings {
+    /// Whether the UI is hidden.
     pub hidden: bool,
+
+    /// Whether the UI is always drawn.
+    ///
+    /// When `false`, UI is hidden during loading screens & character select.
     pub draw_always: bool,
+
+    /// Whether pressing the modifiers are required to move windows.
     pub modifiers_move_lock: bool,
-    pub modifiers_click_block: bool,
+
+    /// Whether pressing the modifiers are required to click windows.
+    pub modifiers_click_lock: bool,
+
+    /// Whether windows should close with the `ESC` key.
     pub close_with_esc: bool,
 }
 
@@ -135,16 +143,21 @@ pub fn get_ui_settings() -> UISettings {
         hidden: raw & 1 == 1,
         draw_always: (raw >> 1) & 1 == 1,
         modifiers_move_lock: (raw >> 2) & 1 == 1,
-        modifiers_click_block: (raw >> 3) & 1 == 1,
+        modifiers_click_lock: (raw >> 3) & 1 == 1,
         close_with_esc: (raw >> 4) & 1 == 1,
     }
 }
 
-/// Set of modifier keybinds as virtual key ids.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+/// Current ArcDPS modifier keybinds as virtual key ids.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Modifiers {
+    /// Virtual key id of the first modifier used by ArcDPS.
     pub modifier1: u16,
+
+    /// Virtual key id of the second modifier used by ArcDPS.
     pub modifier2: u16,
+
+    /// Virtual key id of the "multi" modifier used by ArcDPS.
     pub modifier_multi: u16,
 }
 

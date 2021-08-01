@@ -62,13 +62,13 @@ impl Plugin {
     pub fn new() -> Self {
         Self {
             reminder: Reminder::new(),
-            tracker: Tracker::create_window(),
+            tracker: Tracker::new().windowed(),
 
             #[cfg(feature = "demo")]
-            demo: Demo::create_window(),
+            demo: Demo::new().windowed(),
 
             #[cfg(feature = "log")]
-            debug: DebugLog::create_window(),
+            debug: DebugLog::new().windowed(),
         }
     }
 

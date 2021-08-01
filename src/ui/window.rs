@@ -9,12 +9,17 @@ pub trait Windowed
 where
     Self: Component + Default + Sized,
 {
-    /// Returns the default props for the component's window.
+    /// Returns the default [`WindowProps`] for the [`Component`]'s [`Window`].
     fn window_props() -> WindowProps;
 
-    /// Creates a window containing the component.
+    /// Creates a [`Window`] containing the [`Default`] value of the [`Component`].
     fn create_window() -> Window<Self> {
         Window::with_default(Self::window_props())
+    }
+
+    /// Embeds the [`Component`] into a [`Window`].
+    fn windowed(self) -> Window<Self> {
+        Window::with_inner(Self::window_props(), self)
     }
 }
 
@@ -48,7 +53,7 @@ impl<T> Window<T>
 where
     T: Component + Default,
 {
-    /// Creates a new window with the [`Default`] of the inner [`Component`].
+    /// Creates a new window with the [`Default`] value of the inner [`Component`].
     pub fn with_default(props: WindowProps) -> Self {
         Self::with_inner(props, T::default())
     }

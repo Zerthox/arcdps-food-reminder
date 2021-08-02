@@ -113,7 +113,7 @@ impl Categorize for Utility {
             Self::PotentOil | Self::EnhancedOil | Self::ToxicOil | Self::PeppermintOil => "CONC",
             Self::BountifulOil => "HEAL",
             Self::StrengthWrit | Self::AccuracyWrit | Self::MaliceWrit => "WRIT",
-            Self::SharpeningSkull => "RES",
+            Self::PumpkinOil | Self::CrystallizedNougat | Self::SharpeningSkull => "RES",
             Self::ScarletSlaying => "SLAY",
         }
     }

@@ -69,6 +69,14 @@ MaliceWrit:
   stats: [+200 Condition Damage above 90% Health]
 
 # === OTHER ===
+PumpkinOil:
+  id: 25632
+  name: Flask of Pumpkin Oil
+  stats: ["+100 Power, Toughness & Vitality after reviving"]
+CrystallizedNougat:
+  id: 25631
+  name: Lump of Crystallized Nougat
+  stats: ["+100 Condition Damage, Precision & Toughness after reviving"]
 SharpeningSkull:
   id: 25630
   name: Sharpening Skull

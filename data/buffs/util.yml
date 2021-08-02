@@ -1,8 +1,8 @@
-# GENERAL
+# === GENERAL ===
 Diminished:
   id: 46668
 
-# POWER
+# === POWER ===
 SuperiorStone:
   id: 9963 # potent version uses same id
   name: Superior Sharpening Stone
@@ -16,7 +16,7 @@ FuriousStone:
   name: Furious Sharpening Stone
   stats: [3% Power from Precision, 3% Ferocity from Precision]
 
-# CONDI
+# === CONDI ===
 ToxicCrystal:
   id: 21828
   name: Toxic Focusing Crystal
@@ -30,7 +30,7 @@ TuningIcicle:
   name: Tuning Icicle
   stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
 
-# CONC
+# === CONC ===
 PotentOil:
   id: 53374
   name: Potent Lucent Oil
@@ -48,13 +48,27 @@ PeppermintOil:
   name: Peppermint Oil
   stats: [3% Concentration from Precision, 6% Concentration from Healing Power]
 
-# HEAL
+# === HEAL ===
 BountifulOil:
   id: 25879
   name: Bountiful Maintenance Oil
   stats: [0.6% Outgoing Healing for 100 Healing Power, 0.8% Outgoing Healing for 100 Concentration]
 
-# OTHER
+# === WRIT ===
+StrengthWrit:
+  id: 33297
+  name: Writ of Masterful Strength
+  stats: [+200 Power above 90% Health]
+AccuracyWrit:
+  id: 31970
+  name: Writ of Masterful Accuracy
+  stats: [+200 Precision above 90% Health]
+MaliceWrit:
+  id: 33836
+  name: Writ of Masterful Malice
+  stats: [+200 Condition Damage above 90% Health]
+
+# === OTHER ===
 SharpeningSkull:
   id: 25630
   name: Sharpening Skull

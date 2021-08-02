@@ -112,6 +112,7 @@ impl Categorize for Utility {
             Self::ToxicCrystal | Self::MasterCrystal | Self::TuningIcicle => "CND",
             Self::PotentOil | Self::EnhancedOil | Self::ToxicOil | Self::PeppermintOil => "CONC",
             Self::BountifulOil => "HEAL",
+            Self::StrengthWrit | Self::AccuracyWrit | Self::MaliceWrit => "WRIT",
             Self::SharpeningSkull => "RES",
             Self::ScarletSlaying => "SLAY",
         }

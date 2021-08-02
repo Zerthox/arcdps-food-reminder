@@ -1,8 +1,8 @@
-# GENERAL
+# === GENERAL ===
 Malnourished:
   id: 46587
 
-# POWER
+# === POWER ===
 CilantroSousVideSteak:
   id: 57244
   name: Cilantro Lime Sous-Vide Steak
@@ -11,10 +11,48 @@ PeppercornSousVideSteak:
   id: 57051
   name: Peppercorn-Crusted Sous-Vide Steak
   stats: [-10% Incoming Damage, +100 Power, +70 Ferocity]
+CloveSousVideSteak:
+  id: 57393
+  name: Mushroom Clove Sous-Vide Steak
+  stats: [-20% Incoming Condition Duration, +100 Power, +70 Ferocity]
+SesameSousVideSteak:
+  id: 57241
+  name: Soy-Sesame Sous-Vide Steak
+  stats: [Health every second, +100 Power, +70 Ferocity]
+MintSousVideSteak:
+  id: 57342
+  name: Sous-Vide Steak with Mint-Parsley Sauce
+  stats: [+10% Outgoing Healing, +100 Power, +70 Ferocity]
 SweetSpicyButternut:
   id: 17825
   name: Bowl of Sweet and Spicy Butternut Squash Soup
   stats: [+100 Power, +70 Ferocity]
+# SpicyMoaWings:
+#   id: UNKNOWN
+#   name: Plate of Spicy Moa Wings
+#   stats: [+100 Power, +70 Ferocity]
+
+# === PRECISION ===
+# SalsaCoqAuVin:
+#   id: UNKNOWN
+#   name: Plate of Coq Au Vin with Salsa
+#   stats: [66% Life Steal Chance, +100 Power, +70 Precision]
+PeppercornCoqAuVin:
+  id: 57260
+  name: Plate of Peppercorn-Spiced Coq Au Vin
+  stats: [-10% Incoming Damage, +100 Power, +70 Precision]
+# CloveCoqAuVin:
+#   id: UNKNOWN
+#   name: Plate of Clove-Spiced Coq Au Vin
+#   stats: [-20% Incoming Condition Duration, +100 Power, +70 Precision]
+SesameCoqAuVin:
+  id: 57290
+  name: Plate of Sesame-Crusted Coq Au Vin
+  stats: [Health every second, +100 Power, +70 Precision]
+MintCoqAuVin:
+  id: 57362
+  name: Plate of Coq Au Vin with Mint Garnish
+  stats: [+10% Outgoing Healing, +100 Power, +70 Precision]
 CurryButternut:
   id: 9829
   name: Bowl of Curry Butternut Squash Soup
@@ -23,8 +61,12 @@ TruffleSteak:
   id: 9769
   name: Plate of Truffle Steak
   stats: [+100 Power, +70 Precision]
+# WinterberrySteak:
+#   id: UNKNOWN
+#   name: Steak with Winterberry Sauce
+#   stats: [+100 Power, +70 Precision]
 
-# CONDI
+# === CONDI DMG ===
 CilantroMeatFlatbread:
   id: 57409
   name: Cilantro and Cured Meat Flatbread
@@ -33,6 +75,24 @@ PepperedMeatFlatbread:
   id: 57127
   name: Peppered Cured Meat Flatbread
   stats: [-10% Incoming Damage, +100 Condition Damage, + 70 Expertise]
+# CloveMeatFlatbread:
+#   id: UNKNOWN
+#   name: Clove-Spiced Pear and Cured Meat Flatbread
+#   stats: [-20% Incoming Condition Duration, +100 Condition Damage, +70 Expertise]
+SesameMeatFlatbread:
+  id: 57222
+  name: Sesame-Asparagus and Cured Meat Flatbread
+  stats: [Health every second, +100 Condition Damage, +70 Expertise]
+# MintMeatFlatbread:
+#   id: UNKNOWN
+#   name: Mint-Pear Cured Meat Flatbread
+#   stats: [+10% Outgoing Healing, +100 Condition Damage, +70 Expertise]
+BeefRendang:
+  id: 49686
+  name: Plate of Beef Rendang
+  stats: [+100 Condition Damage, +70 Expertise]
+
+# === EXPERTISE ===
 SalsaVeggieFlatbread:
   id: 57269
   name: Salsa-Topped Veggie Flatbread
@@ -41,16 +101,24 @@ PeppercornVeggieFlatbread:
   id: 57382
   name: Peppercorn and Veggie Flatbread
   stats: [-10% Incoming Damage, +100 Expertise, +70 Condition Damage]
-BeefRendang:
-  id: 49686
-  name: Plate of Beef Rendang
-  stats: [+100 Condition Damage, +70 Expertise]
+# CloveVeggieFlatbread:
+#   id: UNKNOWN
+#   name: Clove and Veggie Flatbread
+#   stats: [-20% Incoming Condition Duration, +100 Expertise, +70 Condition Damage]
+SesameVeggieFlatbread:
+  id: 57050
+  name: Sesame Veggie Flatbread
+  stats: [Health every second, +100 Expertise, +70 Condition Damage]
+MintVeggieFlatbread:
+  id: 57263
+  name: Mint and Veggie Flatbread
+  stats: [+10% Outgoing Healing, +100 Expertise, +70 Condition Damage]
 RedLentil:
   id: 46273
   name: Red Lentil Saobosa
   stats: [+100 Expertise, +70 Condition Damage]
 VeggiePizza:
-  id: 10009 # koi cake uses the same id
+  id: 10009 # koi cake & garlic sautee use the same id
   name: Rare Veggie Pizza
   stats: [+100 Expertise, +70 Condition Damage]
 FireMeatChili:
@@ -58,25 +126,87 @@ FireMeatChili:
   name: Bowl of Fire Meat Chili
   stats: [+15% Burning Duration, +70 Precision]
 
-# CONC
-SalsaEggsBenedict:
-  id: 57117
-  name: Salsa Eggs Benedict
-  stats: [66% Life Steal Chance, +100 Concentration, +70 Expertise]
-SesameEggsBenedict:
-  id: 57084
-  name: Sesame Eggs Benedict
-  stats: [Health every second, +100 Concentration, +70 Expertise]
+# === POWER CONC ===
+# SalsaBeefCarpaccio:
+#   id: UNKNOWN
+#   name: Plate of Beef Carpaccio with Salsa Garnish
+#   stats: [66% Life Steal Chance, +100 Concentration, +70 Power]
+PeppercornBeefCarpaccio:
+  id: 57114
+  name: Plate of Peppercorn-Spiced Beef Carpaccio
+  stats: [-10% Incoming Damage, +100 Concentration, +70 Power]
+# CloveBeefCarpaccio:
+#   id: UNKNOWN
+#   name: Plate of Clove-Spiced Beef Carpaccio
+#   stats: [-20% Incoming Condition Duration, +100 Concentration, +70 Power]
+SesameBeefCarpaccio:
+  id: 57231
+  name: Plate of Sesame-Ginger Beef Carpaccio
+  stats: [Health every second, +100 Concentration, +70 Power]
+# MintBeefCarpaccio:
+#   id: UNKNOWN
+#   name: Plate of Beef Carpaccio with Mint Garnish
+#   stats: [+10% Outgoing Healing, +100 Concentration, +70 Power]
 SoulPastry:
   id: 53222
   name: Soul Pastry
   stats: [+100 Concentration, +70 Power]
+
+# === CONDI CONC ===
+SalsaEggsBenedict:
+  id: 57117
+  name: Salsa Eggs Benedict
+  stats: [66% Life Steal Chance, +100 Concentration, +70 Expertise]
+# PeppercornEggsBenedict:
+#   id: UNKNOWN
+#   name: Sesame Eggs Benedict
+#   stats: [-10% Incoming Damage, +100 Concentration, +70 Expertise]
+# CloveEggsBenedict:
+#   id: UNKNOWN
+#   name: Clove-Spiced Eggs Benedict
+#   stats: [-20% Incoming Condition Duration, +100 Concentration, +70 Expertise]
+SesameEggsBenedict:
+  id: 57084
+  name: Sesame Eggs Benedict
+  stats: [Health every second, +100 Concentration, +70 Expertise]
+# MintEggsBenedict:
+#   id: UNKNOWN
+#   name: Eggs Benedict with Mint-Parsley Sauce
+#   stats: [+10% Outgoing Healing, +100 Concentration, +70 Expertise]
 EggsBenedict:
   id: 57187
   name: Plage of Eggs Benedict
   stats: [+100 Concentration, +70 Expertise]
+# GreenChileIce:
+#   id: UNKNOWN
+#   name: Soul Pastry
+#   stats: [+100 Concentration, +70 Expertise]
+# CarneKhanChili:
+#   id: UNKNOWN
+#   name: Soul Pastry
+#   stats: [+100 Concentration, +70 Expertise]
+# FirebreatherChili:
+#   id: UNKNOWN
+#   name: Soul Pastry
+#   stats: [+100 Concentration, +70 Expertise]
 
-# HEAL
+# === HEAL ===
+# CilantroFruitSalad:
+#   id: UNKNOWN
+#   name: Bowl of Fruit Salad with Cilantro Garnish
+#   stats: [66% Life Steal Chance, +100 Healing Power, +70 Concentration]
+SpicedFruitSalad:
+  id: 57276
+  name: Bowl of Spiced Fruit Salad
+  stats: [-10% Incoming Damage, +100 Healing Power, +70 Concentration]
+# CloveFruitSalad:
+#   id: UNKNOWN
+#   name: Bowl of Fruit Salad with Orange-Clove Syrup
+#   stats: [-20% Incoming Condition Duration, +100 Healing Power, +70 Concentration]
+# SesameFruitSalad:
+#   id: UNKNOWN
+#   name: Bowl of Sesame Fruit Salad
+#   stats: [Health every second, +100 Healing Power, +70 Concentration]
 MintFruitSalad:
   id: 57100
   name: Bowl of Fruit Salad with Mint Garnish
@@ -84,9 +214,29 @@ MintFruitSalad:
 RiceBall:
   id: 26529
   name: Delicious Rice Ball
-  stats: [+10% Outgoing Healing, 100 Healing Power]
+  stats: [+10% Outgoing Healing, +100 Healing Power]
 
-# OTHER
+# === OTHER ===
+# CilantroOysterSoup:
+#   id: UNKNOWN
+#   name: Spherified Cilantro Oyster Soup
+#   stats: [66% Life Steal Chance, +45 All Attributes]
+PeppercornOysterSoup:
+  id: 57165
+  name: Spherified Peppercorn-Spiced Oyster Soup
+  stats: [-10% Incoming Damage, +45 All Attributes]
+CloveOysterSoup:
+  id: 57374
+  name: Spherified Clove-Spiced Oyster Soup
+  stats: [-20% Incoming Condition Duration, +45 All Attributes]
+SesameOysterSoup:
+  id: 57037
+  name: Spherified Sesame Oyster Soup
+  stats: [Health every second, +45 All Attributes]
+MintOysterSoup:
+  id: 57201
+  name: Spherified Oyster Soup with Mint Garnish
+  stats: [+10% Outgoing Healing, +45 All Attributes]
 Starcake:
   id: 19451
   name: Dragon's Revelry Starcake

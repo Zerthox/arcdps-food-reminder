@@ -1,4 +1,4 @@
-# nightmare
+# === NIGHTMARE ===
 Mama:
   id: 17021
   name: MAMA
@@ -15,7 +15,7 @@ Ensolyss:
   encounter: Ensolyss
   location: 98CM Nightmare
 
-# shattered
+# === SHATTERED ===
 Skorvald:
   id: 17632
   name: Skorvald
@@ -32,7 +32,7 @@ Arkk:
   encounter: Arkk
   location: 99CM Shattered Observatory
 
-# sunqua
+# === SUNQUA ===
 Ai:
   id: 23254
   name: Ai

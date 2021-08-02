@@ -59,23 +59,47 @@ impl Categorize for Food {
     fn categorize(&self) -> &'static str {
         match self {
             Self::Malnourished => "NONE",
+
             Self::CilantroSousVideSteak
             | Self::PeppercornSousVideSteak
-            | Self::SweetSpicyButternut
-            | Self::TruffleSteak => "PWR",
-            Self::CurryButternut => "PREC",
-            Self::CilantroMeatFlatbread | Self::PepperedMeatFlatbread | Self::BeefRendang => "CND",
+            | Self::CloveSousVideSteak
+            | Self::SesameSousVideSteak
+            | Self::MintSousVideSteak
+            | Self::SweetSpicyButternut => "PWR",
+
+            Self::PeppercornCoqAuVin
+            | Self::SesameCoqAuVin
+            | Self::MintCoqAuVin
+            | Self::CurryButternut
+            | Self::TruffleSteak => "PREC",
+
+            Self::CilantroMeatFlatbread
+            | Self::SesameMeatFlatbread
+            | Self::PepperedMeatFlatbread
+            | Self::BeefRendang => "CND",
+
             Self::SalsaVeggieFlatbread
             | Self::PeppercornVeggieFlatbread
+            | Self::SesameVeggieFlatbread
+            | Self::MintVeggieFlatbread
             | Self::VeggiePizza
             | Self::RedLentil
             | Self::FireMeatChili => "EXP",
-            Self::SalsaEggsBenedict
+
+            Self::PeppercornBeefCarpaccio
+            | Self::SesameBeefCarpaccio
+            | Self::SalsaEggsBenedict
             | Self::SesameEggsBenedict
             | Self::SoulPastry
             | Self::EggsBenedict => "CONC",
-            Self::MintFruitSalad | Self::RiceBall => "HEAL",
-            Self::Starcake => "ALL",
+
+            Self::SpicedFruitSalad | Self::MintFruitSalad | Self::RiceBall => "HEAL",
+
+            Self::PeppercornOysterSoup
+            | Self::CloveOysterSoup
+            | Self::SesameOysterSoup
+            | Self::MintOysterSoup
+            | Self::Starcake => "ALL",
         }
     }
 }

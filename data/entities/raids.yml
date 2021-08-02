@@ -1,4 +1,4 @@
-# w1
+# === W1 ===
 ValeGuardian:
   id: 15438
   name: Vale Guardian
@@ -15,7 +15,7 @@ Sabetha:
   encounter: Sabetha
   location: W1 Spirit Vale
 
-# w2
+# === W2 ===
 Slothasor:
   id: 16123
   name: Slothasor
@@ -42,7 +42,7 @@ Matthias:
   encounter: Matthias
   location: W2 Salvation Pass
 
-# w3
+# === W3 ===
 MacLeod:
   id: 16253
   name: MacLeod
@@ -59,7 +59,7 @@ Xera:
   encounter: Xera
   location: W3 Stronghold of the Faithful
 
-# w4
+# === W4 ===
 Cairn:
   id: 17194
   name: Cairn
@@ -81,7 +81,7 @@ Deimos:
   encounter: Deimos
   location: W4 Bastion of the Penitent
 
-# w5
+# === W5 ===
 SoullessHorror:
   id: 19767
   name: Soulless Horror
@@ -118,7 +118,7 @@ Dhuum:
   encounter: Dhuum
   location: W5 Hall of Chains
 
-# w6
+# === W6 ===
 ConjuredAmalgamate:
   id: 43974
   name: Conjured Amalgamate
@@ -150,7 +150,7 @@ Qadim:
   encounter: Qadim
   location: W6 Mythwright Gambit
 
-# w7
+# === W7 ===
 Adina:
   id: 22006
   name: Adina

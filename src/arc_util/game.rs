@@ -4,6 +4,7 @@
 
 use num_enum::{FromPrimitive, IntoPrimitive, TryFromPrimitive};
 use serde::{Deserialize, Serialize};
+use std::convert::TryInto;
 use strum_macros::{Display, EnumIter, IntoStaticStr};
 
 /// GW2 client language.
@@ -217,8 +218,43 @@ include!(concat!(env!("OUT_DIR"), "/boss.rs"));
 include!(concat!(env!("OUT_DIR"), "/raidboss.rs"));
 include!(concat!(env!("OUT_DIR"), "/fractalboss.rs"));
 
+impl Into<Boss> for RaidBoss {
+    fn into(self) -> Boss {
+        // raid boss is always a valid boss
+        usize::from(self).try_into().unwrap()
+    }
+}
+
+impl Into<Boss> for FractalBoss {
+    fn into(self) -> Boss {
+        // fractal boss is always a valid boss
+        usize::from(self).try_into().unwrap()
+    }
+}
+
 // buff enums generated from data
 include!(concat!(env!("OUT_DIR"), "/buff.rs"));
 include!(concat!(env!("OUT_DIR"), "/boon.rs"));
 include!(concat!(env!("OUT_DIR"), "/food.rs"));
 include!(concat!(env!("OUT_DIR"), "/util.rs"));
+
+impl Into<Buff> for Boon {
+    fn into(self) -> Buff {
+        // boon is always a valid buff
+        u32::from(self).try_into().unwrap()
+    }
+}
+
+impl Into<Buff> for Food {
+    fn into(self) -> Buff {
+        // food is always a valid buff
+        u32::from(self).try_into().unwrap()
+    }
+}
+
+impl Into<Buff> for Utility {
+    fn into(self) -> Buff {
+        // utility is always a valid buff
+        u32::from(self).try_into().unwrap()
+    }
+}

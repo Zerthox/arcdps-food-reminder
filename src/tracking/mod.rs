@@ -10,7 +10,7 @@ use crate::{
         Component,
     },
 };
-use arcdps::imgui::{im_str, sys as imgui_sys, ImStr, TableColumnFlags, TableFlags, Ui};
+use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::{Buff, BuffState, Categorize, Food, Utility};
 use player::Player;
 use serde::{Deserialize, Serialize};
@@ -126,33 +126,39 @@ impl Tracker {
     }
 
     /// Renders a context menu for a food item.
-    fn render_food_context_menu(ui: &Ui, buff_id: u32, name: Option<&str>) {
-        render::item_context_menu(im_str!("##food-reminder-tracker-context-food"), || {
-            ui.text_disabled(im_str!("Food Options"));
-            if let Some(name) = name {
-                if ui.small_button(im_str!("Copy Name")) {
-                    ui.set_clipboard_text(&im_str!("{}", name));
+    fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
+        render::item_context_menu(
+            &im_str!("##food-reminder-tracker-context-food-{}", menu_id),
+            || {
+                ui.text(im_str!("Food Options"));
+                if let Some(name) = name {
+                    if ui.small_button(im_str!("Copy Name")) {
+                        ui.set_clipboard_text(&im_str!("{}", name));
+                    }
                 }
-            }
-            if ui.small_button(im_str!("Copy ID")) {
-                ui.set_clipboard_text(&im_str!("{}", buff_id));
-            }
-        });
+                if ui.small_button(im_str!("Copy ID")) {
+                    ui.set_clipboard_text(&im_str!("{}", buff_id));
+                }
+            },
+        );
     }
 
     /// Renders a context menu for a utility item.
-    fn render_util_context_menu(ui: &Ui, buff_id: u32, name: Option<&str>) {
-        render::item_context_menu(im_str!("##food-reminder-tracker-context-util"), || {
-            ui.text_disabled(im_str!("Utility Options"));
-            if let Some(name) = name {
-                if ui.small_button(im_str!("Copy Name")) {
-                    ui.set_clipboard_text(&im_str!("{}", name));
+    fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
+        render::item_context_menu(
+            &im_str!("##food-reminder-tracker-context-util-{}", menu_id),
+            || {
+                ui.text(im_str!("Utility Options"));
+                if let Some(name) = name {
+                    if ui.small_button(im_str!("Copy Name")) {
+                        ui.set_clipboard_text(&im_str!("{}", name));
+                    }
                 }
-            }
-            if ui.small_button(im_str!("Copy ID")) {
-                ui.set_clipboard_text(&im_str!("{}", buff_id));
-            }
-        });
+                if ui.small_button(im_str!("Copy ID")) {
+                    ui.set_clipboard_text(&im_str!("{}", buff_id));
+                }
+            },
+        );
     }
 }
 
@@ -242,14 +248,19 @@ impl Component for Tracker {
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Food");
                             }
-                            Self::render_food_context_menu(ui, id, None);
+                            Self::render_food_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(food @ Food::Malnourished) => {
                             ui.text_colored(red, "MAL");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Malnourished");
                             }
-                            Self::render_food_context_menu(ui, food.into(), Some(food.name()));
+                            Self::render_food_context_menu(
+                                ui,
+                                player.id,
+                                food.into(),
+                                Some(food.name()),
+                            );
                         }
                         BuffState::Known(food) => {
                             ui.text_colored(green, food.categorize());
@@ -260,7 +271,12 @@ impl Component for Tracker {
                                     food.stats().join("\n")
                                 ));
                             }
-                            Self::render_food_context_menu(ui, food.into(), Some(food.name()));
+                            Self::render_food_context_menu(
+                                ui,
+                                player.id,
+                                food.into(),
+                                Some(food.name()),
+                            );
                         }
                     }
 
@@ -284,14 +300,19 @@ impl Component for Tracker {
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Utility");
                             }
-                            Self::render_util_context_menu(ui, id, None);
+                            Self::render_util_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(util @ Utility::Diminished) => {
                             ui.text_colored(red, "DIM");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Diminished");
                             }
-                            Self::render_util_context_menu(ui, util.into(), Some(util.name()));
+                            Self::render_util_context_menu(
+                                ui,
+                                player.id,
+                                util.into(),
+                                Some(util.name()),
+                            );
                         }
                         BuffState::Known(util) => {
                             ui.text_colored(green, util.categorize());
@@ -302,7 +323,12 @@ impl Component for Tracker {
                                     util.stats().join("\n")
                                 ));
                             }
-                            Self::render_util_context_menu(ui, util.into(), Some(util.name()));
+                            Self::render_util_context_menu(
+                                ui,
+                                player.id,
+                                util.into(),
+                                Some(util.name()),
+                            );
                         }
                     }
                 }

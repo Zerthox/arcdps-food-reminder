@@ -200,8 +200,8 @@ pub struct WindowSettings<T>
 where
     T: HasSettings,
 {
-    shown: bool,
-    settings: T::Settings,
+    shown: Option<bool>,
+    settings: Option<T::Settings>,
 }
 
 impl<T> HasSettings for Window<T>
@@ -214,12 +214,16 @@ where
     }
     fn get_settings(&self) -> Self::Settings {
         WindowSettings {
-            shown: self.shown,
-            settings: self.inner.get_settings(),
+            shown: Some(self.shown),
+            settings: Some(self.inner.get_settings()),
         }
     }
     fn load_settings(&mut self, loaded: Self::Settings) {
-        self.shown = loaded.shown;
-        self.inner.load_settings(loaded.settings);
+        if let Some(shown) = loaded.shown {
+            self.shown = shown;
+        }
+        if let Some(settings) = loaded.settings {
+            self.inner.load_settings(settings);
+        }
     }
 }

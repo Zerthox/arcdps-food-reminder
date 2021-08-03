@@ -125,6 +125,11 @@ impl Tracker {
         players
     }
 
+    /// Returns the number of tracked players.
+    pub fn len(&self) -> usize {
+        self.players.len()
+    }
+
     /// Renders a context menu for a food item.
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         render::item_context_menu(

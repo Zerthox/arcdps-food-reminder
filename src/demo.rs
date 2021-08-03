@@ -23,7 +23,6 @@ use strum::IntoEnumIterator;
 #[derive(Debug)]
 pub struct Demo {
     reminder: Reminder,
-    next_id: usize,
     all_foods: Vec<BuffState<Food>>,
     all_utils: Vec<BuffState<Utility>>,
     tracker: Window<Tracker>,
@@ -34,7 +33,6 @@ impl Demo {
     pub fn new() -> Self {
         Self {
             reminder: Reminder::new(),
-            next_id: 0,
             all_foods: [BuffState::Unset, BuffState::None, BuffState::Unknown(0)]
                 .iter()
                 .copied()
@@ -117,7 +115,7 @@ impl Component for Demo {
             ui.table_headers_row();
 
             // entries
-            for id in 0..self.next_id {
+            for id in 0..self.tracker.len() {
                 ui.table_next_row();
                 let player = self.tracker.get_player_mut(id).unwrap();
 
@@ -214,8 +212,9 @@ impl Component for Demo {
 
         // add button
         if ui.button(im_str!("Add"), [0.0, 0.0]) {
+            let next_id = self.tracker.len();
             self.tracker.add_player(Player::new(
-                self.next_id,
+                next_id,
                 "char",
                 "acc",
                 false,
@@ -223,15 +222,14 @@ impl Component for Demo {
                 Specialization::Unknown,
                 1,
             ));
-            self.next_id += 1;
         }
         let [button_width, _] = ui.item_rect_size();
 
         // remove button
         ui.same_line(button_width + 10.0);
         if ui.button(im_str!("Remove"), [0.0, 0.0]) {
-            self.next_id -= 1;
-            self.tracker.remove_player(self.next_id);
+            let last_id = self.tracker.len() - 1;
+            self.tracker.remove_player(last_id);
         }
 
         // render children
@@ -249,10 +247,19 @@ impl Windowed for Demo {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
 pub struct DemoSettings {
-    next_id: usize,
     players: Vec<Player>,
     tracker: bool,
+}
+
+impl Default for DemoSettings {
+    fn default() -> Self {
+        Self {
+            players: Vec::new(),
+            tracker: false,
+        }
+    }
 }
 
 impl HasSettings for Demo {
@@ -262,13 +269,11 @@ impl HasSettings for Demo {
     }
     fn get_settings(&self) -> Self::Settings {
         DemoSettings {
-            next_id: self.next_id,
             players: self.tracker.get_players().cloned().collect(),
             tracker: self.tracker.is_visible(),
         }
     }
     fn load_settings(&mut self, loaded: Self::Settings) {
-        self.next_id = loaded.next_id;
         for player in loaded.players {
             self.tracker.add_player(player);
         }

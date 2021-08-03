@@ -206,7 +206,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("No Food");
                             }
                         }
-                        BuffState::Unknown => {
+                        BuffState::Unknown(_) => {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Food");
@@ -245,7 +245,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("No Utility");
                             }
                         }
-                        BuffState::Unknown => {
+                        BuffState::Unknown(_) => {
                             ui.text_colored(yellow, "SOME");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("Unknown Utility");

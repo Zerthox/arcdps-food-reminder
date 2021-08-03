@@ -233,7 +233,7 @@ impl Plugin {
                                                 ));
                                             }
                                         } else if let Some("Nourishment") = skill_name {
-                                            if player.apply_unknown_food(event_id) {
+                                            if player.apply_unknown_food(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Food with id {} applied to {:?}",
@@ -241,7 +241,7 @@ impl Plugin {
                                                 ));
                                             }
                                         } else if let Some("Enhancement") = skill_name {
-                                            if player.apply_unknown_util(event_id) {
+                                            if player.apply_unknown_util(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Utility with id {} applied to {:?}",

@@ -101,8 +101,8 @@ impl Player {
     /// Applies a unknown food buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_food(&mut self, event_id: u64) -> bool {
-        self.food.update(BuffState::Unknown, event_id)
+    pub fn apply_unknown_food(&mut self, id: u32, event_id: u64) -> bool {
+        self.food.update(BuffState::Unknown(id), event_id)
     }
 
     /// Removes the current food buff from the player.
@@ -114,7 +114,7 @@ impl Player {
     /// Returns `false` if this update was ignored.
     pub fn remove_food(&mut self, food: Option<Food>, event_id: u64) -> bool {
         let changed = match (food, self.food.state) {
-            (_, BuffState::Unset) | (None, BuffState::Unknown) => true,
+            (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
             (Some(removed), BuffState::Known(applied)) => removed == applied,
             _ => false,
         };
@@ -135,8 +135,8 @@ impl Player {
     /// Applies an unknown utility buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_util(&mut self, event_id: u64) -> bool {
-        self.util.update(BuffState::Unknown, event_id)
+    pub fn apply_unknown_util(&mut self, id: u32, event_id: u64) -> bool {
+        self.util.update(BuffState::Unknown(id), event_id)
     }
 
     /// Removes the current utility buff from the player.
@@ -148,7 +148,7 @@ impl Player {
     /// Returns `false` if this update was ignored.
     pub fn remove_util(&mut self, util: Option<Utility>, event_id: u64) -> bool {
         let changed = match (util, self.util.state) {
-            (_, BuffState::Unset) | (None, BuffState::Unknown) => true,
+            (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
             (Some(removed), BuffState::Known(applied)) => removed == applied,
             _ => false,
         };

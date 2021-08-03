@@ -35,12 +35,12 @@ impl Demo {
         Self {
             reminder: Reminder::new(),
             next_id: 0,
-            all_foods: [BuffState::Unset, BuffState::None, BuffState::Unknown]
+            all_foods: [BuffState::Unset, BuffState::None, BuffState::Unknown(0)]
                 .iter()
                 .copied()
                 .chain(Food::iter().map(BuffState::Known))
                 .collect(),
-            all_utils: [BuffState::Unset, BuffState::None, BuffState::Unknown]
+            all_utils: [BuffState::Unset, BuffState::None, BuffState::Unknown(0)]
                 .iter()
                 .copied()
                 .chain(Utility::iter().map(BuffState::Known))
@@ -54,7 +54,7 @@ impl Demo {
         match buff {
             BuffState::Unset => im_str!("Unset").into(),
             BuffState::None => im_str!("None").into(),
-            BuffState::Unknown => im_str!("Unknown").into(),
+            BuffState::Unknown(_) => im_str!("Unknown").into(),
             BuffState::Known(food) => im_str!("{}", food.name()).into(),
         }
     }
@@ -64,7 +64,7 @@ impl Demo {
         match buff {
             BuffState::Unset => im_str!("Unset").into(),
             BuffState::None => im_str!("None").into(),
-            BuffState::Unknown => im_str!("Unknown").into(),
+            BuffState::Unknown(_) => im_str!("Unknown").into(),
             BuffState::Known(util) => im_str!("{}", util.name()).into(),
         }
     }

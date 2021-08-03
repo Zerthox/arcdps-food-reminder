@@ -43,7 +43,7 @@ pub enum BuffState<T> {
     None,
 
     /// Some buff is applied but not recognized.
-    Unknown,
+    Unknown(u32),
 
     /// Some buff is applied and recognized.
     Known(T),

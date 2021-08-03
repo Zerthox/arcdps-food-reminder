@@ -107,6 +107,9 @@ impl<T> Hideable for Window<T>
 where
     T: Component,
 {
+    fn is_visible(&self) -> bool {
+        self.shown
+    }
     fn visibility(&mut self) -> &mut bool {
         &mut self.shown
     }

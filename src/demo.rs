@@ -252,6 +252,7 @@ impl Windowed for Demo {
 pub struct DemoSettings {
     next_id: usize,
     players: Vec<Player>,
+    tracker: bool,
 }
 
 impl HasSettings for Demo {
@@ -263,6 +264,7 @@ impl HasSettings for Demo {
         DemoSettings {
             next_id: self.next_id,
             players: self.tracker.get_players().cloned().collect(),
+            tracker: self.tracker.is_visible(),
         }
     }
     fn load_settings(&mut self, loaded: Self::Settings) {
@@ -270,5 +272,6 @@ impl HasSettings for Demo {
         for player in loaded.players {
             self.tracker.add_player(player);
         }
+        self.tracker.set_visibility(loaded.tracker);
     }
 }

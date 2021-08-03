@@ -15,7 +15,10 @@ pub trait Hideable
 where
     Self: Component,
 {
-    /// Returns the component's visibility state.
+    /// Returns whether the component is currently visible.
+    fn is_visible(&self) -> bool;
+
+    /// Returns a mutable reference to the component's visibility state.
     fn visibility(&mut self) -> &mut bool;
 
     /// Hides the component.
@@ -32,5 +35,10 @@ where
     fn toggle_visibility(&mut self) {
         let shown = self.visibility();
         *shown = !*shown;
+    }
+
+    /// Sets the component's visibility state.
+    fn set_visibility(&mut self, visible: bool) {
+        *self.visibility() = visible;
     }
 }

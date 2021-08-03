@@ -203,7 +203,7 @@ impl Plugin {
                     _ => {
                         // TODO: should we restrict this to specific state change kinds?
                         // TODO: can we reliably set unset to none on strike damage?
-                        // FIXME: tracking "nourishment" & "enhancement" buff names may need adjustment for other client languages
+                        // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
                         if buff_remove == BuffRemove::None {

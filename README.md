@@ -30,4 +30,4 @@ You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.
 For the standard release version run `cargo build --release`.
 
 For development you can include a debug log via the `--feature log` flag.
-Run `cargo build --release --feature log` for optimized, `cargo build --debug --feature log` for unoptimized.
+Run `cargo build --release --feature log` for optimized, `cargo build --feature log` for unoptimized.

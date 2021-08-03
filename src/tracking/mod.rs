@@ -87,11 +87,6 @@ impl Tracker {
         self.self_id == id
     }
 
-    /// Sets the player id for the local player (self).
-    pub fn set_self_id(&mut self, id: usize) {
-        self.self_id = id;
-    }
-
     /// Returns a reference to the local player (self).
     pub fn get_self(&self) -> Option<&Player> {
         self.players.get(&self.self_id)

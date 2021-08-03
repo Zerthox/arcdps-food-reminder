@@ -65,7 +65,8 @@ impl Categorize for Food {
             | Self::CloveSousVideSteak
             | Self::SesameSousVideSteak
             | Self::MintSousVideSteak
-            | Self::SweetSpicyButternut => "PWR",
+            | Self::SweetSpicyButternut
+            | Self::SpicyMoaWings => "PWR",
 
             Self::PeppercornCoqAuVin
             | Self::SesameCoqAuVin

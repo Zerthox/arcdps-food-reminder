@@ -218,17 +218,17 @@ include!(concat!(env!("OUT_DIR"), "/boss.rs"));
 include!(concat!(env!("OUT_DIR"), "/raidboss.rs"));
 include!(concat!(env!("OUT_DIR"), "/fractalboss.rs"));
 
-impl Into<Boss> for RaidBoss {
-    fn into(self) -> Boss {
+impl From<RaidBoss> for Boss {
+    fn from(raid_boss: RaidBoss) -> Self {
         // raid boss is always a valid boss
-        usize::from(self).try_into().unwrap()
+        usize::from(raid_boss).try_into().unwrap()
     }
 }
 
-impl Into<Boss> for FractalBoss {
-    fn into(self) -> Boss {
+impl From<FractalBoss> for Boss {
+    fn from(fractal_boss: FractalBoss) -> Self {
         // fractal boss is always a valid boss
-        usize::from(self).try_into().unwrap()
+        usize::from(fractal_boss).try_into().unwrap()
     }
 }
 
@@ -238,23 +238,23 @@ include!(concat!(env!("OUT_DIR"), "/boon.rs"));
 include!(concat!(env!("OUT_DIR"), "/food.rs"));
 include!(concat!(env!("OUT_DIR"), "/util.rs"));
 
-impl Into<Buff> for Boon {
-    fn into(self) -> Buff {
+impl From<Boon> for Buff {
+    fn from(boon: Boon) -> Self {
         // boon is always a valid buff
-        u32::from(self).try_into().unwrap()
+        u32::from(boon).try_into().unwrap()
     }
 }
 
-impl Into<Buff> for Food {
-    fn into(self) -> Buff {
+impl From<Food> for Buff {
+    fn from(food: Food) -> Self {
         // food is always a valid buff
-        u32::from(self).try_into().unwrap()
+        u32::from(food).try_into().unwrap()
     }
 }
 
-impl Into<Buff> for Utility {
-    fn into(self) -> Buff {
+impl From<Utility> for Buff {
+    fn from(util: Utility) -> Self {
         // utility is always a valid buff
-        u32::from(self).try_into().unwrap()
+        u32::from(util).try_into().unwrap()
     }
 }

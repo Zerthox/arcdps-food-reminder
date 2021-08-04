@@ -130,6 +130,11 @@ impl Tracker {
         self.players.len()
     }
 
+    /// Returns true if there is no tracked players.
+    pub fn is_empty(&self) -> bool {
+        self.players.is_empty()
+    }
+
     /// Renders a context menu for a food item.
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         render::item_context_menu(

@@ -36,23 +36,23 @@ SpicyMoaWings:
 # SalsaCoqAuVin:
 #   id: UNKNOWN
 #   name: Plate of Coq Au Vin with Salsa
-#   stats: [66% Life Steal Chance, +100 Power, +70 Precision]
+#   stats: [66% Life Steal Chance, +100 Precision, +70 Power]
 PeppercornCoqAuVin:
   id: 57260
   name: Plate of Peppercorn-Spiced Coq Au Vin
-  stats: [-10% Incoming Damage, +100 Power, +70 Precision]
+  stats: [-10% Incoming Damage, +100 Precision, +70 Power]
 # CloveCoqAuVin:
 #   id: UNKNOWN
 #   name: Plate of Clove-Spiced Coq Au Vin
-#   stats: [-20% Incoming Condition Duration, +100 Power, +70 Precision]
+#   stats: [-20% Incoming Condition Duration, +100 Precision, +70 Power]
 SesameCoqAuVin:
   id: 57290
   name: Plate of Sesame-Crusted Coq Au Vin
-  stats: [Health every second, +100 Power, +70 Precision]
+  stats: [Health every second, +100 Precision, +70 Power]
 MintCoqAuVin:
   id: 57362
   name: Plate of Coq Au Vin with Mint Garnish
-  stats: [+10% Outgoing Healing, +100 Power, +70 Precision]
+  stats: [+10% Outgoing Healing, +100 Precision, +70 Power]
 CurryButternut:
   id: 9829
   name: Bowl of Curry Butternut Squash Soup

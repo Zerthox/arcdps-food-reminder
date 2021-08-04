@@ -13,6 +13,7 @@ ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
   - [x] Food/Utility tracker table
   - [x] Classification of Food/Utility
   - [x] Tooltips with Food/Utility details
+  - [x] Context menu to copy names/ids
   - [ ] Table sorting
 - [ ] Settings
   - [x] Save window states
@@ -23,6 +24,12 @@ ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
 
 ## Buff database
 Known Food & Utility buffs are currently collected in [data/buffs](./data/buffs).
+
+**Found an unknown Food/Utility buff that you would like to see added?**  
+Right click the entry in the tracker and select `Copy ID`.
+Report the copied buff ID & the Food/Utility that applied it.
+
+![Reporting unknown buff](./screenshots/unknown.png)
 
 ## Building from source
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.

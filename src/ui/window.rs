@@ -1,6 +1,6 @@
 use super::{Component, Hideable};
 use crate::settings::HasSettings;
-use arcdps::imgui::{Condition, ImString, Ui, Window as ImGuiWindow};
+use arcdps::imgui::{self, Condition, ImString, Ui};
 use serde::{Deserialize, Serialize};
 use std::ops::{Deref, DerefMut};
 
@@ -180,9 +180,9 @@ impl WindowProps {
         self
     }
 
-    /// Creates the [`ImGuiWindow`] corresponding to the props.
-    fn new_window(&self) -> ImGuiWindow {
-        ImGuiWindow::new(&self.name)
+    /// Creates the [`imgui::Window`] corresponding to the props.
+    fn new_window(&self) -> imgui::Window {
+        imgui::Window::new(&self.name)
             .title_bar(true)
             .draw_background(true)
             .collapsible(false)

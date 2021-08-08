@@ -155,7 +155,7 @@ impl Plugin {
                         #[cfg(feature = "log")]
                         let delta = api::calc_delta(event);
 
-                        // change unset buffs to none,
+                        // change unset buffs to none
                         // initial buffs should be reported right after
                         for player in self.tracker.get_players_mut() {
                             player.unset_to_none(event_id);
@@ -202,7 +202,6 @@ impl Plugin {
                     }
                     _ => {
                         // TODO: should we restrict this to specific state change kinds?
-                        // TODO: can we reliably set unset to none on strike damage?
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
                         let buff_remove = BuffRemove::from(event.is_buff_remove);
@@ -372,6 +371,10 @@ impl Plugin {
         // check for down
         if down && !prev_down {
             // check for hotkeys
+            #[cfg_attr(
+                not(any(feature = "demo", feature = "log")),
+                allow(clippy::single_match)
+            )]
             match key {
                 TRACKER_KEY => {
                     self.tracker.toggle_visibility();

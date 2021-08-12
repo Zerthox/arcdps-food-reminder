@@ -49,9 +49,9 @@ impl Reminder {
     /// Helper to render text.
     fn render_text(ui: &Ui, text: &ImStr) {
         // grab colors
-        let colors = exports::get_colors();
+        let colors = exports::colors();
         let red = colors
-            .get_core(CoreColor::LightRed)
+            .core(CoreColor::LightRed)
             .map(|vec| vec.into())
             .unwrap_or([1.0, 0.0, 0.0, 1.0]);
 

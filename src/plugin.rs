@@ -406,7 +406,7 @@ impl Plugin {
         self.debug.render(ui);
 
         // other ui renders conditionally
-        let ui_settings = exports::get_ui_settings();
+        let ui_settings = exports::ui_settings();
         if !ui_settings.hidden && (not_loading || ui_settings.draw_always) {
             self.tracker.render(ui);
         }

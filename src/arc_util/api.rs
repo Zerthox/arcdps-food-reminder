@@ -1,8 +1,5 @@
 //! ArcDPS API utilities.
 
-// we wont use all enum kinds here but keeping them makes sense
-#![allow(unused)]
-
 use crate::win;
 use arcdps::CombatEvent;
 use num_enum::{FromPrimitive, TryFromPrimitive};
@@ -113,7 +110,9 @@ pub enum Strike {
     Unknown,
 }
 
-/// Combat state change.
+/// Skill activation (cast).
+///
+/// *Arc calls this "combat activation".*
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FromPrimitive)]
 #[repr(u8)]
 pub enum Activation {

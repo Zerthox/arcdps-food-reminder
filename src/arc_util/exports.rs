@@ -8,7 +8,7 @@ use arcdps::{
 use std::{ffi::OsString, mem::MaybeUninit, os::windows::prelude::*, path::PathBuf, slice};
 
 /// Retrieves the config path from ArcDPS.
-pub fn get_config_path() -> Option<PathBuf> {
+pub fn config_path() -> Option<PathBuf> {
     let ptr = unsafe { e0_config_path() };
     if !ptr.is_null() {
         // calculate length
@@ -49,7 +49,7 @@ impl Colors {
     unsafe fn read_color(&self, first_index: usize, second_index: usize) -> Option<ImVec4> {
         let ptr = self.raw[first_index];
         if !ptr.is_null() {
-            // we do no need the full length slice
+            // we do not need the full length slice
             let slice = slice::from_raw_parts(ptr, second_index + 1);
             Some(slice[second_index])
         } else {
@@ -60,21 +60,21 @@ impl Colors {
     /// Returns the base color for a specific [`CoreColor`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_core(&self, color: CoreColor) -> Option<ImVec4> {
+    pub fn core(&self, color: CoreColor) -> Option<ImVec4> {
         unsafe { self.read_color(0, color as usize) }
     }
 
     /// Returns the base color for a specific [`Profession`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_prof_base(&self, prof: Profession) -> Option<ImVec4> {
+    pub fn prof_base(&self, prof: Profession) -> Option<ImVec4> {
         unsafe { self.read_color(1, prof as usize) }
     }
 
     /// Returns the highlight color for a specific [`Profession`].
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
-    pub fn get_prof_highlight(&self, prof: Profession) -> Option<ImVec4> {
+    pub fn prof_highlight(&self, prof: Profession) -> Option<ImVec4> {
         unsafe { self.read_color(2, prof as usize) }
     }
 
@@ -82,7 +82,7 @@ impl Colors {
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
     /// Also returns [`None`] if the subgroup is out of the game subgroup range.
-    pub fn get_sub_base(&self, sub: usize) -> Option<ImVec4> {
+    pub fn sub_base(&self, sub: usize) -> Option<ImVec4> {
         // range check
         if sub != 0 && sub <= 15 {
             unsafe { self.read_color(3, sub) }
@@ -95,7 +95,7 @@ impl Colors {
     ///
     /// This will return [`None`] if ArcDPS did not yield the requested color when the [`Colors`] struct was retrieved.
     /// Also returns [`None`] if the subgroup is out of the game subgroup range.
-    pub fn get_sub_highlight(&self, sub: usize) -> Option<ImVec4> {
+    pub fn sub_highlight(&self, sub: usize) -> Option<ImVec4> {
         // range check
         if sub != 0 && sub <= 15 {
             unsafe { self.read_color(4, sub) }
@@ -106,7 +106,7 @@ impl Colors {
 }
 
 /// Retrieves the color settings from ArcDPS.
-pub fn get_colors() -> Colors {
+pub fn colors() -> Colors {
     // zeroing this is important for our null pointer checks later
     let mut colors = MaybeUninit::zeroed();
     unsafe { e5_colors(colors.as_mut_ptr()) };
@@ -123,7 +123,7 @@ pub struct UISettings {
 
     /// Whether the UI is always drawn.
     ///
-    /// When `false`, UI is hidden during loading screens & character select.
+    /// When `false`, the UI is hidden during loading screens & character select.
     pub draw_always: bool,
 
     /// Whether pressing the modifiers are required to move windows.
@@ -137,7 +137,7 @@ pub struct UISettings {
 }
 
 /// Retrieves the UI settings from ArcDPS.
-pub fn get_ui_settings() -> UISettings {
+pub fn ui_settings() -> UISettings {
     let raw = unsafe { e6_ui_settings() };
     UISettings {
         hidden: raw & 1 == 1,
@@ -162,7 +162,7 @@ pub struct Modifiers {
 }
 
 /// Retrieves the modifier keybinds from ArcDPS.
-pub fn get_modifiers() -> Modifiers {
+pub fn modifiers() -> Modifiers {
     let raw = unsafe { e7_modifiers() };
     Modifiers {
         modifier1: raw as u16,

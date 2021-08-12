@@ -69,7 +69,7 @@ impl Settings {
 
     /// Returns the path to the config file.
     pub fn config_path() -> Option<PathBuf> {
-        exports::get_config_path().map(|mut path| {
+        exports::config_path().map(|mut path| {
             if !path.is_dir() {
                 path.pop();
             }

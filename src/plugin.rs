@@ -415,13 +415,13 @@ impl Plugin {
     /// Callback for ArcDPS option checkboxes.
     pub fn render_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox(im_str!("Food Tracker"), self.tracker.visibility());
+            ui.checkbox(im_str!("Food Tracker"), self.tracker.is_visible_mut());
 
             #[cfg(feature = "demo")]
-            ui.checkbox(im_str!("Food Demo"), self.demo.visibility());
+            ui.checkbox(im_str!("Food Demo"), self.demo.is_visible_mut());
 
             #[cfg(feature = "log")]
-            ui.checkbox(im_str!("Food Debug Log"), self.debug.visibility());
+            ui.checkbox(im_str!("Food Debug Log"), self.debug.is_visible_mut());
         }
         false
     }

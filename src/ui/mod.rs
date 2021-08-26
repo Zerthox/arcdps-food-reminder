@@ -19,26 +19,26 @@ where
     fn is_visible(&self) -> bool;
 
     /// Returns a mutable reference to the component's visibility state.
-    fn visibility(&mut self) -> &mut bool;
+    fn is_visible_mut(&mut self) -> &mut bool;
 
     /// Hides the component.
     fn hide(&mut self) {
-        *self.visibility() = false;
+        *self.is_visible_mut() = false;
     }
 
     /// Shows the component.
     fn show(&mut self) {
-        *self.visibility() = true;
+        *self.is_visible_mut() = true;
     }
 
     /// Toggles the component's visibility.
     fn toggle_visibility(&mut self) {
-        let shown = self.visibility();
+        let shown = self.is_visible_mut();
         *shown = !*shown;
     }
 
     /// Sets the component's visibility state.
     fn set_visibility(&mut self, visible: bool) {
-        *self.visibility() = visible;
+        *self.is_visible_mut() = visible;
     }
 }

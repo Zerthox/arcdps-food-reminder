@@ -97,7 +97,7 @@ impl Component for Demo {
         ui.separator();
         ui.spacing();
 
-        ui.checkbox(im_str!("Tracker"), self.tracker.visibility());
+        ui.checkbox(im_str!("Tracker"), self.tracker.is_visible_mut());
 
         // player editor
         if ui.begin_table(im_str!("##food-reminder-demo-table"), 6) {

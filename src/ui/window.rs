@@ -110,7 +110,7 @@ where
     fn is_visible(&self) -> bool {
         self.shown
     }
-    fn visibility(&mut self) -> &mut bool {
+    fn is_visible_mut(&mut self) -> &mut bool {
         &mut self.shown
     }
 }

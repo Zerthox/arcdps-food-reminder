@@ -111,6 +111,8 @@ impl Component for DebugLog {
                 ui.text(&self.contents);
 
                 // perform auto scroll
+                // strict comparison should fine with the values returned by imgui
+                #[allow(clippy::clippy::float_cmp)]
                 if ui.scroll_y() == self.last_scroll_max {
                     ui.set_scroll_here_y_with_ratio(1.0);
                 }

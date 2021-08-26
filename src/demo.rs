@@ -117,7 +117,7 @@ impl Component for Demo {
             // entries
             for id in 0..self.tracker.len() {
                 ui.table_next_row();
-                let player = self.tracker.get_player_mut(id).unwrap();
+                let player = self.tracker.player_mut(id).unwrap();
 
                 // sub
                 ui.table_next_column();
@@ -269,7 +269,7 @@ impl HasSettings for Demo {
     }
     fn get_settings(&self) -> Self::Settings {
         DemoSettings {
-            players: self.tracker.get_players().cloned().collect(),
+            players: self.tracker.all_players().cloned().collect(),
             tracker: self.tracker.is_visible(),
         }
     }

@@ -132,7 +132,7 @@ impl Plugin {
                     StateChange::EnterCombat => {
                         // combat enter
 
-                        if let Some(player) = self.tracker.get_player_mut(src.id) {
+                        if let Some(player) = self.tracker.player_mut(src.id) {
                             player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]
@@ -142,7 +142,7 @@ impl Plugin {
                     StateChange::ExitCombat => {
                         // combat exit
 
-                        if let Some(player) = self.tracker.get_player_mut(src.id) {
+                        if let Some(player) = self.tracker.player_mut(src.id) {
                             player.exit_combat();
 
                             #[cfg(feature = "log")]
@@ -157,7 +157,7 @@ impl Plugin {
 
                         // change unset buffs to none
                         // initial buffs should be reported right after
-                        for player in self.tracker.get_players_mut() {
+                        for player in self.tracker.all_players_mut() {
                             player.unset_to_none(event_id);
                         }
 
@@ -165,14 +165,27 @@ impl Plugin {
                         let target_id = event.src_agent;
 
                         // check for known boss
-                        #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
+                            self.tracker.start_encounter(boss);
+
                             #[cfg(feature = "log")]
                             self.debug
                                 .log(format!("Log for {} started with {:?} delta", boss, delta));
 
                             // check self buffs
-                            self.check_self_buffs();
+                            if self.is_self_malnourished() {
+                                self.reminder.trigger_food();
+
+                                #[cfg(feature = "log")]
+                                self.debug.log("Food reminder triggered on encounter start");
+                            }
+                            if self.is_self_diminished() {
+                                self.reminder.trigger_util();
+
+                                #[cfg(feature = "log")]
+                                self.debug
+                                    .log("Utility reminder triggered on encounter start");
+                            }
                         } else {
                             #[cfg(feature = "log")]
                             self.debug.log(format!(
@@ -190,11 +203,25 @@ impl Plugin {
                         // check for known boss
                         #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
+                            self.tracker.end_encounter();
+
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Log for {} ended", boss));
 
                             // check self buffs
-                            self.check_self_buffs();
+                            if self.is_self_malnourished() {
+                                self.reminder.trigger_food();
+
+                                #[cfg(feature = "log")]
+                                self.debug.log("Food reminder triggered on encounter end");
+                            }
+                            if self.is_self_diminished() {
+                                self.reminder.trigger_util();
+
+                                #[cfg(feature = "log")]
+                                self.debug
+                                    .log("Utility reminder triggered on encounter end");
+                            }
                         } else {
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Log for id {} ended", target_id));
@@ -211,7 +238,7 @@ impl Plugin {
 
                                 // check for tracked player
                                 if let Some(dest) = dest {
-                                    if let Some(player) = self.tracker.get_player_mut(dest.id) {
+                                    if let Some(player) = self.tracker.player_mut(dest.id) {
                                         let buff_id = event.skill_id;
 
                                         // check for food & util
@@ -222,6 +249,19 @@ impl Plugin {
                                                     "Food {} applied to {:?}",
                                                     food, player
                                                 ));
+
+                                                // check for food running out during encounter
+                                                if player.is_self
+                                                    && self.tracker.in_encounter()
+                                                    && food == Food::Malnourished
+                                                {
+                                                    self.reminder.trigger_food();
+
+                                                    #[cfg(feature = "log")]
+                                                    self.debug.log(
+                                                        "Food reminder triggered during encounter",
+                                                    );
+                                                }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
                                             if player.apply_util(util, event_id) {
@@ -230,6 +270,19 @@ impl Plugin {
                                                     "Utility {} applied to {:?}",
                                                     util, player
                                                 ));
+
+                                                // check for utility running out during encounter
+                                                if player.is_self
+                                                    && self.tracker.in_encounter()
+                                                    && util == Utility::Diminished
+                                                {
+                                                    self.reminder.trigger_util();
+
+                                                    #[cfg(feature = "log")]
+                                                    self.debug.log(
+                                                        "Utility reminder triggered during encounter",
+                                                    );
+                                                }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
                                             if player.apply_unknown_food(buff_id, event_id) {
@@ -255,7 +308,7 @@ impl Plugin {
                             // buff removed
 
                             // check for tracked player
-                            if let Some(player) = self.tracker.get_player_mut(src.id) {
+                            if let Some(player) = self.tracker.player_mut(src.id) {
                                 let buff_id = event.skill_id;
 
                                 // check for food & util
@@ -348,21 +401,19 @@ impl Plugin {
         }
     }
 
-    /// Checks for Malnourished/Diminished on the local player (self).
-    fn check_self_buffs(&mut self) {
-        if let Some(player) = self.tracker.get_self() {
-            if player.food.state == BuffState::Known(Food::Malnourished) {
-                self.reminder.trigger_food();
+    /// Checks for Malnourished on the local player (self).
+    fn is_self_malnourished(&self) -> bool {
+        match self.tracker.get_self() {
+            Some(player) => player.food.state == BuffState::Known(Food::Malnourished),
+            None => false,
+        }
+    }
 
-                #[cfg(feature = "log")]
-                self.debug.log("Food reminder triggered for self");
-            }
-            if player.util.state == BuffState::Known(Utility::Diminished) {
-                self.reminder.trigger_util();
-
-                #[cfg(feature = "log")]
-                self.debug.log("Utility reminder triggered for self");
-            }
+    /// Checks for Diminished on the local player (self).
+    fn is_self_diminished(&self) -> bool {
+        match self.tracker.get_self() {
+            Some(player) => player.util.state == BuffState::Known(Utility::Diminished),
+            None => false,
         }
     }
 

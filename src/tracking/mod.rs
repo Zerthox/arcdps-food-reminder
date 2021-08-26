@@ -2,7 +2,7 @@ pub mod buff;
 pub mod player;
 
 use crate::{
-    arc_util::{api::CoreColor, exports},
+    arc_util::{api::CoreColor, exports, game::Boss},
     settings::HasSettings,
     ui::{
         render,
@@ -26,6 +26,9 @@ pub struct Tracker {
 
     /// Cache for temporarily saved buffs on last character of local player (self).
     cache: Option<(String, Buff<Food>, Buff<Utility>)>,
+
+    /// Current ongoing boss encounter.
+    encounter: Option<Boss>,
 }
 
 impl Tracker {
@@ -35,6 +38,7 @@ impl Tracker {
             players: HashMap::new(),
             self_id: 0,
             cache: None,
+            encounter: None,
         }
     }
 
@@ -68,8 +72,7 @@ impl Tracker {
         // check for self
         if id == self.self_id {
             if let Some(player) = &removed {
-                // TODO: set cache timeout
-                // cache character buffs
+                // cache character name & buffs in case we stay on same character
                 self.cache = Some((player.character.clone(), player.food, player.util));
             }
         }
@@ -94,28 +97,28 @@ impl Tracker {
     }
 
     /// Returns a reference to a tracked player.
-    pub fn get_player(&self, id: usize) -> Option<&Player> {
+    pub fn player(&self, id: usize) -> Option<&Player> {
         self.players.get(&id)
     }
 
     /// Returns a mutable reference to a tracked player.
-    pub fn get_player_mut(&mut self, id: usize) -> Option<&mut Player> {
+    pub fn player_mut(&mut self, id: usize) -> Option<&mut Player> {
         self.players.get_mut(&id)
     }
 
     /// Returns an unsorted iterator over all tracked players.
-    pub fn get_players(&self) -> impl Iterator<Item = &Player> {
+    pub fn all_players(&self) -> impl Iterator<Item = &Player> {
         self.players.values()
     }
 
     /// Returns an unsorted mutable iterator over all tracked players.
-    pub fn get_players_mut(&mut self) -> impl Iterator<Item = &mut Player> {
+    pub fn all_players_mut(&mut self) -> impl Iterator<Item = &mut Player> {
         self.players.values_mut()
     }
 
     /// Returns all tracked players sorted by subgroup.
-    pub fn get_players_by_sub(&self) -> Vec<&Player> {
-        let mut players = self.get_players().collect::<Vec<_>>();
+    pub fn all_players_by_sub(&self) -> Vec<&Player> {
+        let mut players = self.all_players().collect::<Vec<_>>();
         players.sort_by_key(|player| player.subgroup);
         players
     }
@@ -125,9 +128,24 @@ impl Tracker {
         self.players.len()
     }
 
-    /// Returns true if there is no tracked players.
+    /// Returns `true` if there is no tracked players.
     pub fn is_empty(&self) -> bool {
         self.players.is_empty()
+    }
+
+    /// Starts a boss encounter.
+    pub fn start_encounter(&mut self, boss: Boss) {
+        self.encounter = Some(boss);
+    }
+
+    /// Ends the current boss encounter.
+    pub fn end_encounter(&mut self) {
+        self.encounter = None;
+    }
+
+    /// Returns `true` if there is an ongoing boss encounter.
+    pub fn in_encounter(&self) -> bool {
+        self.encounter.is_some()
     }
 
     /// Renders a context menu for a food item.
@@ -211,7 +229,7 @@ impl Component for Tracker {
                     .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
                 // iterate over tracked players
-                for player in self.get_players_by_sub() {
+                for player in self.all_players_by_sub() {
                     // new row for each player
                     ui.table_next_row();
 

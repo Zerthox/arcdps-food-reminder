@@ -17,20 +17,16 @@ const FORMAT: &str = "%b %d %H:%M:%S.%3f";
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DebugLog {
-    /// Whether the log is active.
-    active: bool,
-
     /// Current contents of the log.
     #[serde(skip)]
     contents: ImString,
 
-    /// Current size of contents string.
-    #[serde(skip)]
-    size: usize,
+    /// Whether the log is active.
+    active: bool,
 
     // button widths used for ui rendering
     #[serde(skip)]
-    toggle_width: f32,
+    activity_toggle_width: f32,
 
     #[serde(skip)]
     clear_button_width: f32,
@@ -43,10 +39,9 @@ impl DebugLog {
     /// Creates a new debug log.
     pub fn new() -> Self {
         Self {
-            active: true,
             contents: ImString::default(),
-            size: 1, // imgui string has an implicit null at the end
-            toggle_width: 60.0,
+            active: true,
+            activity_toggle_width: 60.0,
             clear_button_width: 60.0,
             copy_button_width: 60.0,
         }
@@ -62,13 +57,6 @@ impl DebugLog {
             let now = Local::now();
             let line = format!("{}: {}\n", now.format(FORMAT), output.as_ref());
 
-            // clear on overflow
-            if let Some(new) = self.size.checked_add(line.len()) {
-                self.size = new;
-            } else {
-                self.clear();
-            }
-
             // append line
             self.contents.push_str(&line);
         }
@@ -76,7 +64,6 @@ impl DebugLog {
 
     /// Clears the debug log.
     pub fn clear(&mut self) {
-        self.size = 1;
         self.contents.clear();
     }
 }
@@ -97,25 +84,24 @@ impl Component for DebugLog {
         let mut align = RightAlign::build();
 
         // clear button
-        align.item(ui, self.clear_button_width, || {
+        let contents = &mut self.contents;
+        align.item(ui, &mut self.clear_button_width, || {
             if ui.button(im_str!("Clear"), [0.0, 0.0]) {
-                self.clear();
+                contents.clear();
             }
-            self.clear_button_width = ui.item_rect_size()[0];
         });
 
         // copy button
-        align.item(ui, self.copy_button_width, || {
+        align.item(ui, &mut self.copy_button_width, || {
             if ui.button(im_str!("Copy"), [0.0, 0.0]) {
-                ui.set_clipboard_text(&self.contents);
+                ui.set_clipboard_text(contents);
             }
-            self.copy_button_width = ui.item_rect_size()[0];
         });
 
         // activity toggle
-        align.item_with_margin(ui, 10.0, self.toggle_width, || {
-            ui.checkbox(im_str!("Active"), &mut self.active);
-            self.toggle_width = ui.item_rect_size()[0];
+        let active = &mut self.active;
+        align.item_with_margin(ui, 10.0, &mut self.activity_toggle_width, || {
+            ui.checkbox(im_str!("Active"), active);
         });
 
         ui.separator();

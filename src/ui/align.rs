@@ -62,7 +62,7 @@ impl LeftAlign {
     }
 }
 
-/// Render state for  right alignment.
+/// Render state for right alignment.
 #[derive(Debug, Clone, Copy)]
 pub struct RightAlign {
     margin: f32,
@@ -91,8 +91,9 @@ impl RightAlign {
     ///
     /// Items are passed from **right to left**.
     ///
-    /// Currently, the item width should be guessed on the first render and then read & saved for successive renders.
-    pub fn item<F>(&mut self, ui: &Ui, item_width: f32, render: F)
+    /// The item width will be used for alignment and updated with the correct width after render.
+    /// It can be a guessed default on the first render.
+    pub fn item<F>(&mut self, ui: &Ui, item_width: &mut f32, render: F)
     where
         F: FnOnce(),
     {
@@ -102,19 +103,22 @@ impl RightAlign {
     /// Renders the next item with a temporary margin override.
     ///
     /// Items are passed from **right to left**.
-    pub fn item_with_margin<F>(&mut self, ui: &Ui, margin: f32, item_width: f32, render: F)
+    ///
+    /// The item width will be used for alignment and updated with the correct width after render.
+    /// It can be a guessed default on the first render.
+    pub fn item_with_margin<F>(&mut self, ui: &Ui, margin: f32, item_width: &mut f32, render: F)
     where
         F: FnOnce(),
     {
-        // prepare
+        // prepare alignment
         let [window_x, _] = ui.window_content_region_max();
-        ui.same_line(window_x - self.accumulated - item_width);
+        ui.same_line(window_x - self.accumulated - *item_width);
 
         // render item
         render();
 
-        // update accumulated with actual size
-        let [last_width, _] = ui.item_rect_size();
-        self.accumulated += last_width + margin;
+        // update item width & accumulated with actual size
+        *item_width = ui.item_rect_size()[0];
+        self.accumulated += *item_width + margin;
     }
 }

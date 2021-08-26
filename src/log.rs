@@ -21,6 +21,9 @@ pub struct DebugLog {
     /// Whether the log is active.
     active: bool,
 
+    /// Last maximum scroll position.
+    last_scroll_max: f32,
+
     // button widths used for ui rendering
     activity_toggle_width: f32,
     clear_button_width: f32,
@@ -33,6 +36,7 @@ impl DebugLog {
         Self {
             contents: ImString::default(),
             active: true,
+            last_scroll_max: 0.0,
             activity_toggle_width: 60.0,
             clear_button_width: 60.0,
             copy_button_width: 60.0,
@@ -103,8 +107,16 @@ impl Component for DebugLog {
             .scrollable(true)
             .horizontal_scrollbar(true)
             .build(ui, || {
+                // render text
                 ui.text(&self.contents);
-                ui.set_scroll_here_y_with_ratio(1.0);
+
+                // perform auto scroll
+                if ui.scroll_y() == self.last_scroll_max {
+                    ui.set_scroll_here_y_with_ratio(1.0);
+                }
+
+                // update last max
+                self.last_scroll_max = ui.scroll_max_y();
             })
     }
 }

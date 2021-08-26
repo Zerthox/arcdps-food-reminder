@@ -1,7 +1,11 @@
 use crate::arc_util::exports;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::{Map, Value};
-use std::{fs::File, path::PathBuf};
+use std::{
+    fs::File,
+    io::{BufReader, BufWriter},
+    path::PathBuf,
+};
 
 /// Helper trait for components with settings.
 pub trait HasSettings {
@@ -44,7 +48,7 @@ impl Settings {
     pub fn load() -> Option<Self> {
         let path = Self::config_path()?;
         let file = File::open(path).ok()?;
-        let settings = serde_json::from_reader(file).ok()?;
+        let settings = serde_json::from_reader(BufReader::new(file)).ok()?;
         Some(settings)
     }
 
@@ -61,7 +65,7 @@ impl Settings {
             if let Ok(file) = File::create(path) {
                 #[allow(unused_must_use)]
                 {
-                    serde_json::to_writer_pretty(file, self);
+                    serde_json::to_writer_pretty(BufWriter::new(file), self);
                 }
             }
         }

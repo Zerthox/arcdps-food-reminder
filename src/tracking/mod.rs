@@ -13,23 +13,18 @@ use crate::{
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::{Buff, BuffState, Categorize, Food, Utility};
 use player::Player;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Player tracker.
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug)]
 pub struct Tracker {
     /// Currently tracked players mapped by their id.
-    #[serde(skip)]
     players: HashMap<usize, Player>,
 
     /// Current local player (self) id.
-    #[serde(skip)]
     self_id: usize,
 
     /// Cache for temporarily saved buffs on last character of local player (self).
-    #[serde(skip)]
     cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 }
 

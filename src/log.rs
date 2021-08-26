@@ -8,30 +8,22 @@ use crate::{
 };
 use arcdps::imgui::{im_str, ChildWindow, ImString, Ui};
 use chrono::Local;
-use serde::{Deserialize, Serialize};
 
 /// Time format used for debug messages.
 const FORMAT: &str = "%b %d %H:%M:%S.%3f";
 
 /// Debug log component.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone)]
 pub struct DebugLog {
     /// Current contents of the log.
-    #[serde(skip)]
     contents: ImString,
 
     /// Whether the log is active.
     active: bool,
 
     // button widths used for ui rendering
-    #[serde(skip)]
     activity_toggle_width: f32,
-
-    #[serde(skip)]
     clear_button_width: f32,
-
-    #[serde(skip)]
     copy_button_width: f32,
 }
 

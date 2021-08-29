@@ -173,13 +173,13 @@ impl Plugin {
                                 .log(format!("Log for {} started with {:?} delta", boss, delta));
 
                             // check self buffs
-                            if self.is_self_malnourished() {
+                            if self.no_self_food() {
                                 self.reminder.trigger_food();
 
                                 #[cfg(feature = "log")]
                                 self.debug.log("Food reminder triggered on encounter start");
                             }
-                            if self.is_self_diminished() {
+                            if self.no_self_util() {
                                 self.reminder.trigger_util();
 
                                 #[cfg(feature = "log")]
@@ -209,13 +209,13 @@ impl Plugin {
                             self.debug.log(format!("Log for {} ended", boss));
 
                             // check self buffs
-                            if self.is_self_malnourished() {
+                            if self.no_self_food() {
                                 self.reminder.trigger_food();
 
                                 #[cfg(feature = "log")]
                                 self.debug.log("Food reminder triggered on encounter end");
                             }
-                            if self.is_self_diminished() {
+                            if self.no_self_util() {
                                 self.reminder.trigger_util();
 
                                 #[cfg(feature = "log")]
@@ -249,19 +249,6 @@ impl Plugin {
                                                     "Food {} applied to {:?}",
                                                     food, player
                                                 ));
-
-                                                // check for food running out during encounter
-                                                if player.is_self
-                                                    && self.tracker.in_encounter()
-                                                    && food == Food::Malnourished
-                                                {
-                                                    self.reminder.trigger_food();
-
-                                                    #[cfg(feature = "log")]
-                                                    self.debug.log(
-                                                        "Food reminder triggered during encounter",
-                                                    );
-                                                }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
                                             if player.apply_util(util, event_id) {
@@ -270,19 +257,6 @@ impl Plugin {
                                                     "Utility {} applied to {:?}",
                                                     util, player
                                                 ));
-
-                                                // check for utility running out during encounter
-                                                if player.is_self
-                                                    && self.tracker.in_encounter()
-                                                    && util == Utility::Diminished
-                                                {
-                                                    self.reminder.trigger_util();
-
-                                                    #[cfg(feature = "log")]
-                                                    self.debug.log(
-                                                        "Utility reminder triggered during encounter",
-                                                    );
-                                                }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
                                             if player.apply_unknown_food(buff_id, event_id) {
@@ -319,6 +293,18 @@ impl Plugin {
                                             "Food {:?} removed from {:?}",
                                             food, player
                                         ));
+
+                                        // check for food running out during encounter
+                                        if player.is_self
+                                            && self.tracker.in_encounter()
+                                            && self.no_self_food()
+                                        {
+                                            self.reminder.trigger_food();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug
+                                                .log("Food reminder triggered during encounter");
+                                        }
                                     }
                                 } else if let Ok(util) = Utility::try_from(buff_id) {
                                     if player.remove_util(Some(util), event_id) {
@@ -327,6 +313,18 @@ impl Plugin {
                                             "Utility {:?} removed from {:?}",
                                             util, player
                                         ));
+
+                                        // check for utility running out during encounter
+                                        if player.is_self
+                                            && self.tracker.in_encounter()
+                                            && self.no_self_util()
+                                        {
+                                            self.reminder.trigger_util();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug
+                                                .log("Utility reminder triggered during encounter");
+                                        }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
                                     if player.remove_food(None, event_id) {
@@ -335,6 +333,19 @@ impl Plugin {
                                             "Unknown Food with id {} removed from {:?}",
                                             buff_id, player
                                         ));
+
+                                        // check for food running out during encounter
+                                        if player.is_self
+                                            && self.tracker.in_encounter()
+                                            && self.no_self_food()
+                                        {
+                                            self.reminder.trigger_food();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(
+                                                "Unknown Food reminder triggered during encounter",
+                                            );
+                                        }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
                                     if player.remove_util(None, event_id) {
@@ -343,6 +354,18 @@ impl Plugin {
                                             "Unknown Utility with id {} removed from {:?}",
                                             buff_id, player
                                         ));
+
+                                        // check for utility running out during encounter
+                                        if player.is_self
+                                            && self.tracker.in_encounter()
+                                            && self.no_self_util()
+                                        {
+                                            self.reminder.trigger_util();
+
+                                            #[cfg(feature = "log")]
+                                            self.debug
+                                                .log("Unknown Utility reminder triggered during encounter");
+                                        }
                                     }
                                 }
                             }
@@ -401,18 +424,24 @@ impl Plugin {
         }
     }
 
-    /// Checks for Malnourished on the local player (self).
-    fn is_self_malnourished(&self) -> bool {
+    /// Returns `true` if the local player (self) has no Food buff applied.
+    fn no_self_food(&self) -> bool {
         match self.tracker.get_self() {
-            Some(player) => player.food.state == BuffState::Known(Food::Malnourished),
+            Some(player) => matches!(
+                player.food.state,
+                BuffState::None | BuffState::Known(Food::Malnourished)
+            ),
             None => false,
         }
     }
 
-    /// Checks for Diminished on the local player (self).
-    fn is_self_diminished(&self) -> bool {
+    /// Returns `true` if the local player (self) has no Utility buff applied.
+    fn no_self_util(&self) -> bool {
         match self.tracker.get_self() {
-            Some(player) => player.util.state == BuffState::Known(Utility::Diminished),
+            Some(player) => matches!(
+                player.util.state,
+                BuffState::None | BuffState::Known(Utility::Diminished)
+            ),
             None => false,
         }
     }

@@ -260,7 +260,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        BuffState::None => {
+                        BuffState::None | BuffState::Known(Food::Malnourished) => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Food");
@@ -272,18 +272,6 @@ impl Component for Tracker {
                                 ui.tooltip_text("Unknown Food");
                             }
                             Self::render_food_context_menu(ui, player.id, id, None);
-                        }
-                        BuffState::Known(food @ Food::Malnourished) => {
-                            ui.text_colored(red, "MAL");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Malnourished");
-                            }
-                            Self::render_food_context_menu(
-                                ui,
-                                player.id,
-                                food.into(),
-                                Some(food.name()),
-                            );
                         }
                         BuffState::Known(food) => {
                             ui.text_colored(green, food.categorize());
@@ -312,7 +300,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        BuffState::None => {
+                        BuffState::None | BuffState::Known(Utility::Diminished) => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Utility");
@@ -324,18 +312,6 @@ impl Component for Tracker {
                                 ui.tooltip_text("Unknown Utility");
                             }
                             Self::render_util_context_menu(ui, player.id, id, None);
-                        }
-                        BuffState::Known(util @ Utility::Diminished) => {
-                            ui.text_colored(red, "DIM");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Diminished");
-                            }
-                            Self::render_util_context_menu(
-                                ui,
-                                player.id,
-                                util.into(),
-                                Some(util.name()),
-                            );
                         }
                         BuffState::Known(util) => {
                             ui.text_colored(green, util.categorize());

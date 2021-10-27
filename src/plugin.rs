@@ -31,14 +31,6 @@ use crate::{arc_util::api, log::DebugLog};
 /// Hotkey for the tracker.
 const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
 
-/// Hotkey for the demo.
-#[cfg(feature = "demo")]
-const DEMO_KEY: usize = VirtualKey::D.0 as usize;
-
-/// Hotkey for the log.
-#[cfg(feature = "log")]
-const LOG_KEY: usize = VirtualKey::L.0 as usize;
-
 /// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
@@ -451,26 +443,9 @@ impl Plugin {
         // check for down
         if down && !prev_down {
             // check for hotkeys
-            #[cfg_attr(
-                not(any(feature = "demo", feature = "log")),
-                allow(clippy::single_match)
-            )]
-            match key {
-                TRACKER_KEY => {
-                    self.tracker.toggle_visibility();
-                    return false;
-                }
-                #[cfg(feature = "demo")]
-                DEMO_KEY => {
-                    self.demo.toggle_visibility();
-                    return false;
-                }
-                #[cfg(feature = "log")]
-                LOG_KEY => {
-                    self.debug.toggle_visibility();
-                    return false;
-                }
-                _ => {}
+            if key == TRACKER_KEY {
+                self.tracker.toggle_visibility();
+                return false;
             }
         }
         true

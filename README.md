@@ -18,7 +18,7 @@ ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
 - [ ] Settings
   - [x] Save window states
   - [ ] Custom hotkeys
-  - [ ] Reminder on Malnourished/Diminished vs. none
+  - [ ] ~~Reminder on Malnourished/Diminished vs. none~~
   - [ ] Custom reminder delay
   - [ ] Custom Food/Utility definitions
 
@@ -37,4 +37,4 @@ You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.
 For the standard release version run `cargo build --release`.
 
 For development you can include a debug log via the `--feature log` flag.
-Run `cargo build --release --feature log` for optimized, `cargo build --feature log` for unoptimized.
+There is also a makefile provided for use with [cargo-make](https://github.com/sagiegurari/cargo-make).

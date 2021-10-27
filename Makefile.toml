@@ -1,0 +1,13 @@
+[env]
+ARCDPS_PATH = "C:/Program Files/Guild Wars 2/addons/arcdps"
+
+[tasks.build-dev]
+script = "cargo build --release --features log"
+
+[tasks.copy]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/arcdps_food_reminder.dll\" \"${ARCDPS_PATH}\""
+script_runner = "@shell"
+
+[tasks.dev]
+run_task = { name = ["build-dev", "copy"] }
+watch = true

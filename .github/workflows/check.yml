@@ -1,8 +1,14 @@
 name: Commit
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
+    paths:
+      - src/**
+  pull_request:
+    paths:
+      - src/**
 
 jobs:
   check:

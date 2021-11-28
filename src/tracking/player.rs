@@ -1,5 +1,5 @@
 pub use super::buff::{Buff, BuffState, Food, Utility};
-pub use crate::arc_util::game::{Profession, Specialization};
+pub use arc_util::game::{Profession, Specialization};
 use serde::{Deserialize, Serialize};
 use std::cmp;
 

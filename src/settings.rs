@@ -1,25 +1,15 @@
-use crate::arc_util::exports;
+use arc_util::{
+    exports,
+    ui::{Component, Hideable, Window, Windowed},
+};
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_json::{Map, Value};
 use std::{
     fs::File,
     io::{BufReader, BufWriter},
+    ops::{Deref, DerefMut},
     path::PathBuf,
 };
-
-/// Helper trait for components with settings.
-pub trait HasSettings {
-    type Settings: Serialize + DeserializeOwned;
-
-    /// Returns the component's settings name.
-    fn settings_name() -> &'static str;
-
-    /// Returns the component's current settings state.
-    fn get_settings(&self) -> Self::Settings;
-
-    /// Loads the component's settings from a loaded version.
-    fn load_settings(&mut self, loaded: Self::Settings);
-}
 
 /// Name of the config file.
 const CONFIG_NAME: &str = "arcdps_food_reminder.json";
@@ -110,5 +100,52 @@ impl Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Helper trait for components with settings.
+pub trait HasSettings {
+    type Settings: Serialize + DeserializeOwned;
+
+    /// Returns the component's settings name.
+    fn settings_name() -> &'static str;
+
+    /// Returns the component's current settings state.
+    fn get_settings(&self) -> Self::Settings;
+
+    /// Loads the component's settings from a loaded version.
+    fn load_settings(&mut self, loaded: Self::Settings);
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct WindowSettings<T>
+where
+    T: HasSettings,
+{
+    shown: Option<bool>,
+    settings: Option<T::Settings>,
+}
+
+impl<T> HasSettings for Window<T>
+where
+    T: Component + Windowed + HasSettings,
+{
+    type Settings = WindowSettings<T>;
+    fn settings_name() -> &'static str {
+        T::settings_name()
+    }
+    fn get_settings(&self) -> Self::Settings {
+        WindowSettings {
+            shown: Some(self.is_visible()),
+            settings: Some(self.deref().get_settings()),
+        }
+    }
+    fn load_settings(&mut self, loaded: Self::Settings) {
+        if let Some(shown) = loaded.shown {
+            self.set_visibility(shown);
+        }
+        if let Some(settings) = loaded.settings {
+            self.deref_mut().load_settings(settings);
+        }
     }
 }

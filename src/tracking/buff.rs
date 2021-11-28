@@ -1,4 +1,4 @@
-pub use crate::arc_util::game::{Food, Utility};
+pub use crate::data::{Food, Utility};
 use serde::{Deserialize, Serialize};
 
 /// Struct representing a buff.

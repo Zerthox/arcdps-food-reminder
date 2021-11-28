@@ -1,14 +1,11 @@
 pub mod buff;
 pub mod player;
 
-use crate::{
-    arc_util::{api::CoreColor, exports, game::Boss},
-    settings::HasSettings,
-    ui::{
-        render,
-        window::{WindowProps, Windowed},
-        Component,
-    },
+use crate::{data::Boss, settings::HasSettings};
+use arc_util::{
+    api::CoreColor,
+    exports,
+    ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::{Buff, BuffState, Categorize, Food, Utility};
@@ -31,6 +28,7 @@ pub struct Tracker {
     encounter: Option<Boss>,
 }
 
+#[allow(unused)]
 impl Tracker {
     /// Creates a new tracker.
     pub fn new() -> Self {
@@ -150,7 +148,7 @@ impl Tracker {
 
     /// Renders a context menu for a food item.
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        render::item_context_menu(
+        item_context_menu(
             &im_str!("##food-reminder-tracker-context-food-{}", menu_id),
             || {
                 ui.text(im_str!("Food Options"));
@@ -168,7 +166,7 @@ impl Tracker {
 
     /// Renders a context menu for a utility item.
     fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        render::item_context_menu(
+        item_context_menu(
             &im_str!("##food-reminder-tracker-context-util-{}", menu_id),
             || {
                 ui.text(im_str!("Utility Options"));

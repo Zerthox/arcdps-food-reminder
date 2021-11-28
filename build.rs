@@ -24,11 +24,6 @@ fn main() {
     let manifest = manifest_dir();
     let out = out_dir();
 
-    // windows bindings
-    windows::build! {
-        Windows::{System::VirtualKey, Win32::Media::Multimedia::timeGetTime},
-    }
-
     // parse entity data
     let raids = parse_data::<_, Entity>(manifest.join("data/entities/raids.yml"));
     let fractals = parse_data::<_, Entity>(manifest.join("data/entities/fractals.yml"));

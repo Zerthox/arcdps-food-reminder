@@ -8,12 +8,8 @@ use crate::{
         player::{Player, Profession, Specialization},
         Tracker,
     },
-    ui::{
-        align::LeftAlign,
-        window::{Window, WindowProps, Windowed},
-        Component, Hideable,
-    },
 };
+use arc_util::ui::{align::LeftAlign, Component, Hideable, Window, WindowProps, Windowed};
 use arcdps::imgui::{im_str, ComboBox, ImStr, ImString, Ui};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
@@ -43,7 +39,7 @@ impl Demo {
                 .copied()
                 .chain(Utility::iter().map(BuffState::Known))
                 .collect(),
-            tracker: Tracker::create_window(),
+            tracker: Tracker::default().windowed(),
         }
     }
 

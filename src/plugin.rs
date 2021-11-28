@@ -1,20 +1,17 @@
 use crate::{
-    arc_util::{
-        api::{BuffRemove, StateChange},
-        exports,
-        game::{Boss, Food, Utility},
-    },
+    data::{Boss, Food, Utility},
     reminder::Reminder,
     settings::Settings,
     tracking::{
         player::{BuffState, Player},
         Tracker,
     },
-    ui::{
-        window::{Window, Windowed},
-        Component, Hideable,
-    },
-    win::VirtualKey,
+};
+use arc_util::{
+    api::{BuffRemove, StateChange},
+    exports,
+    ui::{Component, Hideable, Window, Windowed},
+    win::System::VirtualKey,
 };
 use arcdps::{
     imgui::{im_str, Ui},
@@ -26,7 +23,7 @@ use std::convert::TryFrom;
 use crate::demo::Demo;
 
 #[cfg(feature = "log")]
-use crate::{arc_util::api, log::DebugLog};
+use {arc_util::api, arc_util::ui::components::log::Log};
 
 /// Hotkey for the tracker.
 const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
@@ -46,7 +43,7 @@ pub struct Plugin {
 
     /// Debug log window.
     #[cfg(feature = "log")]
-    debug: Window<DebugLog>,
+    debug: Window<Log>,
 }
 
 impl Plugin {
@@ -60,7 +57,7 @@ impl Plugin {
             demo: Demo::new().windowed(),
 
             #[cfg(feature = "log")]
-            debug: DebugLog::new().windowed(),
+            debug: Log::new().windowed_with_name("Food Reminder Debug Log"),
         }
     }
 
@@ -81,10 +78,6 @@ impl Plugin {
         // load demo settings
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
-
-        // load log settings
-        #[cfg(feature = "log")]
-        settings.load_component(&mut self.debug);
     }
 
     /// Unloads the plugin.
@@ -97,10 +90,6 @@ impl Plugin {
         // update demo settings
         #[cfg(feature = "demo")]
         settings.store_component(&self.demo);
-
-        // update log settings
-        #[cfg(feature = "log")]
-        settings.store_component(&self.debug);
 
         // save settings
         settings.save();

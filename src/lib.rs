@@ -1,16 +1,11 @@
-pub mod arc_util;
-pub mod plugin;
-pub mod reminder;
-pub mod settings;
-pub mod tracking;
-pub mod ui;
-pub mod win;
+mod data;
+mod plugin;
+mod reminder;
+mod settings;
+mod tracking;
 
 #[cfg(feature = "demo")]
-pub mod demo;
-
-#[cfg(feature = "log")]
-pub mod log;
+mod demo;
 
 use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
 use lazy_static::lazy_static;

@@ -1,7 +1,4 @@
-use crate::{
-    arc_util::{api::CoreColor, exports},
-    ui::Component,
-};
+use arc_util::{api::CoreColor, exports, ui::Component};
 use arcdps::imgui::{im_str, Condition, ImStr, Ui, Window};
 use std::time::{Duration, Instant};
 

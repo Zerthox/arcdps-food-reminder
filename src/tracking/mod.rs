@@ -84,9 +84,9 @@ impl Tracker {
         self.players
             .iter()
             .position(|player| player.id == id)
-            .map(|pos| {
-                // remove player
-                let removed = self.players.remove(pos);
+            .map(|index| {
+                // swap remove is fine, we will sort anyway
+                let removed = self.players.swap_remove(index);
 
                 // check for self
                 if id == self.self_id {

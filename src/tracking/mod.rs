@@ -1,16 +1,18 @@
 pub mod buff;
 pub mod player;
 
-use crate::{data::Boss, settings::HasSettings};
+use crate::data::Boss;
 use arc_util::{
     api::CoreColor,
     exports,
+    settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
 use buff::{Buff, BuffState, Categorize, Food, Utility};
 use player::Player;
 use std::collections::HashMap;
+use windows::System::VirtualKey;
 
 /// Player tracker.
 #[derive(Debug)]
@@ -339,16 +341,21 @@ impl Component for Tracker {
 impl Windowed for Tracker {
     fn window_props() -> WindowProps {
         WindowProps::new("Food Tracker")
+            .hotkey(VirtualKey::F.0 as usize)
             .visible(false)
             .auto_resize(true)
     }
 }
 
+// required to save window settings
 impl HasSettings for Tracker {
     type Settings = ();
-    fn settings_name() -> &'static str {
+
+    fn settings_id() -> &'static str {
         "tracker"
     }
+
     fn get_settings(&self) -> Self::Settings {}
+
     fn load_settings(&mut self, _: Self::Settings) {}
 }

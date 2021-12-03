@@ -1,8 +1,8 @@
 mod data;
 mod plugin;
 mod reminder;
-mod settings;
 mod tracking;
+mod win;
 
 #[cfg(feature = "demo")]
 mod demo;
@@ -14,12 +14,13 @@ use std::sync::Mutex;
 
 // create exports for arcdps
 arcdps_export! {
-    name: "food-reminder",
+    name: "Food Reminder",
     sig: 0x642baaae , // random id
     init,
     release,
     combat,
     imgui,
+    options_end,
     options_windows,
     wnd_filter,
 }
@@ -60,7 +61,14 @@ fn imgui(ui: &Ui, not_loading_or_character_selection: bool) {
 }
 
 fn options_windows(ui: &Ui, window_name: Option<&str>) -> bool {
-    PLUGIN.lock().unwrap().render_options(ui, window_name)
+    PLUGIN
+        .lock()
+        .unwrap()
+        .render_window_options(ui, window_name)
+}
+
+fn options_end(ui: &Ui) {
+    PLUGIN.lock().unwrap().render_options(ui)
 }
 
 fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {

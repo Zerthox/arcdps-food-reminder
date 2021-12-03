@@ -4,13 +4,14 @@ version = 3
 
 [[package]]
 name = "arc_util"
-version = "0.2.0"
-source = "git+https://github.com/zerthox/gw2-arcdps-utils?branch=master#648358db3cdb08f65ef1d45d73c04e0f914032ab"
+version = "0.3.0"
+source = "git+https://github.com/zerthox/gw2-arcdps-utils?branch=master#db0d90d57d9ff74640a8b79e9ce680524d5e715e"
 dependencies = [
  "arcdps",
  "chrono",
  "num_enum",
  "serde",
+ "serde_json",
  "strum",
  "strum_macros",
  "windows",
@@ -36,6 +37,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "arcdps_food_reminder"
+version = "0.2.2"
+dependencies = [
+ "arc_util",
+ "arcdps",
+ "lazy_static",
+ "num_enum",
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_yaml",
+ "strum",
+ "strum_macros",
+ "windows",
 ]
 
 [[package]]
@@ -97,23 +115,6 @@ name = "dtoa"
 version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
-
-[[package]]
-name = "gw2-arcdps-food-reminder"
-version = "0.2.0"
-dependencies = [
- "arc_util",
- "arcdps",
- "lazy_static",
- "num_enum",
- "proc-macro2",
- "quote",
- "serde",
- "serde_json",
- "serde_yaml",
- "strum",
- "strum_macros",
-]
 
 [[package]]
 name = "hashbrown"
@@ -333,9 +334,9 @@ checksum = "61b3909d758bb75c79f23d4736fac9433868679d3ad2ea7a61e3c25cfda9a088"
 
 [[package]]
 name = "ryu"
-version = "1.0.5"
+version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
+checksum = "3c9613b5a66ab9ba26415184cfc41156594925a9cf3a2057e57f31ff145f6568"
 
 [[package]]
 name = "scopeguard"

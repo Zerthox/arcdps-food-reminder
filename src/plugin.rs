@@ -1,20 +1,20 @@
 use crate::{
     data::{Boss, Food, Utility},
     reminder::Reminder,
-    settings::Settings,
     tracking::{
         player::{BuffState, Player},
         Tracker,
     },
+    win,
 };
 use arc_util::{
     api::{BuffRemove, StateChange},
     exports,
-    ui::{Component, Hideable, Window, Windowed},
-    win::System::VirtualKey,
+    settings::Settings,
+    ui::{align::LeftAlign, Component, Hideable, Window, Windowed},
 };
 use arcdps::{
-    imgui::{im_str, Ui},
+    imgui::{im_str, ImString, Ui},
     Agent, CombatEvent,
 };
 use std::convert::TryFrom;
@@ -25,8 +25,8 @@ use crate::demo::Demo;
 #[cfg(feature = "log")]
 use {arc_util::api, arc_util::ui::components::log::Log};
 
-/// Hotkey for the tracker.
-const TRACKER_KEY: usize = VirtualKey::F.0 as usize;
+/// Settings file name.
+const SETTINGS_FILE: &str = "arcdps_food_reminder.json";
 
 /// Main plugin.
 #[derive(Debug)]
@@ -67,7 +67,7 @@ impl Plugin {
         self.debug.log("Plugin load");
 
         // load settings
-        let mut settings = Settings::load_or_initial();
+        let mut settings = Settings::from_file(SETTINGS_FILE);
 
         #[cfg(feature = "log")]
         self.debug.log(format!("Loaded {:?}", settings));
@@ -82,7 +82,7 @@ impl Plugin {
 
     /// Unloads the plugin.
     pub fn unload(&mut self) {
-        let mut settings = Settings::load_or_initial();
+        let mut settings = Settings::from_file(SETTINGS_FILE);
 
         // update tracker settings
         settings.store_component(&self.tracker);
@@ -92,7 +92,7 @@ impl Plugin {
         settings.store_component(&self.demo);
 
         // save settings
-        settings.save();
+        settings.save_file();
     }
 
     /// Handles a combat event.
@@ -427,19 +427,6 @@ impl Plugin {
         }
     }
 
-    /// Handles a key event.
-    pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
-        // check for down
-        if down && !prev_down {
-            // check for hotkeys
-            if key == TRACKER_KEY {
-                self.tracker.toggle_visibility();
-                return false;
-            }
-        }
-        true
-    }
-
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // log & demo render always
@@ -456,8 +443,53 @@ impl Plugin {
         }
     }
 
+    /// Callback for option UI creation.
+    pub fn render_options(&mut self, ui: &Ui) {
+        let mut align = LeftAlign::with_margin(10.0);
+        ui.align_text_to_frame_padding();
+
+        align.item(ui, || ui.text(im_str!("Tracker Hotkey")));
+
+        align.item(ui, || {
+            let mut buffer = ImString::with_capacity(3);
+            buffer.push_str(
+                &self
+                    .tracker
+                    .hotkey()
+                    .map(|keycode| keycode.to_string())
+                    .unwrap_or_default(),
+            );
+            ui.push_item_width(ui.calc_text_size(im_str!("1234"), false, 0.0)[0]);
+
+            if ui
+                .input_text(im_str!("##food-reminder-tracker-hotkey"), &mut buffer)
+                .chars_decimal(true)
+                .chars_uppercase(false)
+                .chars_noblank(true)
+                .build()
+            {
+                let result = buffer.to_str();
+                if result.is_empty() {
+                    self.tracker.set_hotkey(None);
+                } else if let Ok(keycode) = result.parse() {
+                    self.tracker.set_hotkey(Some(keycode));
+                }
+            }
+        });
+
+        align.item(ui, || {
+            let name = self
+                .tracker
+                .hotkey()
+                .map(|keycode| win::keycode_to_name(keycode as u32))
+                .flatten()
+                .unwrap_or_default();
+            ui.text(name);
+        });
+    }
+
     /// Callback for ArcDPS option checkboxes.
-    pub fn render_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
+    pub fn render_window_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
             ui.checkbox(im_str!("Food Tracker"), self.tracker.is_visible_mut());
 
@@ -468,6 +500,19 @@ impl Plugin {
             ui.checkbox(im_str!("Food Debug Log"), self.debug.is_visible_mut());
         }
         false
+    }
+
+    /// Handles a key event.
+    pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
+        // check for down
+        if down && !prev_down {
+            // check for hotkeys
+            if Some(key) == self.tracker.hotkey() {
+                self.tracker.toggle_visibility();
+                return false;
+            }
+        }
+        true
     }
 }
 

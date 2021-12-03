@@ -263,6 +263,7 @@ pub struct DemoSettings {
     tracker: bool,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for DemoSettings {
     fn default() -> Self {
         Self {

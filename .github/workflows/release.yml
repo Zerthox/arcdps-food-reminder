@@ -19,3 +19,7 @@ jobs:
         with:
           command: build
           args: --release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: arcdps_food_reminder
+          path: target/release/arcdps_food_reminder.dll

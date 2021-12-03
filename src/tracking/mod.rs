@@ -9,7 +9,7 @@ use arc_util::{
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
 use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
-use buff::{Buff, BuffState, Categorize, Food, Utility};
+use buff::{Buff, BuffState, Food, Utility};
 use player::Player;
 use std::collections::HashMap;
 use windows::System::VirtualKey;
@@ -135,9 +135,7 @@ impl Tracker {
 
     /// Starts a boss encounter.
     pub fn start_encounter(&mut self, boss: Option<Boss>) {
-        self.encounter = boss
-            .map(|boss| Encounter::Boss(boss))
-            .unwrap_or(Encounter::Unknown);
+        self.encounter = boss.map(Encounter::Boss).unwrap_or(Encounter::Unknown);
     }
 
     /// Ends the current boss encounter.
@@ -281,7 +279,7 @@ impl Component for Tracker {
                             Self::render_food_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(food) => {
-                            ui.text_colored(green, food.categorize());
+                            ui.text_colored(green, food.category().unwrap_or("SOME"));
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",
@@ -321,7 +319,7 @@ impl Component for Tracker {
                             Self::render_util_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(util) => {
-                            ui.text_colored(green, util.categorize());
+                            ui.text_colored(green, util.category().unwrap_or("SOME"));
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",

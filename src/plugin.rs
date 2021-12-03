@@ -153,12 +153,12 @@ impl Plugin {
                         // check for known boss
                         let boss = Boss::try_from(target_id).ok();
                         self.tracker.start_encounter(boss);
+
+                        #[cfg(feature = "log")]
                         if let Some(boss) = boss {
-                            #[cfg(feature = "log")]
                             self.debug
                                 .log(format!("Log for {} started with {:?} delta", boss, delta));
                         } else {
-                            #[cfg(feature = "log")]
                             self.debug.log(format!(
                                 "Log for id {} started with {:?} delta",
                                 target_id, delta
@@ -172,17 +172,17 @@ impl Plugin {
                     StateChange::LogEnd => {
                         // log end
 
-                        // grab target id
-                        let target_id = event.src_agent;
+                        #[cfg(feature = "log")]
+                        {
+                            // grab target id
+                            let target_id = event.src_agent;
 
-                        // check for known boss
-                        #[cfg_attr(not(feature = "log"), allow(unused))]
-                        if let Ok(boss) = Boss::try_from(target_id) {
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Log for {} ended", boss));
-                        } else {
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Log for id {} ended", target_id));
+                            // check for known boss
+                            if let Ok(boss) = Boss::try_from(target_id) {
+                                self.debug.log(format!("Log for {} ended", boss));
+                            } else {
+                                self.debug.log(format!("Log for id {} ended", target_id));
+                            }
                         }
 
                         // check self buffs

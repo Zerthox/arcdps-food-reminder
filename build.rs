@@ -97,6 +97,8 @@ struct Buff {
 
     #[serde(default)]
     stats: Vec<String>,
+
+    category: Option<String>,
 }
 
 /// Entity data entry.
@@ -145,6 +147,17 @@ fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenS
         (format_ident!("{}", name), quote! { &[#(#stats),*] })
     }));
 
+    // generate category match
+    let category_match = generate_match(buffs.iter().map(|(name, buff)| {
+        (
+            format_ident!("{}", name),
+            buff.category
+                .as_ref()
+                .map(|category| quote! { Some(#category) })
+                .unwrap_or(quote! { None }),
+        )
+    }));
+
     // generate full code
     quote! {
         #[doc = #doc]
@@ -163,6 +176,11 @@ fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenS
             /// The returned slice will be empty if no stats are applied or the stats are not known.
             pub fn stats(&self) -> &[&'static str] {
                 #stat_match
+            }
+
+            /// Returns the category of the buff.
+            pub fn category(&self) -> Option<&'static str> {
+                #category_match
             }
         }
     }

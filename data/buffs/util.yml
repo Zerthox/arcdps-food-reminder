@@ -1,52 +1,63 @@
 # === GENERAL ===
 Diminished:
   id: 46668
+  category: DIM
 
 # === POWER ===
 SuperiorStone:
   id: 9963 # potent version uses same id
   name: Superior Sharpening Stone
   stats: [3% Power from Precision, 6% Power from Ferocity]
+  category: PWR
 Fruitcake:
   id: 34211
   name: Tin of Fruitcake
   stats: [3% Power from Precision, 6% Power from Ferocity]
+  category: PWR
 FuriousStone:
   id: 25882
   name: Furious Sharpening Stone
   stats: [3% Power from Precision, 3% Ferocity from Precision]
+  category: PWR
 
 # === CONDI ===
 ToxicCrystal:
   id: 21828
   name: Toxic Focusing Crystal
   stats: [3% Condition Damage from Power, 3% Condition Damage from Precision]
+  category: CND
 MasterCrystal:
   id: 9967
   name: Master Tuning Crystal
   stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
+  category: EXP
 TuningIcicle:
   id: 34206
   name: Tuning Icicle
   stats: [3% Condition Damage from Precision, 8% Condition Damage from Expertise]
+  category: EXP
 
 # === CONC ===
 PotentOil:
   id: 53374
   name: Potent Lucent Oil
   stats: [3% Concentration from Power, 3% Concentration from Precision]
+  category: PCON
 EnhancedOil:
   id: 53304
   name: Enhanced Lucent Oil
   stats: [6% Concentration from Condition Damage, 3% Concentration from Precision]
+  category: PCON
 ToxicOil:
   id: 21827
   name: Toxic Maintenance Oil
   stats: [3% Concentration from Power, 6% Concentration from Condition Damage]
+  category: CCON
 PeppermintOil:
   id: 34187
   name: Peppermint Oil
   stats: [3% Concentration from Precision, 6% Concentration from Healing Power]
+  category: CCON
 
 # === HEAL ===
 BountifulOil:
@@ -59,29 +70,36 @@ StrengthWrit:
   id: 33297
   name: Writ of Masterful Strength
   stats: [+200 Power above 90% Health]
+  category: WRIT
 AccuracyWrit:
   id: 31970
   name: Writ of Masterful Accuracy
   stats: [+200 Precision above 90% Health]
+  category: WRIT
 MaliceWrit:
   id: 33836
   name: Writ of Masterful Malice
   stats: [+200 Condition Damage above 90% Health]
+  category: WRIT
 
 # === OTHER ===
 PumpkinOil:
   id: 25632
   name: Flask of Pumpkin Oil
   stats: ["+100 Power, Toughness & Vitality after reviving"]
+  category: RES
 CrystallizedNougat:
   id: 25631
   name: Lump of Crystallized Nougat
   stats: ["+100 Condition Damage, Precision & Toughness after reviving"]
+  category: RES
 SharpeningSkull:
   id: 25630
   name: Sharpening Skull
   stats: [+75 All Attributes after reviving]
+  category: RES
 ScarletSlaying:
   id: 23228
   name: Powerful Potion of Slaying Scarlet's Armies
   stats: [+10% Damage against Scarlet's Armies, -10% Damage from Scarlet's Armies]
+  category: SLAY

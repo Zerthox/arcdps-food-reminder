@@ -15,22 +15,14 @@ const FONT_SIZE: f32 = 2.0;
 #[derive(Debug)]
 pub struct Reminder {
     pub settings: ReminderSettings,
-
-    duration: Duration,
     food_trigger: Option<Instant>,
     util_trigger: Option<Instant>,
 }
 
 impl Reminder {
-    /// Creates a new reminder with the default duration.
+    /// Creates a new reminder.
     pub fn new() -> Self {
-        Self::with_duration(DEFAULT_DURATION)
-    }
-
-    /// Creates a new reminder with a custom duration.
-    pub fn with_duration(duration: Duration) -> Self {
         Self {
-            duration,
             settings: ReminderSettings::default(),
             food_trigger: None,
             util_trigger: None,
@@ -73,7 +65,7 @@ impl Component for Reminder {
 
         // check for food trigger
         let food = match self.food_trigger {
-            Some(time) if now.saturating_duration_since(time) <= self.duration => true,
+            Some(time) if now.saturating_duration_since(time) <= self.settings.duration => true,
             Some(_) => {
                 self.food_trigger = None;
                 false
@@ -83,7 +75,7 @@ impl Component for Reminder {
 
         // check for util trigger
         let util = match self.util_trigger {
-            Some(time) if now.saturating_duration_since(time) <= self.duration => true,
+            Some(time) if now.saturating_duration_since(time) <= self.settings.duration => true,
             Some(_) => {
                 self.util_trigger = None;
                 false
@@ -134,6 +126,7 @@ impl Default for Reminder {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReminderSettings {
+    pub duration: Duration,
     pub only_bosses: bool,
     pub encounter_start: bool,
     pub encounter_end: bool,
@@ -143,6 +136,7 @@ pub struct ReminderSettings {
 impl Default for ReminderSettings {
     fn default() -> Self {
         Self {
+            duration: DEFAULT_DURATION,
             only_bosses: true,
             encounter_start: true,
             encounter_end: true,

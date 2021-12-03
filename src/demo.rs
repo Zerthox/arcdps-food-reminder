@@ -126,7 +126,7 @@ impl Component for Demo {
                     .chars_decimal(true)
                     .build()
                 {
-                    player.subgroup = match AsRef::<str>::as_ref(&sub).parse() {
+                    player.subgroup = match sub.to_str().parse() {
                         Ok(num) if num > 15 => 15,
                         Ok(0) | Err(_) => 1,
                         Ok(num) => num,
@@ -142,7 +142,7 @@ impl Component for Demo {
                     .input_text(&im_str!("##food-reminder-demo-char-{}", id), &mut char_name)
                     .build()
                 {
-                    player.character = AsRef::<str>::as_ref(&char_name).into();
+                    player.character = char_name.to_str().into();
                 }
 
                 // account name
@@ -154,7 +154,7 @@ impl Component for Demo {
                     .input_text(&im_str!("##food-reminder-demo-acc-{}", id), &mut acc_name)
                     .build()
                 {
-                    player.account = AsRef::<str>::as_ref(&acc_name).into();
+                    player.account = acc_name.to_string();
                 }
 
                 // class

@@ -6,9 +6,8 @@
 
 ## Development progress
 - [x] Food reminder
-  - [x] On encounter start
-  - [x] After encounter end
-  - [x] Running out during encounter
+  - [x] Display onscreen
+  - [ ] Notification sound
 - [x] Food tracking
   - [x] Food/Utility tracker table
   - [x] Classification of Food/Utility

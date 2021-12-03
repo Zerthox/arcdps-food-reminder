@@ -17,7 +17,7 @@ use arcdps::{
     imgui::{im_str, ImString, Ui},
     Agent, CombatEvent,
 };
-use std::convert::TryFrom;
+use std::{convert::TryFrom, time::Duration};
 
 #[cfg(feature = "demo")]
 use crate::demo::Demo;
@@ -429,24 +429,22 @@ impl Plugin {
         align.item(ui, || ui.text(im_str!("Tracker Hotkey")));
 
         align.item(ui, || {
-            let mut buffer = ImString::with_capacity(3);
-            buffer.push_str(
+            let mut key_buffer = ImString::with_capacity(3);
+            key_buffer.push_str(
                 &self
                     .tracker
                     .hotkey()
                     .map(|keycode| keycode.to_string())
                     .unwrap_or_default(),
             );
-            ui.push_item_width(ui.calc_text_size(im_str!("1234"), false, 0.0)[0]);
 
+            ui.push_item_width(ui.calc_text_size(im_str!("0000"), false, 0.0)[0]);
             if ui
-                .input_text(im_str!("##food-reminder-tracker-hotkey"), &mut buffer)
+                .input_text(im_str!("##food-reminder-tracker-hotkey"), &mut key_buffer)
                 .chars_decimal(true)
-                .chars_uppercase(false)
-                .chars_noblank(true)
                 .build()
             {
-                let result = buffer.to_str();
+                let result = key_buffer.to_str();
                 if result.is_empty() {
                     self.tracker.set_hotkey(None);
                 } else if let Ok(keycode) = result.parse() {
@@ -481,6 +479,23 @@ impl Plugin {
             im_str!("Remind during encounter"),
             &mut self.reminder.settings.during_encounter,
         );
+
+        let mut duration_buffer = ImString::with_capacity(5);
+        duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
+
+        ui.push_item_width(ui.calc_text_size(im_str!("000000"), false, 0.0)[0]);
+        if ui
+            .input_text(
+                im_str!("Reminder duration (ms)##food-reminder-duration-input"),
+                &mut duration_buffer,
+            )
+            .chars_decimal(true)
+            .build()
+        {
+            if let Ok(num) = duration_buffer.to_str().parse() {
+                self.reminder.settings.duration = Duration::from_millis(num);
+            }
+        }
     }
 
     /// Callback for ArcDPS option checkboxes.

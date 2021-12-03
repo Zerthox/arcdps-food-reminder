@@ -26,8 +26,8 @@ pub struct Tracker {
     /// Cache for temporarily saved buffs on last character of local player (self).
     cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 
-    /// Current ongoing boss encounter.
-    encounter: Option<Boss>,
+    /// Current ongoing encounter.
+    encounter: Encounter,
 }
 
 #[allow(unused)]
@@ -38,7 +38,7 @@ impl Tracker {
             players: HashMap::new(),
             self_id: 0,
             cache: None,
-            encounter: None,
+            encounter: Encounter::None,
         }
     }
 
@@ -134,18 +134,25 @@ impl Tracker {
     }
 
     /// Starts a boss encounter.
-    pub fn start_encounter(&mut self, boss: Boss) {
-        self.encounter = Some(boss);
+    pub fn start_encounter(&mut self, boss: Option<Boss>) {
+        self.encounter = boss
+            .map(|boss| Encounter::Boss(boss))
+            .unwrap_or(Encounter::Unknown);
     }
 
     /// Ends the current boss encounter.
     pub fn end_encounter(&mut self) {
-        self.encounter = None;
+        self.encounter = Encounter::None;
+    }
+
+    /// Returns the encounter state.
+    pub fn encounter(&self) -> Encounter {
+        self.encounter
     }
 
     /// Returns `true` if there is an ongoing boss encounter.
     pub fn in_encounter(&self) -> bool {
-        self.encounter.is_some()
+        self.encounter != Encounter::None
     }
 
     /// Renders a context menu for a food item.
@@ -355,7 +362,20 @@ impl HasSettings for Tracker {
         "tracker"
     }
 
-    fn get_settings(&self) -> Self::Settings {}
+    fn current_settings(&self) -> Self::Settings {}
 
     fn load_settings(&mut self, _: Self::Settings) {}
+}
+
+/// Possible encounter states.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Encounter {
+    // No ongoing encounter.
+    None,
+
+    // Ongoing unknown encounter.
+    Unknown,
+
+    // Ongoing encounter with known boss.
+    Boss(Boss),
 }

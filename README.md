@@ -1,5 +1,5 @@
 # GW2 ArcDPS Food Reminder
-ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
+[ArcDPS](https://deltaconnected.com/arcdps) plugin for [Guild Wars 2](https://guildwars2.com) allowing tracking of buff food & utility items.
 
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
@@ -15,10 +15,10 @@ ArcDPS plugin for Guild Wars 2 allowing tracking of buff food & utility items.
   - [x] Tooltips with Food/Utility details
   - [x] Context menu to copy names/ids
   - [ ] Table sorting
-- [ ] Settings
+- [x] Settings
   - [x] Save window states
   - [x] Custom hotkeys
-  - [ ] Reminder customization
+  - [x] Reminder customization
   - [ ] Custom Food/Utility definitions
 
 ## Buff database

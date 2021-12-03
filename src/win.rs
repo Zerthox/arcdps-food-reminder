@@ -7,6 +7,7 @@ use windows::Win32::{
     },
 };
 
+/// Converts a keycode to the key's name.
 pub fn keycode_to_name(keycode: u32) -> Option<ImString> {
     let scan_code = unsafe { MapVirtualKeyA(keycode, MAPVK_VK_TO_VSC) };
 

@@ -1,5 +1,6 @@
-use arc_util::{api::CoreColor, exports, ui::Component};
+use arc_util::{api::CoreColor, exports, settings::HasSettings, ui::Component};
 use arcdps::imgui::{im_str, Condition, ImStr, Ui, Window};
+use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
 
 // TODO: alert component with custom text instead of this?
@@ -13,6 +14,8 @@ const FONT_SIZE: f32 = 2.0;
 /// Reminder UI component.
 #[derive(Debug)]
 pub struct Reminder {
+    pub settings: ReminderSettings,
+
     duration: Duration,
     food_trigger: Option<Instant>,
     util_trigger: Option<Instant>,
@@ -28,6 +31,7 @@ impl Reminder {
     pub fn with_duration(duration: Duration) -> Self {
         Self {
             duration,
+            settings: ReminderSettings::default(),
             food_trigger: None,
             util_trigger: None,
         }
@@ -124,5 +128,41 @@ impl Component for Reminder {
 impl Default for Reminder {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct ReminderSettings {
+    pub only_bosses: bool,
+    pub encounter_start: bool,
+    pub encounter_end: bool,
+    pub during_encounter: bool,
+}
+
+impl Default for ReminderSettings {
+    fn default() -> Self {
+        Self {
+            only_bosses: true,
+            encounter_start: true,
+            encounter_end: true,
+            during_encounter: true,
+        }
+    }
+}
+
+impl HasSettings for Reminder {
+    type Settings = ReminderSettings;
+
+    fn settings_id() -> &'static str {
+        "reminder"
+    }
+
+    fn current_settings(&self) -> Self::Settings {
+        self.settings.clone()
+    }
+
+    fn load_settings(&mut self, loaded: Self::Settings) {
+        self.settings = loaded;
     }
 }

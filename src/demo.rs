@@ -279,7 +279,7 @@ impl HasSettings for Demo {
         "demo"
     }
 
-    fn get_settings(&self) -> Self::Settings {
+    fn current_settings(&self) -> Self::Settings {
         DemoSettings {
             players: self.tracker.all_players().cloned().collect(),
             tracker: self.tracker.is_visible(),

@@ -3,7 +3,7 @@ use crate::{
     reminder::Reminder,
     tracking::{
         player::{BuffState, Player},
-        Tracker,
+        Encounter, Tracker,
     },
     win,
 };
@@ -24,6 +24,9 @@ use crate::demo::Demo;
 
 #[cfg(feature = "log")]
 use {arc_util::api, arc_util::ui::components::log::Log};
+
+/// Plugin version.
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Settings file name.
 const SETTINGS_FILE: &str = "arcdps_food_reminder.json";
@@ -72,10 +75,10 @@ impl Plugin {
         #[cfg(feature = "log")]
         self.debug.log(format!("Loaded {:?}", settings));
 
-        // load tracker settings
+        // load component settings
         settings.load_component(&mut self.tracker);
+        settings.load_component(&mut self.reminder);
 
-        // load demo settings
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
     }
@@ -84,10 +87,12 @@ impl Plugin {
     pub fn unload(&mut self) {
         let mut settings = Settings::from_file(SETTINGS_FILE);
 
-        // update tracker settings
-        settings.store_component(&self.tracker);
+        settings.store_data("version", VERSION);
 
-        // update demo settings
+        // update component settings
+        settings.store_component(&self.tracker);
+        settings.store_component(&self.reminder);
+
         #[cfg(feature = "demo")]
         settings.store_component(&self.demo);
 
@@ -146,27 +151,12 @@ impl Plugin {
                         let target_id = event.src_agent;
 
                         // check for known boss
-                        if let Ok(boss) = Boss::try_from(target_id) {
-                            self.tracker.start_encounter(boss);
-
+                        let boss = Boss::try_from(target_id).ok();
+                        self.tracker.start_encounter(boss);
+                        if let Some(boss) = boss {
                             #[cfg(feature = "log")]
                             self.debug
                                 .log(format!("Log for {} started with {:?} delta", boss, delta));
-
-                            // check self buffs
-                            if self.no_self_food() {
-                                self.reminder.trigger_food();
-
-                                #[cfg(feature = "log")]
-                                self.debug.log("Food reminder triggered on encounter start");
-                            }
-                            if self.no_self_util() {
-                                self.reminder.trigger_util();
-
-                                #[cfg(feature = "log")]
-                                self.debug
-                                    .log("Utility reminder triggered on encounter start");
-                            }
                         } else {
                             #[cfg(feature = "log")]
                             self.debug.log(format!(
@@ -174,6 +164,10 @@ impl Plugin {
                                 target_id, delta
                             ))
                         }
+
+                        // check self buffs
+                        self.check_self_food();
+                        self.check_self_util();
                     }
                     StateChange::LogEnd => {
                         // log end
@@ -184,29 +178,19 @@ impl Plugin {
                         // check for known boss
                         #[cfg_attr(not(feature = "log"), allow(unused))]
                         if let Ok(boss) = Boss::try_from(target_id) {
-                            self.tracker.end_encounter();
-
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Log for {} ended", boss));
-
-                            // check self buffs
-                            if self.no_self_food() {
-                                self.reminder.trigger_food();
-
-                                #[cfg(feature = "log")]
-                                self.debug.log("Food reminder triggered on encounter end");
-                            }
-                            if self.no_self_util() {
-                                self.reminder.trigger_util();
-
-                                #[cfg(feature = "log")]
-                                self.debug
-                                    .log("Utility reminder triggered on encounter end");
-                            }
                         } else {
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Log for id {} ended", target_id));
                         }
+
+                        // check self buffs
+                        self.check_self_food();
+                        self.check_self_util();
+
+                        // end encounter
+                        self.tracker.end_encounter();
                     }
                     _ => {
                         // TODO: should we restrict this to specific state change kinds?
@@ -275,16 +259,9 @@ impl Plugin {
                                             food, player
                                         ));
 
-                                        // check for food running out during encounter
-                                        if player.is_self
-                                            && self.tracker.in_encounter()
-                                            && self.no_self_food()
-                                        {
-                                            self.reminder.trigger_food();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug
-                                                .log("Food reminder triggered during encounter");
+                                        // check for food running out
+                                        if player.is_self {
+                                            self.check_self_food();
                                         }
                                     }
                                 } else if let Ok(util) = Utility::try_from(buff_id) {
@@ -295,16 +272,9 @@ impl Plugin {
                                             util, player
                                         ));
 
-                                        // check for utility running out during encounter
-                                        if player.is_self
-                                            && self.tracker.in_encounter()
-                                            && self.no_self_util()
-                                        {
-                                            self.reminder.trigger_util();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug
-                                                .log("Utility reminder triggered during encounter");
+                                        // check for utility running out
+                                        if player.is_self {
+                                            self.check_self_util();
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
@@ -315,17 +285,9 @@ impl Plugin {
                                             buff_id, player
                                         ));
 
-                                        // check for food running out during encounter
-                                        if player.is_self
-                                            && self.tracker.in_encounter()
-                                            && self.no_self_food()
-                                        {
-                                            self.reminder.trigger_food();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(
-                                                "Unknown Food reminder triggered during encounter",
-                                            );
+                                        // check for food running out
+                                        if player.is_self {
+                                            self.check_self_food();
                                         }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
@@ -336,16 +298,9 @@ impl Plugin {
                                             buff_id, player
                                         ));
 
-                                        // check for utility running out during encounter
-                                        if player.is_self
-                                            && self.tracker.in_encounter()
-                                            && self.no_self_util()
-                                        {
-                                            self.reminder.trigger_util();
-
-                                            #[cfg(feature = "log")]
-                                            self.debug
-                                                .log("Unknown Utility reminder triggered during encounter");
+                                        // check for utility running out
+                                        if player.is_self {
+                                            self.check_self_util();
                                         }
                                     }
                                 }
@@ -405,25 +360,46 @@ impl Plugin {
         }
     }
 
-    /// Returns `true` if the local player (self) has no Food buff applied.
-    fn no_self_food(&self) -> bool {
-        match self.tracker.get_self() {
-            Some(player) => matches!(
-                player.food.state,
-                BuffState::None | BuffState::Known(Food::Malnourished)
-            ),
-            None => false,
+    /// Whether the local player can be reminded.
+    fn can_remind(&self) -> bool {
+        if self.reminder.settings.only_bosses {
+            matches!(self.tracker.encounter(), Encounter::Boss(_))
+        } else {
+            self.tracker.in_encounter()
         }
     }
 
-    /// Returns `true` if the local player (self) has no Utility buff applied.
-    fn no_self_util(&self) -> bool {
-        match self.tracker.get_self() {
-            Some(player) => matches!(
-                player.util.state,
-                BuffState::None | BuffState::Known(Utility::Diminished)
-            ),
-            None => false,
+    /// Checks for missing food on the local player.
+    fn check_self_food(&mut self) {
+        if let Some(player) = self.tracker.get_self() {
+            if self.can_remind()
+                && matches!(
+                    player.food.state,
+                    BuffState::None | BuffState::Known(Food::Malnourished)
+                )
+            {
+                self.reminder.trigger_food();
+
+                #[cfg(feature = "log")]
+                self.debug.log("Food reminder triggered");
+            }
+        }
+    }
+
+    /// Checks for missing utility on the local player.
+    fn check_self_util(&mut self) {
+        if let Some(player) = self.tracker.get_self() {
+            if self.can_remind()
+                && matches!(
+                    player.util.state,
+                    BuffState::None | BuffState::Known(Utility::Diminished)
+                )
+            {
+                self.reminder.trigger_util();
+
+                #[cfg(feature = "log")]
+                self.debug.log("Utility reminder triggered");
+            }
         }
     }
 
@@ -486,6 +462,23 @@ impl Plugin {
                 .unwrap_or_default();
             ui.text(name);
         });
+
+        ui.checkbox(
+            im_str!("Remind only on bosses"),
+            &mut self.reminder.settings.only_bosses,
+        );
+        ui.checkbox(
+            im_str!("Remind on encounter start"),
+            &mut self.reminder.settings.encounter_start,
+        );
+        ui.checkbox(
+            im_str!("Remind on encounter end"),
+            &mut self.reminder.settings.encounter_end,
+        );
+        ui.checkbox(
+            im_str!("Remind during encounter"),
+            &mut self.reminder.settings.during_encounter,
+        );
     }
 
     /// Callback for ArcDPS option checkboxes.

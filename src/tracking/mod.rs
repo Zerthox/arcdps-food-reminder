@@ -451,6 +451,7 @@ pub enum Encounter {
     Boss(Boss),
 }
 
+/// Current column sorted by.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Sorting {
     Sub,

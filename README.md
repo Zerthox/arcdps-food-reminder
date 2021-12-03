@@ -13,7 +13,7 @@
   - [x] Classification of Food/Utility
   - [x] Tooltips with Food/Utility details
   - [x] Context menu to copy names/ids
-  - [ ] Table sorting
+  - [x] Table sorting
 - [x] Settings
   - [x] Save window states
   - [x] Custom hotkeys

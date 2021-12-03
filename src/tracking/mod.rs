@@ -8,23 +8,33 @@ use arc_util::{
     settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
-use arcdps::imgui::{im_str, TableColumnFlags, TableFlags, Ui};
+use arcdps::imgui::{
+    im_str,
+    sys::{igTableGetSortSpecs, ImGuiSortDirection_Ascending, ImGuiSortDirection_None},
+    TableColumnFlags, TableFlags, Ui,
+};
 use buff::{Buff, BuffState, Food, Utility};
 use player::Player;
-use std::collections::HashMap;
+use std::{cmp::Reverse, slice};
 use windows::System::VirtualKey;
 
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
-    /// Currently tracked players mapped by their id.
-    players: HashMap<usize, Player>,
+    /// Currently tracked players.
+    players: Vec<Player>,
+
+    /// Current sorting.
+    sorting: Sorting,
+
+    /// Current sorting direction.
+    reverse: bool,
 
     /// Current local player (self) id.
     self_id: usize,
 
     /// Cache for temporarily saved buffs on last character of local player (self).
-    cache: Option<(String, Buff<Food>, Buff<Utility>)>,
+    self_cache: Option<(String, Buff<Food>, Buff<Utility>)>,
 
     /// Current ongoing encounter.
     encounter: Encounter,
@@ -35,9 +45,11 @@ impl Tracker {
     /// Creates a new tracker.
     pub fn new() -> Self {
         Self {
-            players: HashMap::new(),
+            players: Vec::new(),
+            sorting: Sorting::Sub,
+            reverse: false,
             self_id: 0,
-            cache: None,
+            self_cache: None,
             encounter: Encounter::None,
         }
     }
@@ -50,7 +62,7 @@ impl Tracker {
             self.self_id = player.id;
 
             // check & reset cache
-            if let Some((character, food, util)) = self.cache.take() {
+            if let Some((character, food, util)) = self.self_cache.take() {
                 // check for same character
                 if character == player.character {
                     // use cached food
@@ -61,24 +73,33 @@ impl Tracker {
         }
 
         // insert player
-        self.players.insert(player.id, player);
+        self.players.push(player);
+
+        // refresh sorting
+        self.refresh_sort();
     }
 
     /// Removes a tracked player, returning the removed player if they were tracked.
     pub fn remove_player(&mut self, id: usize) -> Option<Player> {
-        // remove player
-        let removed = self.players.remove(&id);
+        self.players
+            .iter()
+            .position(|player| player.id == id)
+            .map(|pos| {
+                // remove player
+                let removed = self.players.remove(pos);
 
-        // check for self
-        if id == self.self_id {
-            if let Some(player) = &removed {
-                // cache character name & buffs in case we stay on same character
-                self.cache = Some((player.character.clone(), player.food, player.util));
-            }
-        }
+                // check for self
+                if id == self.self_id {
+                    // cache character name & buffs in case we stay on same character
+                    self.self_cache = Some((removed.character.clone(), removed.food, removed.util));
+                }
 
-        // return removed player
-        removed
+                // refresh sorting
+                self.refresh_sort();
+
+                // return removed player
+                removed
+            })
     }
 
     /// Checks whether the given id is the local player (self).
@@ -88,39 +109,32 @@ impl Tracker {
 
     /// Returns a reference to the local player (self).
     pub fn get_self(&self) -> Option<&Player> {
-        self.players.get(&self.self_id)
+        self.player(self.self_id)
     }
 
     /// Returns a mutable reference to the local player (self).
     pub fn get_self_mut(&mut self) -> Option<&mut Player> {
-        self.players.get_mut(&self.self_id)
+        self.player_mut(self.self_id)
     }
 
     /// Returns a reference to a tracked player.
     pub fn player(&self, id: usize) -> Option<&Player> {
-        self.players.get(&id)
+        self.players.iter().find(|player| player.id == id)
     }
 
     /// Returns a mutable reference to a tracked player.
     pub fn player_mut(&mut self, id: usize) -> Option<&mut Player> {
-        self.players.get_mut(&id)
+        self.players.iter_mut().find(|player| player.id == id)
     }
 
-    /// Returns an unsorted iterator over all tracked players.
+    /// Returns an iterator over all tracked players.
     pub fn all_players(&self) -> impl Iterator<Item = &Player> {
-        self.players.values()
+        self.players.iter()
     }
 
-    /// Returns an unsorted mutable iterator over all tracked players.
+    /// Returns a mutable iterator over all tracked players.
     pub fn all_players_mut(&mut self) -> impl Iterator<Item = &mut Player> {
-        self.players.values_mut()
-    }
-
-    /// Returns all tracked players sorted by subgroup.
-    pub fn all_players_by_sub(&self) -> Vec<&Player> {
-        let mut players = self.all_players().collect::<Vec<_>>();
-        players.sort_by_key(|player| player.subgroup);
-        players
+        self.players.iter_mut()
     }
 
     /// Returns the number of tracked players.
@@ -151,6 +165,25 @@ impl Tracker {
     /// Returns `true` if there is an ongoing boss encounter.
     pub fn in_encounter(&self) -> bool {
         self.encounter != Encounter::None
+    }
+
+    /// Sorts the players in the tracker table.
+    fn refresh_sort(&mut self) {
+        match (self.sorting, self.reverse) {
+            (Sorting::Sub, false) => self.players.sort_by_key(|player| player.subgroup),
+            (Sorting::Sub, true) => self.players.sort_by_key(|player| Reverse(player.subgroup)),
+
+            (Sorting::Name, false) => self.players.sort_by(|a, b| a.character.cmp(&b.character)),
+            (Sorting::Name, true) => self
+                .players
+                .sort_by(|a, b| Reverse(&a.character).cmp(&Reverse(&b.character))),
+
+            (Sorting::Food, false) => self.players.sort_by_key(|player| player.food),
+            (Sorting::Food, true) => self.players.sort_by_key(|player| Reverse(player.food)),
+
+            (Sorting::Util, false) => self.players.sort_by_key(|player| player.util),
+            (Sorting::Util, true) => self.players.sort_by_key(|player| Reverse(player.util)),
+        }
     }
 
     /// Renders a context menu for a food item.
@@ -205,18 +238,58 @@ impl Component for Tracker {
             if ui.begin_table_with_flags(
                 im_str!("##food-reminder-tracker-table"),
                 4,
-                TableFlags::NONE,
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
             ) {
                 // declare columns
-                ui.table_setup_column_with_flags(im_str!("Sub"), TableColumnFlags::DEFAULT_SORT);
-                ui.table_setup_column_with_flags(im_str!("Player"), TableColumnFlags::NO_SORT);
-                ui.table_setup_column_with_flags(im_str!("Food"), TableColumnFlags::NO_SORT);
-                ui.table_setup_column_with_flags(im_str!("Util"), TableColumnFlags::NO_SORT);
+                ui.table_setup_column_with_flags(
+                    im_str!("Sub"),
+                    TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
+                );
+                ui.table_setup_column_with_flags(
+                    im_str!("Player"),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                );
+                ui.table_setup_column_with_flags(
+                    im_str!("Food"),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                );
+                ui.table_setup_column_with_flags(
+                    im_str!("Util"),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                );
 
                 // render header
                 ui.table_headers_row();
 
-                // TODO: sorting, imgui-rs currently has no wrapping, need to use imgui::sys directly
+                // sorting
+                if let Some(sort_specs) = unsafe { igTableGetSortSpecs().as_mut() } {
+                    // check for changes
+                    if sort_specs.SpecsDirty {
+                        let column_specs = unsafe {
+                            slice::from_raw_parts(sort_specs.Specs, sort_specs.SpecsCount as usize)
+                        };
+                        if let Some(sorted_column) = column_specs
+                            .iter()
+                            .find(|column| column.SortDirection() as u32 != ImGuiSortDirection_None)
+                        {
+                            // update sorting state
+                            match sorted_column.ColumnIndex {
+                                0 => self.sorting = Sorting::Sub,
+                                1 => self.sorting = Sorting::Name,
+                                2 => self.sorting = Sorting::Food,
+                                3 => self.sorting = Sorting::Util,
+                                _ => {}
+                            }
+
+                            // ascending is reverse order for us
+                            self.reverse = sorted_column.SortDirection() as u32
+                                == ImGuiSortDirection_Ascending;
+
+                            // refresh sorting
+                            self.refresh_sort();
+                        }
+                    }
+                }
 
                 // grab arc colors
                 let colors = exports::colors();
@@ -234,7 +307,7 @@ impl Component for Tracker {
                     .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
                 // iterate over tracked players
-                for player in self.all_players_by_sub() {
+                for player in &self.players {
                     // new row for each player
                     ui.table_next_row();
 
@@ -366,7 +439,7 @@ impl HasSettings for Tracker {
 }
 
 /// Possible encounter states.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Encounter {
     // No ongoing encounter.
     None,
@@ -376,4 +449,12 @@ pub enum Encounter {
 
     // Ongoing encounter with known boss.
     Boss(Boss),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Sorting {
+    Sub,
+    Name,
+    Food,
+    Util,
 }

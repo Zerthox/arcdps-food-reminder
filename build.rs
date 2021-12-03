@@ -161,7 +161,7 @@ fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenS
     // generate full code
     quote! {
         #[doc = #doc]
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
         #[repr(u32)]
         pub #raw_enum
 
@@ -232,7 +232,7 @@ fn generate_entity(doc: &str, name: &str, entities: &HashMap<String, Entity>) ->
     // generate full code
     quote! {
         #[doc = #doc]
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
         #[repr(usize)]
         pub #raw_enum
 

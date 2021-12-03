@@ -3,6 +3,7 @@ pub use arc_util::game::{Profession, Specialization};
 use serde::{Deserialize, Serialize};
 use std::cmp;
 
+// TODO: move general player struct to utils
 // TODO: track buff duration & reset to unset when duration runs out?
 
 /// Struct representing a player.

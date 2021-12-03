@@ -1,5 +1,6 @@
 pub use crate::data::{Food, Utility};
 use serde::{Deserialize, Serialize};
+use std::cmp::{Ordering, PartialOrd};
 
 /// Struct representing a buff.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -31,8 +32,26 @@ impl<T> Buff<T> {
     }
 }
 
+impl<T> PartialOrd for Buff<T>
+where
+    T: PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.state.partial_cmp(&other.state)
+    }
+}
+
+impl<T> Ord for Buff<T>
+where
+    T: Ord,
+{
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.state.cmp(&other.state)
+    }
+}
+
 /// Possible buff states.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum BuffState<T> {
     /// Buff state is not set (yet).
     ///

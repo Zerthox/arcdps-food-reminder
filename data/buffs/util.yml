@@ -64,6 +64,7 @@ BountifulOil:
   id: 25879
   name: Bountiful Maintenance Oil
   stats: [0.6% Outgoing Healing for 100 Healing Power, 0.8% Outgoing Healing for 100 Concentration]
+  category: HEAL
 
 # === WRIT ===
 StrengthWrit:

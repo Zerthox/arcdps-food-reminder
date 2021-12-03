@@ -176,6 +176,7 @@ SesameBeefCarpaccio:
   id: 57231
   name: Plate of Sesame-Ginger Beef Carpaccio
   stats: [Health every second, +100 Concentration, +70 Power]
+  category: PCON
 # MintBeefCarpaccio:
 #   id: UNKNOWN
 #   name: Plate of Beef Carpaccio with Mint Garnish

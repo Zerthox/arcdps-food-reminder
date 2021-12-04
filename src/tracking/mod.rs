@@ -85,17 +85,14 @@ impl Tracker {
             .iter()
             .position(|player| player.id == id)
             .map(|index| {
-                // swap remove is fine, we will sort anyway
-                let removed = self.players.swap_remove(index);
+                // remove player, sorting will be preserved
+                let removed = self.players.remove(index);
 
                 // check for self
                 if id == self.self_id {
                     // cache character name & buffs in case we stay on same character
                     self.self_cache = Some((removed.character.clone(), removed.food, removed.util));
                 }
-
-                // refresh sorting
-                self.refresh_sort();
 
                 // return removed player
                 removed

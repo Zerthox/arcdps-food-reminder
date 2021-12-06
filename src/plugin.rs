@@ -166,8 +166,10 @@ impl Plugin {
                         }
 
                         // check self buffs
-                        self.check_self_food();
-                        self.check_self_util();
+                        if self.reminder.settings.encounter_start {
+                            self.check_self_food();
+                            self.check_self_util();
+                        }
                     }
                     StateChange::LogEnd => {
                         // log end
@@ -186,8 +188,10 @@ impl Plugin {
                         }
 
                         // check self buffs
-                        self.check_self_food();
-                        self.check_self_util();
+                        if self.reminder.settings.encounter_end {
+                            self.check_self_food();
+                            self.check_self_util();
+                        }
 
                         // end encounter
                         self.tracker.end_encounter();
@@ -260,7 +264,8 @@ impl Plugin {
                                         ));
 
                                         // check for food running out
-                                        if player.is_self {
+                                        if player.is_self && self.reminder.settings.during_encounter
+                                        {
                                             self.check_self_food();
                                         }
                                     }
@@ -273,7 +278,8 @@ impl Plugin {
                                         ));
 
                                         // check for utility running out
-                                        if player.is_self {
+                                        if player.is_self && self.reminder.settings.during_encounter
+                                        {
                                             self.check_self_util();
                                         }
                                     }
@@ -286,7 +292,8 @@ impl Plugin {
                                         ));
 
                                         // check for food running out
-                                        if player.is_self {
+                                        if player.is_self && self.reminder.settings.during_encounter
+                                        {
                                             self.check_self_food();
                                         }
                                     }
@@ -299,7 +306,8 @@ impl Plugin {
                                         ));
 
                                         // check for utility running out
-                                        if player.is_self {
+                                        if player.is_self && self.reminder.settings.during_encounter
+                                        {
                                             self.check_self_util();
                                         }
                                     }

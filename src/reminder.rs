@@ -131,6 +131,7 @@ pub struct ReminderSettings {
     pub encounter_start: bool,
     pub encounter_end: bool,
     pub during_encounter: bool,
+    pub always_mal_dim: bool,
 }
 
 impl Default for ReminderSettings {
@@ -141,6 +142,7 @@ impl Default for ReminderSettings {
             encounter_start: true,
             encounter_end: true,
             during_encounter: true,
+            always_mal_dim: true,
         }
     }
 }

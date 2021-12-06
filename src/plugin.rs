@@ -218,6 +218,13 @@ impl Plugin {
                                                     "Food {} applied to {:?}",
                                                     food, player
                                                 ));
+
+                                                // trigger reminder
+                                                if self.reminder.settings.always_mal_dim
+                                                    && food == Food::Malnourished
+                                                {
+                                                    self.reminder.trigger_food();
+                                                }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
                                             if player.apply_util(util, event_id) {
@@ -226,6 +233,13 @@ impl Plugin {
                                                     "Utility {} applied to {:?}",
                                                     util, player
                                                 ));
+
+                                                // trigger reminder
+                                                if self.reminder.settings.always_mal_dim
+                                                    && util == Utility::Diminished
+                                                {
+                                                    self.reminder.trigger_util();
+                                                }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
                                             if player.apply_unknown_food(buff_id, event_id) {
@@ -472,10 +486,6 @@ impl Plugin {
         });
 
         ui.checkbox(
-            im_str!("Remind only on bosses"),
-            &mut self.reminder.settings.only_bosses,
-        );
-        ui.checkbox(
             im_str!("Remind on encounter start"),
             &mut self.reminder.settings.encounter_start,
         );
@@ -486,6 +496,14 @@ impl Plugin {
         ui.checkbox(
             im_str!("Remind during encounter"),
             &mut self.reminder.settings.during_encounter,
+        );
+        ui.checkbox(
+            im_str!("Restrict reminders for encounters to bosses"),
+            &mut self.reminder.settings.only_bosses,
+        );
+        ui.checkbox(
+            im_str!("Always remind when becoming Malnourished/Diminished"),
+            &mut self.reminder.settings.always_mal_dim,
         );
 
         let mut duration_buffer = ImString::with_capacity(5);

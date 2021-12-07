@@ -506,7 +506,7 @@ impl Plugin {
             &mut self.reminder.settings.during_encounter,
         );
         ui.checkbox(
-            im_str!("Restrict reminders for encounters to bosses"),
+            im_str!("Restrict reminders for encounters to Raids & Fractal CMs"),
             &mut self.reminder.settings.only_bosses,
         );
         ui.checkbox(

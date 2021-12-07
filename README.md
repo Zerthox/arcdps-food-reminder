@@ -1,6 +1,8 @@
 # GW2 ArcDPS Food Reminder
 [ArcDPS](https://deltaconnected.com/arcdps) plugin for [Guild Wars 2](https://guildwars2.com) allowing tracking of buff food & utility items.
 
+Published releases can be found [here](../../releases). Click [here](../releases/latest/download/arcdps_food_reminder.dll) to directly download the latest release.
+
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
 

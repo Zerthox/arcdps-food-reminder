@@ -219,7 +219,7 @@ impl Plugin {
                                                     food, player
                                                 ));
 
-                                                // trigger reminder
+                                                // trigger reminder on malnourished
                                                 if self.reminder.settings.always_mal_dim
                                                     && food == Food::Malnourished
                                                 {
@@ -234,7 +234,7 @@ impl Plugin {
                                                     util, player
                                                 ));
 
-                                                // trigger reminder
+                                                // trigger reminder on diminished
                                                 if self.reminder.settings.always_mal_dim
                                                     && util == Utility::Diminished
                                                 {

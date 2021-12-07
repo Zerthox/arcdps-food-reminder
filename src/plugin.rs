@@ -221,9 +221,13 @@ impl Plugin {
 
                                                 // trigger reminder on malnourished
                                                 if self.reminder.settings.always_mal_dim
+                                                    && player.is_self
                                                     && food == Food::Malnourished
                                                 {
                                                     self.reminder.trigger_food();
+
+                                                    #[cfg(feature = "log")]
+                                                    self.debug.log("Food reminder triggered");
                                                 }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
@@ -236,9 +240,13 @@ impl Plugin {
 
                                                 // trigger reminder on diminished
                                                 if self.reminder.settings.always_mal_dim
+                                                    && player.is_self
                                                     && util == Utility::Diminished
                                                 {
                                                     self.reminder.trigger_util();
+
+                                                    #[cfg(feature = "log")]
+                                                    self.debug.log("Food reminder triggered");
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {

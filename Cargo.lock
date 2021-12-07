@@ -41,7 +41,7 @@ dependencies = [
 
 [[package]]
 name = "arcdps_food_reminder"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "arc_util",
  "arcdps",

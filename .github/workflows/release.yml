@@ -19,6 +19,9 @@ jobs:
         with:
           command: build
           args: --release
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: target/release/arcdps_food_reminder.dll
       - uses: actions/upload-artifact@v2
         with:
           name: arcdps_food_reminder

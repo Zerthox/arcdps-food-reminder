@@ -1,15 +1,13 @@
 use crate::{
     data::{Boss, Food, Utility},
     reminder::Reminder,
-    tracking::{
-        player::{BuffState, Player},
-        Encounter, Tracker,
-    },
+    tracking::{entry::BuffState, Encounter, Tracker},
     win,
 };
 use arc_util::{
     api::{BuffRemove, StateChange},
     exports,
+    game::Player,
     settings::Settings,
     ui::{align::LeftAlign, Component, Hideable, Window, Windowed},
 };
@@ -118,21 +116,21 @@ impl Plugin {
                     StateChange::EnterCombat => {
                         // combat enter
 
-                        if let Some(player) = self.tracker.player_mut(src.id) {
-                            player.enter_combat(Some(event.dst_agent));
+                        if let Some(entry) = self.tracker.player_mut(src.id) {
+                            entry.player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]
-                            self.debug.log(format!("Combat enter for {:?}", player));
+                            self.debug.log(format!("Combat enter for {:?}", entry));
                         }
                     }
                     StateChange::ExitCombat => {
                         // combat exit
 
-                        if let Some(player) = self.tracker.player_mut(src.id) {
-                            player.exit_combat();
+                        if let Some(entry) = self.tracker.player_mut(src.id) {
+                            entry.player.exit_combat();
 
                             #[cfg(feature = "log")]
-                            self.debug.log(format!("Combat exit for {:?}", player));
+                            self.debug.log(format!("Combat exit for {:?}", entry));
                         }
                     }
                     StateChange::LogStart => {
@@ -143,8 +141,8 @@ impl Plugin {
 
                         // change unset buffs to none
                         // initial buffs should be reported right after
-                        for player in self.tracker.all_players_mut() {
-                            player.unset_to_none(event_id);
+                        for entry in self.tracker.all_players_mut() {
+                            entry.unset_to_none(event_id);
                         }
 
                         // grab target id
@@ -207,21 +205,21 @@ impl Plugin {
 
                                 // check for tracked player
                                 if let Some(dest) = dest {
-                                    if let Some(player) = self.tracker.player_mut(dest.id) {
+                                    if let Some(entry) = self.tracker.player_mut(dest.id) {
                                         let buff_id = event.skill_id;
 
                                         // check for food & util
                                         if let Ok(food) = Food::try_from(buff_id) {
-                                            if player.apply_food(food, event_id) {
+                                            if entry.apply_food(food, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Food {} applied to {:?}",
-                                                    food, player
+                                                    food, entry
                                                 ));
 
                                                 // trigger reminder on malnourished
                                                 if self.reminder.settings.always_mal_dim
-                                                    && player.is_self
+                                                    && entry.player.is_self
                                                     && food == Food::Malnourished
                                                 {
                                                     self.reminder.trigger_food();
@@ -231,16 +229,16 @@ impl Plugin {
                                                 }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
-                                            if player.apply_util(util, event_id) {
+                                            if entry.apply_util(util, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Utility {} applied to {:?}",
-                                                    util, player
+                                                    util, entry
                                                 ));
 
                                                 // trigger reminder on diminished
                                                 if self.reminder.settings.always_mal_dim
-                                                    && player.is_self
+                                                    && entry.player.is_self
                                                     && util == Utility::Diminished
                                                 {
                                                     self.reminder.trigger_util();
@@ -250,19 +248,19 @@ impl Plugin {
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
-                                            if player.apply_unknown_food(buff_id, event_id) {
+                                            if entry.apply_unknown_food(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Food with id {} applied to {:?}",
-                                                    buff_id, player
+                                                    buff_id, entry
                                                 ));
                                             }
                                         } else if let Some("Enhancement") = skill_name {
-                                            if player.apply_unknown_util(buff_id, event_id) {
+                                            if entry.apply_unknown_util(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Utility with id {} applied to {:?}",
-                                                    buff_id, player
+                                                    buff_id, entry
                                                 ));
                                             }
                                         }
@@ -273,62 +271,66 @@ impl Plugin {
                             // buff removed
 
                             // check for tracked player
-                            if let Some(player) = self.tracker.player_mut(src.id) {
+                            if let Some(entry) = self.tracker.player_mut(src.id) {
                                 let buff_id = event.skill_id;
 
                                 // check for food & util
                                 if let Ok(food) = Food::try_from(buff_id) {
-                                    if player.remove_food(Some(food), event_id) {
+                                    if entry.remove_food(Some(food), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Food {:?} removed from {:?}",
-                                            food, player
+                                            food, entry
                                         ));
 
                                         // check for food running out
-                                        if player.is_self && self.reminder.settings.during_encounter
+                                        if entry.player.is_self
+                                            && self.reminder.settings.during_encounter
                                         {
                                             self.check_self_food();
                                         }
                                     }
                                 } else if let Ok(util) = Utility::try_from(buff_id) {
-                                    if player.remove_util(Some(util), event_id) {
+                                    if entry.remove_util(Some(util), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Utility {:?} removed from {:?}",
-                                            util, player
+                                            util, entry
                                         ));
 
                                         // check for utility running out
-                                        if player.is_self && self.reminder.settings.during_encounter
+                                        if entry.player.is_self
+                                            && self.reminder.settings.during_encounter
                                         {
                                             self.check_self_util();
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
-                                    if player.remove_food(None, event_id) {
+                                    if entry.remove_food(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Food with id {} removed from {:?}",
-                                            buff_id, player
+                                            buff_id, entry
                                         ));
 
                                         // check for food running out
-                                        if player.is_self && self.reminder.settings.during_encounter
+                                        if entry.player.is_self
+                                            && self.reminder.settings.during_encounter
                                         {
                                             self.check_self_food();
                                         }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
-                                    if player.remove_util(None, event_id) {
+                                    if entry.remove_util(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Utility with id {} removed from {:?}",
-                                            buff_id, player
+                                            buff_id, entry
                                         ));
 
                                         // check for utility running out
-                                        if player.is_self && self.reminder.settings.during_encounter
+                                        if entry.player.is_self
+                                            && self.reminder.settings.during_encounter
                                         {
                                             self.check_self_util();
                                         }
@@ -381,8 +383,8 @@ impl Plugin {
                         let removed = self.tracker.remove_player(id);
 
                         #[cfg(feature = "log")]
-                        if let Some(player) = removed {
-                            self.debug.log(format!("Removed {:?}", player));
+                        if let Some(entry) = removed {
+                            self.debug.log(format!("Removed {:?}", entry));
                         }
                     }
                 }
@@ -401,10 +403,10 @@ impl Plugin {
 
     /// Checks for missing food on the local player.
     fn check_self_food(&mut self) {
-        if let Some(player) = self.tracker.get_self() {
+        if let Some(entry) = self.tracker.get_self() {
             if self.can_remind()
                 && matches!(
-                    player.food.state,
+                    entry.food.state,
                     BuffState::None | BuffState::Known(Food::Malnourished)
                 )
             {
@@ -418,10 +420,10 @@ impl Plugin {
 
     /// Checks for missing utility on the local player.
     fn check_self_util(&mut self) {
-        if let Some(player) = self.tracker.get_self() {
+        if let Some(entry) = self.tracker.get_self() {
             if self.can_remind()
                 && matches!(
-                    player.util.state,
+                    entry.util.state,
                     BuffState::None | BuffState::Known(Utility::Diminished)
                 )
             {

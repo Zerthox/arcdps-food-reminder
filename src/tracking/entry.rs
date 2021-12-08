@@ -1,37 +1,16 @@
 pub use super::buff::{Buff, BuffState, Food, Utility};
+use arc_util::game::Player;
 pub use arc_util::game::{Profession, Specialization};
 use serde::{Deserialize, Serialize};
 use std::cmp;
 
-// TODO: move general player struct to utils
 // TODO: track buff duration & reset to unset when duration runs out?
 
 /// Struct representing a player.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Player {
-    /// Player id given by the game.
-    pub id: usize,
-
-    /// Player character name.
-    pub character: String,
-
-    /// Player account name.
-    pub account: String,
-
-    /// Whether the player is the local player.
-    pub is_self: bool,
-
-    /// Profession (class) of the player character.
-    pub profession: Profession,
-
-    /// Current elite specialization the player has equipped.
-    pub elite: Specialization,
-
-    /// Current squad subgroup the player is in.
-    pub subgroup: usize,
-
-    /// Whether the player is currently in combat.
-    pub combat: bool,
+pub struct Entry {
+    /// Player this entry corresponds to.
+    pub player: Player,
 
     /// Current food buff applied to the player.
     pub food: Buff<Food>,
@@ -40,30 +19,11 @@ pub struct Player {
     pub util: Buff<Utility>,
 }
 
-impl Player {
-    /// Creates a new player.
-    pub fn new<C, A>(
-        id: usize,
-        character: C,
-        account: A,
-        is_self: bool,
-        profession: Profession,
-        elite: Specialization,
-        subgroup: usize,
-    ) -> Self
-    where
-        C: Into<String>,
-        A: Into<String>,
-    {
+impl Entry {
+    /// Creates a new entry.
+    pub fn new(player: Player) -> Self {
         Self {
-            id,
-            character: character.into(),
-            account: account.into(),
-            is_self,
-            profession,
-            elite,
-            subgroup,
-            combat: false,
+            player,
             food: Buff::new(BuffState::Unset, 0),
             util: Buff::new(BuffState::Unset, 0),
         }
@@ -77,19 +37,6 @@ impl Player {
         if self.util.state == BuffState::Unset {
             self.util.update(BuffState::None, time);
         }
-    }
-
-    /// Enters the player into combat.
-    pub fn enter_combat(&mut self, new_subgroup: Option<usize>) {
-        self.combat = true;
-        if let Some(sub) = new_subgroup {
-            self.subgroup = sub;
-        }
-    }
-
-    /// Exits the player from combat.
-    pub fn exit_combat(&mut self) {
-        self.combat = false;
     }
 
     /// Applies a food buff to the player.
@@ -161,22 +108,28 @@ impl Player {
     }
 }
 
-impl PartialEq for Player {
+impl PartialEq for Entry {
     fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
+        self.player == other.player
     }
 }
 
-impl Eq for Player {}
+impl Eq for Entry {}
 
-impl cmp::PartialOrd for Player {
+impl cmp::PartialOrd for Entry {
     fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
-        self.id.partial_cmp(&other.id)
+        self.player.partial_cmp(&other.player)
     }
 }
 
-impl cmp::Ord for Player {
+impl cmp::Ord for Entry {
     fn cmp(&self, other: &Self) -> cmp::Ordering {
-        self.id.cmp(&other.id)
+        self.player.cmp(&other.player)
+    }
+}
+
+impl From<Player> for Entry {
+    fn from(player: Player) -> Self {
+        Self::new(player)
     }
 }

@@ -1,10 +1,11 @@
 pub mod buff;
-pub mod player;
+pub mod entry;
 
 use crate::data::Boss;
 use arc_util::{
     api::CoreColor,
     exports,
+    game::Player,
     settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
@@ -14,7 +15,7 @@ use arcdps::imgui::{
     TableColumnFlags, TableFlags, Ui,
 };
 use buff::{Buff, BuffState, Food, Utility};
-use player::Player;
+use entry::Entry;
 use std::{cmp::Reverse, slice};
 use windows::System::VirtualKey;
 
@@ -22,7 +23,7 @@ use windows::System::VirtualKey;
 #[derive(Debug)]
 pub struct Tracker {
     /// Currently tracked players.
-    players: Vec<Player>,
+    players: Vec<Entry>,
 
     /// Current sorting.
     sorting: Sorting,
@@ -55,46 +56,49 @@ impl Tracker {
     }
 
     /// Adds a new tracked player.
-    pub fn add_player(&mut self, mut player: Player) {
+    pub fn add_player(&mut self, player: Player) {
+        let mut entry = Entry::new(player);
+
         // check for self
-        if player.is_self {
+        if entry.player.is_self {
             // update self id
-            self.self_id = player.id;
+            self.self_id = entry.player.id;
 
             // check & reset cache
             if let Some((character, food, util)) = self.self_cache.take() {
                 // check for same character
-                if character == player.character {
+                if character == entry.player.character {
                     // use cached food
-                    player.food = food;
-                    player.util = util;
+                    entry.food = food;
+                    entry.util = util;
                 }
             }
         }
 
-        // insert player
-        self.players.push(player);
+        // insert entry
+        self.players.push(entry);
 
         // refresh sorting
         self.refresh_sort();
     }
 
-    /// Removes a tracked player, returning the removed player if they were tracked.
-    pub fn remove_player(&mut self, id: usize) -> Option<Player> {
+    /// Removes a tracked player, returning the removed entry if they were tracked.
+    pub fn remove_player(&mut self, id: usize) -> Option<Entry> {
         self.players
             .iter()
-            .position(|player| player.id == id)
+            .position(|entry| entry.player.id == id)
             .map(|index| {
-                // remove player, sorting will be preserved
+                // remove entry, sorting will be preserved
                 let removed = self.players.remove(index);
 
                 // check for self
                 if id == self.self_id {
                     // cache character name & buffs in case we stay on same character
-                    self.self_cache = Some((removed.character.clone(), removed.food, removed.util));
+                    self.self_cache =
+                        Some((removed.player.character.clone(), removed.food, removed.util));
                 }
 
-                // return removed player
+                // return removed entry
                 removed
             })
     }
@@ -105,32 +109,32 @@ impl Tracker {
     }
 
     /// Returns a reference to the local player (self).
-    pub fn get_self(&self) -> Option<&Player> {
+    pub fn get_self(&self) -> Option<&Entry> {
         self.player(self.self_id)
     }
 
     /// Returns a mutable reference to the local player (self).
-    pub fn get_self_mut(&mut self) -> Option<&mut Player> {
+    pub fn get_self_mut(&mut self) -> Option<&mut Entry> {
         self.player_mut(self.self_id)
     }
 
-    /// Returns a reference to a tracked player.
-    pub fn player(&self, id: usize) -> Option<&Player> {
-        self.players.iter().find(|player| player.id == id)
+    /// Returns a reference to a tracked player entryyy.
+    pub fn player(&self, id: usize) -> Option<&Entry> {
+        self.players.iter().find(|entry| entry.player.id == id)
     }
 
-    /// Returns a mutable reference to a tracked player.
-    pub fn player_mut(&mut self, id: usize) -> Option<&mut Player> {
-        self.players.iter_mut().find(|player| player.id == id)
+    /// Returns a mutable reference to a tracked player entryyy.
+    pub fn player_mut(&mut self, id: usize) -> Option<&mut Entry> {
+        self.players.iter_mut().find(|entry| entry.player.id == id)
     }
 
-    /// Returns an iterator over all tracked players.
-    pub fn all_players(&self) -> impl Iterator<Item = &Player> {
+    /// Returns an iterator over all tracked player entries.
+    pub fn all_players(&self) -> impl Iterator<Item = &Entry> {
         self.players.iter()
     }
 
-    /// Returns a mutable iterator over all tracked players.
-    pub fn all_players_mut(&mut self) -> impl Iterator<Item = &mut Player> {
+    /// Returns a mutable iterator over all tracked player entries.
+    pub fn all_players_mut(&mut self) -> impl Iterator<Item = &mut Entry> {
         self.players.iter_mut()
     }
 
@@ -167,19 +171,23 @@ impl Tracker {
     /// Sorts the players in the tracker table.
     fn refresh_sort(&mut self) {
         match (self.sorting, self.reverse) {
-            (Sorting::Sub, false) => self.players.sort_by_key(|player| player.subgroup),
-            (Sorting::Sub, true) => self.players.sort_by_key(|player| Reverse(player.subgroup)),
+            (Sorting::Sub, false) => self.players.sort_by_key(|entry| entry.player.subgroup),
+            (Sorting::Sub, true) => self
+                .players
+                .sort_by_key(|entry| Reverse(entry.player.subgroup)),
 
-            (Sorting::Name, false) => self.players.sort_by(|a, b| a.character.cmp(&b.character)),
+            (Sorting::Name, false) => self
+                .players
+                .sort_by(|a, b| a.player.character.cmp(&b.player.character)),
             (Sorting::Name, true) => self
                 .players
-                .sort_by(|a, b| Reverse(&a.character).cmp(&Reverse(&b.character))),
+                .sort_by(|a, b| Reverse(&a.player.character).cmp(&Reverse(&b.player.character))),
 
-            (Sorting::Food, false) => self.players.sort_by_key(|player| player.food),
-            (Sorting::Food, true) => self.players.sort_by_key(|player| Reverse(player.food)),
+            (Sorting::Food, false) => self.players.sort_by_key(|entry| entry.food),
+            (Sorting::Food, true) => self.players.sort_by_key(|entry| Reverse(entry.food)),
 
-            (Sorting::Util, false) => self.players.sort_by_key(|player| player.util),
-            (Sorting::Util, true) => self.players.sort_by_key(|player| Reverse(player.util)),
+            (Sorting::Util, false) => self.players.sort_by_key(|entry| entry.util),
+            (Sorting::Util, true) => self.players.sort_by_key(|entry| Reverse(entry.util)),
         }
     }
 
@@ -304,7 +312,9 @@ impl Component for Tracker {
                     .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
                 // iterate over tracked players
-                for player in &self.players {
+                for entry in &self.players {
+                    let player = &entry.player;
+
                     // new row for each player
                     ui.table_next_row();
 
@@ -328,7 +338,7 @@ impl Component for Tracker {
 
                     // render food cell
                     ui.table_next_column();
-                    match player.food.state {
+                    match entry.food.state {
                         BuffState::Unset => {
                             ui.text("???");
                             if ui.is_item_hovered() {
@@ -368,7 +378,7 @@ impl Component for Tracker {
 
                     // render util cell
                     ui.table_next_column();
-                    match player.util.state {
+                    match entry.util.state {
                         BuffState::Unset => {
                             ui.text("???");
                             if ui.is_item_hovered() {

@@ -4,11 +4,12 @@ use crate::{
     reminder::Reminder,
     tracking::{
         buff::{BuffState, Food, Utility},
-        player::{Player, Profession, Specialization},
+        entry::{Entry, Profession, Specialization},
         Tracker,
     },
 };
 use arc_util::{
+    game::Player,
     settings::HasSettings,
     ui::{align::LeftAlign, Component, Hideable, Window, WindowProps, Windowed},
 };
@@ -115,18 +116,18 @@ impl Component for Demo {
             // entries
             for id in 0..self.tracker.len() {
                 ui.table_next_row();
-                let player = self.tracker.player_mut(id).unwrap();
+                let entry = self.tracker.player_mut(id).unwrap();
 
                 // sub
                 ui.table_next_column();
                 let mut sub = ImString::with_capacity(2);
-                sub.push_str(&format!("{}", player.subgroup));
+                sub.push_str(&format!("{}", entry.player.subgroup));
                 if ui
                     .input_text(&im_str!("##food-reminder-demo-sub-{}", id), &mut sub)
                     .chars_decimal(true)
                     .build()
                 {
-                    player.subgroup = match sub.to_str().parse() {
+                    entry.player.subgroup = match sub.to_str().parse() {
                         Ok(num) if num > 15 => 15,
                         Ok(0) | Err(_) => 1,
                         Ok(num) => num,
@@ -136,25 +137,25 @@ impl Component for Demo {
                 // character name
                 ui.table_next_column();
                 let mut char_name = ImString::with_capacity(19);
-                char_name.push_str(&player.character);
+                char_name.push_str(&entry.player.character);
                 ui.push_item_width(INPUT_SIZE);
                 if ui
                     .input_text(&im_str!("##food-reminder-demo-char-{}", id), &mut char_name)
                     .build()
                 {
-                    player.character = char_name.to_str().into();
+                    entry.player.character = char_name.to_str().into();
                 }
 
                 // account name
                 ui.table_next_column();
                 let mut acc_name = ImString::with_capacity(19);
-                acc_name.push_str(&player.account);
+                acc_name.push_str(&entry.player.account);
                 ui.push_item_width(INPUT_SIZE);
                 if ui
                     .input_text(&im_str!("##food-reminder-demo-acc-{}", id), &mut acc_name)
                     .build()
                 {
-                    player.account = acc_name.to_string();
+                    entry.player.account = acc_name.to_string();
                 }
 
                 // class
@@ -171,7 +172,7 @@ impl Component for Demo {
                     im_str!("Necromancer"),
                     im_str!("Revenant"),
                 ];
-                let mut prof = player.profession as usize;
+                let mut prof = entry.player.profession as usize;
                 ui.push_item_width(INPUT_SIZE);
                 if ComboBox::new(&im_str!("##food-reminder-demo-class-{}", id)).build_simple(
                     ui,
@@ -179,7 +180,7 @@ impl Component for Demo {
                     &PROF_NAMES,
                     &|prof| (*prof).into(),
                 ) {
-                    player.profession = (prof as u32).into();
+                    entry.player.profession = (prof as u32).into();
                 }
 
                 // food
@@ -187,7 +188,7 @@ impl Component for Demo {
                 let mut food_id = self
                     .all_foods
                     .iter()
-                    .position(|buff| *buff == player.food.state)
+                    .position(|buff| *buff == entry.food.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
                 if ComboBox::new(&im_str!("##food-reminder-demo-food-{}", id)).build_simple(
@@ -196,7 +197,7 @@ impl Component for Demo {
                     &self.all_foods,
                     &|buff| Self::food_name(*buff),
                 ) {
-                    player.food.state = self.all_foods[food_id];
+                    entry.food.state = self.all_foods[food_id];
                 }
 
                 // utility
@@ -204,7 +205,7 @@ impl Component for Demo {
                 let mut util_id = self
                     .all_utils
                     .iter()
-                    .position(|buff| *buff == player.util.state)
+                    .position(|buff| *buff == entry.util.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
                 if ComboBox::new(&im_str!("##food-reminder-demo-util-{}", id)).build_simple(
@@ -213,7 +214,7 @@ impl Component for Demo {
                     &self.all_utils,
                     &|buff| Self::util_name(*buff),
                 ) {
-                    player.util.state = self.all_utils[util_id];
+                    entry.util.state = self.all_utils[util_id];
                 }
             }
 
@@ -259,7 +260,7 @@ impl Windowed for Demo {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DemoSettings {
-    players: Vec<Player>,
+    players: Vec<Entry>,
     tracker: bool,
 }
 
@@ -288,8 +289,12 @@ impl HasSettings for Demo {
     }
 
     fn load_settings(&mut self, loaded: Self::Settings) {
-        for player in loaded.players {
-            self.tracker.add_player(player);
+        for loaded in loaded.players {
+            let id = loaded.player.id;
+            self.tracker.add_player(loaded.player);
+            let entry = self.tracker.player_mut(id).unwrap();
+            entry.food = loaded.food;
+            entry.util = loaded.util;
         }
         self.tracker.set_visibility(loaded.tracker);
     }

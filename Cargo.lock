@@ -4,8 +4,8 @@ version = 3
 
 [[package]]
 name = "arc_util"
-version = "0.3.0"
-source = "git+https://github.com/zerthox/gw2-arcdps-utils?branch=master#8e41e04b41527153d23e2797ac5579c379d37c7c"
+version = "0.3.2"
+source = "git+https://github.com/zerthox/gw2-arcdps-utils?tag=0.3.2#6f7b967c9e76e78af98d15119da84fd307aa99d7"
 dependencies = [
  "arcdps",
  "chrono",
@@ -41,7 +41,7 @@ dependencies = [
 
 [[package]]
 name = "arcdps_food_reminder"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "arc_util",
  "arcdps",

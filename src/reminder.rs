@@ -21,9 +21,9 @@ pub struct Reminder {
 
 impl Reminder {
     /// Creates a new reminder.
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
-            settings: ReminderSettings::default(),
+            settings: ReminderSettings::new(),
             food_trigger: None,
             util_trigger: None,
         }
@@ -134,8 +134,9 @@ pub struct ReminderSettings {
     pub always_mal_dim: bool,
 }
 
-impl Default for ReminderSettings {
-    fn default() -> Self {
+impl ReminderSettings {
+    /// Creates new reminder settings with the defaults.
+    pub const fn new() -> Self {
         Self {
             duration: DEFAULT_DURATION,
             only_bosses: true,
@@ -144,6 +145,12 @@ impl Default for ReminderSettings {
             during_encounter: true,
             always_mal_dim: true,
         }
+    }
+}
+
+impl Default for ReminderSettings {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

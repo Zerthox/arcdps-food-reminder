@@ -44,7 +44,7 @@ pub struct Tracker {
 #[allow(unused)]
 impl Tracker {
     /// Creates a new tracker.
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             players: Vec::new(),
             sorting: Sorting::Sub,

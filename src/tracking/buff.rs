@@ -14,7 +14,7 @@ pub struct Buff<T> {
 
 impl<T> Buff<T> {
     /// Creates a new buff.
-    pub fn new(state: BuffState<T>, event_id: u64) -> Self {
+    pub const fn new(state: BuffState<T>, event_id: u64) -> Self {
         Self { state, event_id }
     }
 

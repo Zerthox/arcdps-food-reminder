@@ -21,7 +21,7 @@ pub struct Entry {
 
 impl Entry {
     /// Creates a new entry.
-    pub fn new(player: Player) -> Self {
+    pub const fn new(player: Player) -> Self {
         Self {
             player,
             food: Buff::new(BuffState::Unset, 0),

@@ -57,7 +57,7 @@ PeppermintOil:
   id: 34187
   name: Peppermint Oil
   stats: [3% Concentration from Precision, 6% Concentration from Healing Power]
-  category: CCON
+  category: HCON
 
 # === HEAL ===
 BountifulOil:

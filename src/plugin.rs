@@ -284,8 +284,8 @@ impl Plugin {
                                         ));
 
                                         // check for food running out
-                                        if entry.player.is_self
-                                            && self.reminder.settings.during_encounter
+                                        if self.reminder.settings.during_encounter
+                                            && entry.player.is_self
                                         {
                                             self.check_self_food();
                                         }
@@ -299,8 +299,8 @@ impl Plugin {
                                         ));
 
                                         // check for utility running out
-                                        if entry.player.is_self
-                                            && self.reminder.settings.during_encounter
+                                        if self.reminder.settings.during_encounter
+                                            && entry.player.is_self
                                         {
                                             self.check_self_util();
                                         }
@@ -314,8 +314,8 @@ impl Plugin {
                                         ));
 
                                         // check for food running out
-                                        if entry.player.is_self
-                                            && self.reminder.settings.during_encounter
+                                        if self.reminder.settings.during_encounter
+                                            && entry.player.is_self
                                         {
                                             self.check_self_food();
                                         }
@@ -329,8 +329,8 @@ impl Plugin {
                                         ));
 
                                         // check for utility running out
-                                        if entry.player.is_self
-                                            && self.reminder.settings.during_encounter
+                                        if self.reminder.settings.during_encounter
+                                            && entry.player.is_self
                                         {
                                             self.check_self_util();
                                         }

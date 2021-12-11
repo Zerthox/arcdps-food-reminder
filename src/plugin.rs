@@ -198,8 +198,7 @@ impl Plugin {
                         // TODO: should we restrict this to specific state change kinds?
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
-                        let buff_remove = BuffRemove::from(event.is_buff_remove);
-                        if buff_remove == BuffRemove::None {
+                        if let BuffRemove::None = event.is_buff_remove.into() {
                             if event.buff != 0 && event.buff_dmg == 0 {
                                 // buff applied
 
@@ -207,6 +206,8 @@ impl Plugin {
                                 if let Some(dest) = dest {
                                     if let Some(entry) = self.tracker.player_mut(dest.id) {
                                         let buff_id = event.skill_id;
+
+                                        // api delayed state changes need to be ignored for reminder on malnourished/diminished apply
 
                                         // check for food & util
                                         if let Ok(food) = Food::try_from(buff_id) {
@@ -217,10 +218,11 @@ impl Plugin {
                                                     food, statechange, entry
                                                 ));
 
-                                                // trigger reminder on malnourished
+                                                // trigger reminder on malnourished unless api delayed
                                                 if self.reminder.settings.always_mal_dim
                                                     && entry.player.is_self
                                                     && food == Food::Malnourished
+                                                    && statechange != StateChange::ApiDelayed
                                                 {
                                                     self.reminder.trigger_food();
 
@@ -239,10 +241,11 @@ impl Plugin {
                                                     util, statechange, entry
                                                 ));
 
-                                                // trigger reminder on diminished
+                                                // trigger reminder on diminished unless api delayed
                                                 if self.reminder.settings.always_mal_dim
                                                     && entry.player.is_self
                                                     && util == Utility::Diminished
+                                                    && statechange != StateChange::ApiDelayed
                                                 {
                                                     self.reminder.trigger_util();
 

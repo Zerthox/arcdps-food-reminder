@@ -65,7 +65,7 @@ impl Plugin {
     /// Loads the plugin.
     pub fn load(&mut self) {
         #[cfg(feature = "log")]
-        self.debug.log("Plugin load");
+        self.debug.log(format!("Food Reminder v{} load", VERSION));
 
         // load settings
         let mut settings = Settings::from_file(SETTINGS_FILE);
@@ -194,7 +194,7 @@ impl Plugin {
                         // end encounter
                         self.tracker.end_encounter();
                     }
-                    _ => {
+                    statechange => {
                         // TODO: should we restrict this to specific state change kinds?
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
@@ -213,8 +213,8 @@ impl Plugin {
                                             if entry.apply_food(food, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
-                                                    "Food {} applied to {:?}",
-                                                    food, entry
+                                                    "Food {} applied on {:?} to {:?}",
+                                                    food, statechange, entry
                                                 ));
 
                                                 // trigger reminder on malnourished
@@ -225,15 +225,18 @@ impl Plugin {
                                                     self.reminder.trigger_food();
 
                                                     #[cfg(feature = "log")]
-                                                    self.debug.log("Food reminder triggered");
+                                                    self.debug.log(format!(
+                                                        "Food Malnourished reminder triggered on {:?}",
+                                                        statechange
+                                                    ));
                                                 }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
                                             if entry.apply_util(util, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
-                                                    "Utility {} applied to {:?}",
-                                                    util, entry
+                                                    "Utility {} applied on {:?} to {:?}",
+                                                    util, statechange, entry
                                                 ));
 
                                                 // trigger reminder on diminished
@@ -244,23 +247,26 @@ impl Plugin {
                                                     self.reminder.trigger_util();
 
                                                     #[cfg(feature = "log")]
-                                                    self.debug.log("Food reminder triggered");
+                                                    self.debug.log(format!(
+                                                        "Utility Diminished reminder triggered on {:?}",
+                                                        statechange,
+                                                    ));
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
                                             if entry.apply_unknown_food(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
-                                                    "Unknown Food with id {} applied to {:?}",
-                                                    buff_id, entry
+                                                    "Unknown Food with id {} applied on {:?} to {:?}",
+                                                    buff_id, statechange, entry
                                                 ));
                                             }
                                         } else if let Some("Enhancement") = skill_name {
                                             if entry.apply_unknown_util(buff_id, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
-                                                    "Unknown Utility with id {} applied to {:?}",
-                                                    buff_id, entry
+                                                    "Unknown Utility with id {} applied on {:?} to {:?}",
+                                                    buff_id, statechange, entry
                                                 ));
                                             }
                                         }
@@ -279,8 +285,8 @@ impl Plugin {
                                     if entry.remove_food(Some(food), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
-                                            "Food {:?} removed from {:?}",
-                                            food, entry
+                                            "Food {:?} removed on {:?} from {:?}",
+                                            food, statechange, entry
                                         ));
 
                                         // check for food running out
@@ -294,8 +300,8 @@ impl Plugin {
                                     if entry.remove_util(Some(util), event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
-                                            "Utility {:?} removed from {:?}",
-                                            util, entry
+                                            "Utility {:?} removed on {:?} from {:?}",
+                                            util, statechange, entry
                                         ));
 
                                         // check for utility running out
@@ -309,8 +315,8 @@ impl Plugin {
                                     if entry.remove_food(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
-                                            "Unknown Food with id {} removed from {:?}",
-                                            buff_id, entry
+                                            "Unknown Food with id {} removed on {:?} from {:?}",
+                                            buff_id, statechange, entry
                                         ));
 
                                         // check for food running out
@@ -324,8 +330,8 @@ impl Plugin {
                                     if entry.remove_util(None, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
-                                            "Unknown Utility with id {} removed from {:?}",
-                                            buff_id, entry
+                                            "Unknown Utility with id {} removed on {:?} from {:?}",
+                                            buff_id, statechange, entry
                                         ));
 
                                         // check for utility running out

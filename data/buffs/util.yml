@@ -88,6 +88,93 @@ MaliceWrit:
   stats: [+200 Condition Damage above 90% Health]
   category: WRIT
 
+# === SLAYING ===
+UndeadSlaying:
+  id: 9837
+  name: Powerful Potion of Undead Slaying
+  stats: [+10% Damage against Undead, -10% Damage from Undead]
+  category: SLAY
+CentaurSlaying:
+  id: 9845
+  name: Powerful Potion of Centaur Slaying
+  stats: [+10% Damage against Centaur, -10% Damage from Centaur]
+  category: SLAY
+GrawlSlaying:
+  id: 9853
+  name: Powerful Potion of Grawl Slaying
+  stats: [+10% Damage against Grawl, -10% Damage from Grawl]
+  category: SLAY
+IceBroodSlaying:
+  id: 9861
+  name: Powerful Potion of Ice Brood Slaying
+  stats: [+10% Damage against Ice Brood, -10% Damage from Ice Brood]
+  category: SLAY
+DestroyerSlaying:
+  id: 9869
+  name: Powerful Potion of Destroyer Slaying
+  stats: [+10% Damage against Destroyers, -10% Damage from Destroyers]
+  category: SLAY
+OgreSlaying:
+  id: 9877
+  name: Powerful Potion of Ogre Slaying
+  stats: [+10% Damage against Ogres, -10% Damage from Ogres]
+  category: SLAY
+KraitSlaying:
+  id: 9885
+  name: Powerful Potion of Krait Slaying
+  stats: [+10% Damage against Krait, -10% Damage from Krait]
+  category: SLAY
+ElementalSlaying:
+  id: 9893
+  name: Powerful Potion of Elemental Slaying
+  stats: [+10% Damage against Elementals, -10% Damage from Elementals]
+  category: SLAY
+DemonSlaying:
+  id: 9901
+  name: Powerful Potion of Demon Slaying
+  stats: [+10% Damage against Demons, -10% Damage from Demons]
+  category: SLAY
+SonsOfSvanirSlaying:
+  id: 9909
+  name: Powerful Potion of Sons of Svanir Slaying
+  stats: [+10% Damage against Sons of Svanir, -10% Damage from Sons of Svanir]
+  category: SLAY
+InquestSlaying:
+  id: 9917
+  name: Powerful Potion of Inquest Slaying
+  stats: [+10% Damage against Inquest, -10% Damage from Inquest]
+  category: SLAY
+FlameLegionSlaying:
+  id: 9925
+  name: Powerful Potion of Flame Legion Slaying
+  stats: [+10% Damage against Flame Legion, -10% Damage from Flame Legion]
+  category: SLAY
+OutlawSlaying:
+  id: 9933
+  name: Powerful Potion of Outlaw Slaying
+  stats: [+10% Damage against Outlaws, -10% Damage from Outlaws]
+  category: SLAY
+NightmareCourtSlaying:
+  id: 9941
+  name: Powerful Potion of Nightmare Court Slaying
+  stats: [+10% Damage against Nightmare Court, -10% Damage from Nightmare Court]
+  category: SLAY
+DredgeSlaying:
+  id: 9949
+  name: Powerful Potion of Dredge Slaying
+  stats: [+10% Damage against Dredge, -10% Damage from Dredge]
+  category: SLAY
+HalloweenSlaying:
+  id: 15279
+  name: Powerful Potion of Halloween Slaying
+  stats: [+10% Damage against Halloween Creatures, -10% Damage from Halloween Creatures]
+  category: SLAY
+ScarletSlaying:
+  id: 23228
+  name: Powerful Potion of Slaying Scarlet's Armies
+  stats: [+10% Damage against Scarlet's Armies, -10% Damage from Scarlet's Armies]
+  category: SLAY
+
 # === OTHER ===
 PumpkinOil:
   id: 25632
@@ -104,8 +191,3 @@ SharpeningSkull:
   name: Sharpening Skull
   stats: [+75 All Attributes after reviving]
   category: RES
-ScarletSlaying:
-  id: 23228
-  name: Powerful Potion of Slaying Scarlet's Armies
-  stats: [+10% Damage against Scarlet's Armies, -10% Damage from Scarlet's Armies]
-  category: SLAY

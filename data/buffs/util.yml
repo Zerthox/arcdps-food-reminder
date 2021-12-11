@@ -58,6 +58,11 @@ PeppermintOil:
   name: Peppermint Oil
   stats: [3% Concentration from Precision, 6% Concentration from Healing Power]
   category: HCON
+MagnanimousOil:
+  id: 38605
+  name: Magnanimous Maintenance Oil
+  stats: [3% Concentration from Vitality, 3% Concentration from Toughness]
+  category: TCON
 
 # === HEAL ===
 BountifulOil:

@@ -267,6 +267,18 @@ RiceBall:
   stats: [+10% Outgoing Healing, +100 Healing Power]
   category: HEAL
 
+# === ON KILL ===
+DragonBreathBun:
+  id: 9750
+  name: Dragon's Breath Bun
+  stats: [+200 Power on Kill, +70 Ferocity]
+  category: KILL
+KarkaEggOmelet:
+  id: 9756
+  name: Karka Egg Omelet
+  stats: [+200 Condition Damage on Kill, +70 Precision]
+  category: KILL
+
 # === OTHER ===
 # CilantroOysterSoup:
 #   id: UNKNOWN

@@ -1,5 +1,12 @@
 [env]
-ARCDPS_PATH = "C:/Program Files/Guild Wars 2/addons/arcdps"
+GW2_PATH = { value = "C:/Program Files/Guild Wars 2", condition = { env_not_set = ["GW2_PATH"] } }
+GW2_ADDON_MANAGER = { value = "true", condition = { files_exist = ["${GW2_PATH}/addons/arcdps/gw2addon_arcdps.dll"] } }
+
+[env.ARCDPS_PATH]
+default_value = "${GW2_PATH}/bin64"
+source = "${GW2_ADDON_MANAGER}"
+mapping = { true = "${GW2_PATH}/addons/arcdps" }
+condition = { env_not_set = ["ARCDPS_PATH"] }
 
 [tasks.build]
 script = "cargo build --release"

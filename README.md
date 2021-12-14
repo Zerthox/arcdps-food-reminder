@@ -35,6 +35,8 @@ Report the copied buff ID & the Food/Utility that applied it.
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.
 
 For the standard release version run `cargo build --release`.
-
 For development you can include a debug log via the `--feature log` flag.
+
 There is also a makefile provided for use with [cargo-make](https://github.com/sagiegurari/cargo-make).
+To build & install the plugin run `cargo make install`.
+You can provide a custom Guild Wars 2 installation path via the `GW2_PATH` environment variable.

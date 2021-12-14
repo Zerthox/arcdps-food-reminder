@@ -12,9 +12,16 @@ script = "cargo build --release --features log"
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/arcdps_food_reminder.dll\" \"${ARCDPS_PATH}\""
 script_runner = "@shell"
 
+[tasks.remove]
+script = "rm \"${ARCDPS_PATH}/arcdps_food_reminder.dll\""
+script_runner = "@shell"
+
 [tasks.dev]
 run_task = { name = ["build-dev", "copy"] }
 watch = true
 
 [tasks.install]
 run_task = { name = ["build", "copy"] }
+
+[tasks.uninstall]
+alias = "remove"

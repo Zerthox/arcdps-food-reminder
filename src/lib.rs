@@ -8,7 +8,8 @@ mod win;
 mod demo;
 
 use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
-use lazy_static::lazy_static;
+
+use once_cell::sync::Lazy;
 use plugin::Plugin;
 use std::sync::Mutex;
 
@@ -25,11 +26,9 @@ arcdps_export! {
     wnd_filter,
 }
 
-lazy_static! {
-    // FIXME: a single mutex for the whole thing is potentially inefficient
-    /// Main plugin instance.
-    static ref PLUGIN: Mutex<Plugin> = Mutex::new(Plugin::new());
-}
+/// Main plugin instance.
+// FIXME: a single mutex for the whole thing is potentially inefficient
+static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 
 fn init() {
     PLUGIN.lock().unwrap().load()

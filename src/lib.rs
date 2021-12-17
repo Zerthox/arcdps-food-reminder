@@ -8,7 +8,6 @@ mod win;
 mod demo;
 
 use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
-
 use once_cell::sync::Lazy;
 use plugin::Plugin;
 use std::sync::Mutex;

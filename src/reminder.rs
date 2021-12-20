@@ -157,9 +157,7 @@ impl Default for ReminderSettings {
 impl HasSettings for Reminder {
     type Settings = ReminderSettings;
 
-    fn settings_id() -> &'static str {
-        "reminder"
-    }
+    const SETTINGS_ID: &'static str = "reminder";
 
     fn current_settings(&self) -> Self::Settings {
         self.settings.clone()

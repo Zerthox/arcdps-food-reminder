@@ -277,9 +277,7 @@ impl Default for DemoSettings {
 impl HasSettings for Demo {
     type Settings = DemoSettings;
 
-    fn settings_id() -> &'static str {
-        "demo"
-    }
+    const SETTINGS_ID: &'static str = "demo";
 
     fn current_settings(&self) -> Self::Settings {
         DemoSettings {

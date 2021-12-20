@@ -43,6 +43,9 @@ pub struct Tracker {
 
 #[allow(unused)]
 impl Tracker {
+    /// Defaullt hotkey for tracker.
+    pub const HOTKEY: usize = VirtualKey::F.0 as usize;
+
     /// Creates a new tracker.
     pub const fn new() -> Self {
         Self {
@@ -426,7 +429,7 @@ impl Component for Tracker {
 impl Windowed for Tracker {
     fn window_props() -> WindowProps {
         WindowProps::new("Food Tracker")
-            .hotkey(VirtualKey::F.0 as usize)
+            .hotkey(Tracker::HOTKEY)
             .visible(false)
             .auto_resize(true)
     }
@@ -436,9 +439,7 @@ impl Windowed for Tracker {
 impl HasSettings for Tracker {
     type Settings = ();
 
-    fn settings_id() -> &'static str {
-        "tracker"
-    }
+    const SETTINGS_ID: &'static str = "tracker";
 
     fn current_settings(&self) -> Self::Settings {}
 

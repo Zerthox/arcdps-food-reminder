@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "arc_util"
 version = "0.4.1"
-source = "git+https://github.com/zerthox/gw2-arcdps-utils?branch=0.4.x#0b7984164650c667f0cd64d7242d03fb9e45e7da"
+source = "git+https://github.com/zerthox/gw2-arcdps-utils?branch=0.4.x#27b4dcd16a9b5aabfa4846a965ce9ec4caa8a840"
 dependencies = [
  "arcdps",
  "chrono",

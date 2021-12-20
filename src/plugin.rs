@@ -8,7 +8,7 @@ use arc_util::{
     api::{BuffRemove, StateChange},
     exports,
     game::Player,
-    settings::Settings,
+    settings::{HasSettings, Settings},
     ui::{align::LeftAlign, Component, Hideable, Window, Windowed},
 };
 use arcdps::{
@@ -21,7 +21,7 @@ use std::{convert::TryFrom, time::Duration};
 use crate::demo::Demo;
 
 #[cfg(feature = "log")]
-use {arc_util::api, arc_util::ui::components::log::Log};
+use arc_util::{api, ui::components::log::Log};
 
 /// Plugin version.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -108,7 +108,7 @@ impl Plugin {
         event_id: u64,
         _revision: u64,
     ) {
-        // source should always be set, but we dont want to cause a crash
+        // ignore events without source
         if let Some(src) = src {
             // check for combat event
             if let Some(event) = event {
@@ -530,16 +530,18 @@ impl Plugin {
 
         ui.push_item_width(ui.calc_text_size(im_str!("000000"), false, 0.0)[0]);
         if ui
-            .input_text(
-                im_str!("Reminder duration (ms)##food-reminder-duration-input"),
-                &mut duration_buffer,
-            )
+            .input_text(im_str!("Reminder duration (ms)"), &mut duration_buffer)
             .chars_decimal(true)
             .build()
         {
             if let Ok(num) = duration_buffer.to_str().parse() {
                 self.reminder.settings.duration = Duration::from_millis(num);
             }
+        }
+
+        if ui.button(im_str!("Reset to default"), [0.0, 0.0]) {
+            self.tracker.reset_settings();
+            self.reminder.reset_settings();
         }
     }
 

@@ -405,6 +405,8 @@ impl Plugin {
                         // player removed
 
                         let id = src.id;
+
+                        #[cfg_attr(not(feature = "log"), allow(unused))]
                         let removed = self.tracker.remove_player(id);
 
                         #[cfg(feature = "log")]

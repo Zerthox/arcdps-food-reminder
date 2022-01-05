@@ -65,19 +65,19 @@ fn main() {
     // generate buff enums
     write_formatted(
         out.join("buff.rs"),
-        generate_buff("All Buffs.", "Buff", &all),
+        generate_buff("All buffs.", "Buff", &all),
     );
     write_formatted(
         out.join("boon.rs"),
-        generate_buff("Boon Buffs.", "Boon", &boon),
+        generate_buff("Boon buffs.", "Boon", &boon),
     );
     write_formatted(
         out.join("food.rs"),
-        generate_buff("Food Buffs.", "Food", &food),
+        generate_buff("Food buffs.", "Food", &food),
     );
     write_formatted(
         out.join("util.rs"),
-        generate_buff("Utility Buffs.", "Utility", &util),
+        generate_buff("Utility buffs.", "Utility", &util),
     );
 
     // rerun info
@@ -99,6 +99,8 @@ struct Buff {
     stats: Vec<String>,
 
     category: Option<String>,
+
+    proc: Option<usize>,
 }
 
 /// Entity data entry.
@@ -122,11 +124,17 @@ where
 
 // Generates a buff enum from buff data.
 fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenStream {
+    let repr = format_ident!("u32");
+
     // generate enum name
     let enum_name = format_ident!("{}", name);
+    let proc_enum_name = format_ident!("{}Proc", name);
+    let has_procs = buffs.iter().any(|(_, buff)| buff.proc.is_some());
 
     // generate enum
     let raw_enum = generate_enum(
+        doc,
+        &repr,
         &enum_name,
         buffs
             .iter()
@@ -158,12 +166,47 @@ fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenS
         )
     }));
 
+    // generate proc match
+    let proc_match = generate_match(buffs.iter().map(|(name, buff)| {
+        let name = format_ident!("{}", name);
+        (
+            name.clone(),
+            if buff.proc.is_some() {
+                quote! { Some(#proc_enum_name::#name) }
+            } else {
+                quote! { None }
+            },
+        )
+    }));
+    let proc_func = if has_procs {
+        quote! {
+            /// Returns the proc of the buff.
+            pub fn proc(&self) -> Option<#proc_enum_name> {
+                #proc_match
+            }
+        }
+    } else {
+        quote! {}
+    };
+
+    // generate proc enum
+    let proc_enum = if has_procs {
+        generate_enum(
+            &format!("{} procs.", name),
+            &repr,
+            &proc_enum_name,
+            buffs.iter().filter_map(|(name, buff)| {
+                buff.proc
+                    .map(|proc_id| (format_ident!("{}", name), proc_id))
+            }),
+        )
+    } else {
+        quote! {}
+    };
+
     // generate full code
     quote! {
-        #[doc = #doc]
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
-        #[repr(u32)]
-        pub #raw_enum
+        #raw_enum
 
         impl #enum_name {
             /// Returns the display name of the buff.
@@ -182,17 +225,25 @@ fn generate_buff(doc: &str, name: &str, buffs: &HashMap<String, Buff>) -> TokenS
             pub fn category(&self) -> Option<&'static str> {
                 #category_match
             }
+
+            #proc_func
         }
+
+        #proc_enum
     }
 }
 
 // Generates an entity enum from entity data.
 fn generate_entity(doc: &str, name: &str, entities: &HashMap<String, Entity>) -> TokenStream {
+    let repr = format_ident!("usize");
+
     // generate enum name
     let enum_name = format_ident!("{}", name);
 
     // generate enum
     let raw_enum = generate_enum(
+        doc,
+        &repr,
         &enum_name,
         entities
             .iter()
@@ -231,10 +282,7 @@ fn generate_entity(doc: &str, name: &str, entities: &HashMap<String, Entity>) ->
 
     // generate full code
     quote! {
-        #[doc = #doc]
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
-        #[repr(usize)]
-        pub #raw_enum
+        #raw_enum
 
         impl #enum_name {
             /// Returns the display name of the entity.
@@ -255,8 +303,8 @@ fn generate_entity(doc: &str, name: &str, entities: &HashMap<String, Entity>) ->
     }
 }
 
-/// Helper function to generate enums.
-fn generate_enum<I>(name: &Ident, kinds: I) -> TokenStream
+/// Generate an enums with a given repr and default derives.
+fn generate_enum<I>(doc: &str, repr: &Ident, name: &Ident, kinds: I) -> TokenStream
 where
     I: Iterator<Item = (Ident, usize)>,
 {
@@ -265,13 +313,16 @@ where
         quote! { #ident = #id, }
     });
     quote! {
-        enum #name {
+        #[doc = #doc]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, IntoPrimitive, TryFromPrimitive, Display, IntoStaticStr, EnumIter, Serialize, Deserialize)]
+        #[repr(#repr)]
+        pub enum #name {
             #(#kinds)*
         }
     }
 }
 
-/// Helper function to generate matches on `self`.
+/// Generate matches on `self` for an enum.
 fn generate_match<I, T>(iter: I) -> TokenStream
 where
     I: Iterator<Item = (Ident, T)>,

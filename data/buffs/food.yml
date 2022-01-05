@@ -273,11 +273,13 @@ DragonBreathBun:
   name: Dragon's Breath Bun
   stats: [+200 Power on Kill, +70 Ferocity]
   category: KILL
+  proc: 10110
 SaffronMushroom:
   id: 9756
   name: Saffron Stuffed Mushroom # karka omelet uses the same id
   stats: [+200 Condition Damage on Kill, +70 Precision]
   category: KILL
+  proc: 10104
 
 # === OTHER ===
 # CilantroOysterSoup:

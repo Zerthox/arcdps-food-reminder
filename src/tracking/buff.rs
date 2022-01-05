@@ -8,26 +8,36 @@ pub struct Buff<T> {
     /// Current state of the buff.
     pub state: BuffState<T>,
 
-    /// ID of the last event update.
+    /// Timestamp of the last update.
+    pub time: u64,
+
+    /// Event id of the last update.
     pub event_id: u64,
 }
 
 impl<T> Buff<T> {
     /// Creates a new buff.
-    pub const fn new(state: BuffState<T>, event_id: u64) -> Self {
-        Self { state, event_id }
+    pub const fn new(state: BuffState<T>, time: u64, event_id: u64) -> Self {
+        Self {
+            state,
+            time,
+            event_id,
+        }
     }
 
     /// Updates the buff state.
     ///
     /// Returns `false` if this update was ignored due to out of order.
-    pub fn update(&mut self, state: BuffState<T>, event_id: u64) -> bool {
-        if event_id > self.event_id {
-            self.state = state;
-            self.event_id = event_id;
-            true
-        } else {
-            false
+    pub fn update(&mut self, state: BuffState<T>, time: u64, event_id: u64) -> bool {
+        // check for later time or same time & later event id
+        match (time.cmp(&self.time), event_id > self.event_id) {
+            (Ordering::Greater, _) | (Ordering::Equal, true) => {
+                self.state = state;
+                self.time = time;
+                self.event_id = event_id;
+                true
+            }
+            _ => false,
         }
     }
 }

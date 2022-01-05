@@ -24,33 +24,33 @@ impl Entry {
     pub const fn new(player: Player) -> Self {
         Self {
             player,
-            food: Buff::new(BuffState::Unset, 0),
-            util: Buff::new(BuffState::Unset, 0),
+            food: Buff::new(BuffState::Unset, 0, 0),
+            util: Buff::new(BuffState::Unset, 0, 0),
         }
     }
 
     /// Sets all unset buffs to none.
-    pub fn unset_to_none(&mut self, time: u64) {
+    pub fn unset_to_none(&mut self, time: u64, event_id: u64) {
         if self.food.state == BuffState::Unset {
-            self.food.update(BuffState::None, time);
+            self.food.update(BuffState::None, time, event_id);
         }
         if self.util.state == BuffState::Unset {
-            self.util.update(BuffState::None, time);
+            self.util.update(BuffState::None, time, event_id);
         }
     }
 
     /// Applies a food buff to the player.
     ///
     /// Returns `true` if this update changed the buff state.
-    pub fn apply_food(&mut self, food: Food, event_id: u64) -> bool {
-        self.food.update(BuffState::Known(food), event_id)
+    pub fn apply_food(&mut self, food: Food, time: u64, event_id: u64) -> bool {
+        self.food.update(BuffState::Known(food), time, event_id)
     }
 
     /// Applies a unknown food buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_food(&mut self, id: u32, event_id: u64) -> bool {
-        self.food.update(BuffState::Unknown(id), event_id)
+    pub fn apply_unknown_food(&mut self, id: u32, time: u64, event_id: u64) -> bool {
+        self.food.update(BuffState::Unknown(id), time, event_id)
     }
 
     /// Removes the current food buff from the player.
@@ -60,14 +60,14 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_food(&mut self, food: Option<Food>, event_id: u64) -> bool {
+    pub fn remove_food(&mut self, food: Option<Food>, time: u64, event_id: u64) -> bool {
         let changed = match (food, self.food.state) {
             (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
             (Some(removed), BuffState::Known(applied)) => removed == applied,
             _ => false,
         };
         if changed {
-            self.food.update(BuffState::None, event_id)
+            self.food.update(BuffState::None, time, event_id)
         } else {
             false
         }
@@ -76,15 +76,15 @@ impl Entry {
     /// Applies an utility buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_util(&mut self, util: Utility, event_id: u64) -> bool {
-        self.util.update(BuffState::Known(util), event_id)
+    pub fn apply_util(&mut self, util: Utility, time: u64, event_id: u64) -> bool {
+        self.util.update(BuffState::Known(util), time, event_id)
     }
 
     /// Applies an unknown utility buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_util(&mut self, id: u32, event_id: u64) -> bool {
-        self.util.update(BuffState::Unknown(id), event_id)
+    pub fn apply_unknown_util(&mut self, id: u32, time: u64, event_id: u64) -> bool {
+        self.util.update(BuffState::Unknown(id), time, event_id)
     }
 
     /// Removes the current utility buff from the player.
@@ -94,14 +94,14 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_util(&mut self, util: Option<Utility>, event_id: u64) -> bool {
+    pub fn remove_util(&mut self, util: Option<Utility>, time: u64, event_id: u64) -> bool {
         let changed = match (util, self.util.state) {
             (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
             (Some(removed), BuffState::Known(applied)) => removed == applied,
             _ => false,
         };
         if changed {
-            self.util.update(BuffState::None, event_id)
+            self.util.update(BuffState::None, time, event_id)
         } else {
             false
         }

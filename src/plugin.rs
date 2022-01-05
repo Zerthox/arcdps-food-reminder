@@ -142,7 +142,7 @@ impl Plugin {
                         // change unset buffs to none
                         // initial buffs should be reported right after
                         for entry in self.tracker.all_players_mut() {
-                            entry.unset_to_none(event_id);
+                            entry.unset_to_none(event.time, event_id);
                         }
 
                         // grab target id
@@ -164,6 +164,7 @@ impl Plugin {
                         }
 
                         // check self buffs
+                        // FIXME: does not wait for reports on initial buffs
                         if self.reminder.settings.encounter_start {
                             self.check_self_food();
                             self.check_self_util();
@@ -207,22 +208,19 @@ impl Plugin {
                                     if let Some(entry) = self.tracker.player_mut(dest.id) {
                                         let buff_id = event.skill_id;
 
-                                        // api delayed state changes need to be ignored for reminder on malnourished/diminished apply
-
                                         // check for food & util
                                         if let Ok(food) = Food::try_from(buff_id) {
-                                            if entry.apply_food(food, event_id) {
+                                            if entry.apply_food(food, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Food {} applied on {:?} to {:?}",
                                                     food, statechange, entry
                                                 ));
 
-                                                // trigger reminder on malnourished unless api delayed
+                                                // trigger reminder on malnourished
                                                 if self.reminder.settings.always_mal_dim
                                                     && entry.player.is_self
                                                     && food == Food::Malnourished
-                                                    && statechange != StateChange::ApiDelayed
                                                 {
                                                     self.reminder.trigger_food();
 
@@ -234,18 +232,17 @@ impl Plugin {
                                                 }
                                             }
                                         } else if let Ok(util) = Utility::try_from(buff_id) {
-                                            if entry.apply_util(util, event_id) {
+                                            if entry.apply_util(util, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Utility {} applied on {:?} to {:?}",
                                                     util, statechange, entry
                                                 ));
 
-                                                // trigger reminder on diminished unless api delayed
+                                                // trigger reminder on diminished
                                                 if self.reminder.settings.always_mal_dim
                                                     && entry.player.is_self
                                                     && util == Utility::Diminished
-                                                    && statechange != StateChange::ApiDelayed
                                                 {
                                                     self.reminder.trigger_util();
 
@@ -257,7 +254,9 @@ impl Plugin {
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
-                                            if entry.apply_unknown_food(buff_id, event_id) {
+                                            if entry
+                                                .apply_unknown_food(buff_id, event.time, event_id)
+                                            {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Food with id {} applied on {:?} to {:?}",
@@ -265,7 +264,9 @@ impl Plugin {
                                                 ));
                                             }
                                         } else if let Some("Enhancement") = skill_name {
-                                            if entry.apply_unknown_util(buff_id, event_id) {
+                                            if entry
+                                                .apply_unknown_util(buff_id, event.time, event_id)
+                                            {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Utility with id {} applied on {:?} to {:?}",
@@ -285,7 +286,7 @@ impl Plugin {
 
                                 // check for food & util
                                 if let Ok(food) = Food::try_from(buff_id) {
-                                    if entry.remove_food(Some(food), event_id) {
+                                    if entry.remove_food(Some(food), event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Food {:?} removed on {:?} from {:?}",
@@ -300,7 +301,7 @@ impl Plugin {
                                         }
                                     }
                                 } else if let Ok(util) = Utility::try_from(buff_id) {
-                                    if entry.remove_util(Some(util), event_id) {
+                                    if entry.remove_util(Some(util), event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Utility {:?} removed on {:?} from {:?}",
@@ -315,7 +316,7 @@ impl Plugin {
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
-                                    if entry.remove_food(None, event_id) {
+                                    if entry.remove_food(None, event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Food with id {} removed on {:?} from {:?}",
@@ -330,7 +331,7 @@ impl Plugin {
                                         }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
-                                    if entry.remove_util(None, event_id) {
+                                    if entry.remove_util(None, event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Utility with id {} removed on {:?} from {:?}",

@@ -1,5 +1,5 @@
 use crate::{
-    data::{Boss, Food, Utility},
+    data::{Boss, Food, FoodProc, Utility},
     reminder::Reminder,
     tracking::{entry::BuffState, Encounter, Tracker},
     win,
@@ -123,6 +123,7 @@ impl Plugin {
                             self.debug.log(format!("Combat enter for {:?}", entry));
                         }
                     }
+
                     StateChange::ExitCombat => {
                         // combat exit
 
@@ -133,6 +134,7 @@ impl Plugin {
                             self.debug.log(format!("Combat exit for {:?}", entry));
                         }
                     }
+
                     StateChange::LogStart => {
                         // log start
 
@@ -164,12 +166,13 @@ impl Plugin {
                         }
 
                         // check self buffs
-                        // FIXME: does not wait for reports on initial buffs
+                        // FIXME: need to wait for reports on initial buffs
                         if self.reminder.settings.encounter_start {
                             self.check_self_food();
                             self.check_self_util();
                         }
                     }
+
                     StateChange::LogEnd => {
                         // log end
 
@@ -195,6 +198,7 @@ impl Plugin {
                         // end encounter
                         self.tracker.end_encounter();
                     }
+
                     #[cfg_attr(not(feature = "log"), allow(unused))]
                     statechange => {
                         // TODO: should we restrict this to specific state change kinds?
@@ -209,8 +213,14 @@ impl Plugin {
                                     if let Some(entry) = self.tracker.player_mut(dest.id) {
                                         let buff_id = event.skill_id;
 
-                                        // check for food & util
-                                        if let Ok(food) = Food::try_from(buff_id) {
+                                        // check type of buff
+                                        if let Ok(proc) = FoodProc::try_from(buff_id) {
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Food proc {} applied to {:?}",
+                                                proc, entry
+                                            ));
+                                        } else if let Ok(food) = Food::try_from(buff_id) {
                                             if entry.apply_food(food, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
@@ -285,8 +295,14 @@ impl Plugin {
                             if let Some(entry) = self.tracker.player_mut(src.id) {
                                 let buff_id = event.skill_id;
 
-                                // check for food & util
-                                if let Ok(food) = Food::try_from(buff_id) {
+                                // check type of buff
+                                if let Ok(proc) = FoodProc::try_from(buff_id) {
+                                    #[cfg(feature = "log")]
+                                    self.debug.log(format!(
+                                        "Food proc {} removed from {:?}",
+                                        proc, entry
+                                    ));
+                                } else if let Ok(food) = Food::try_from(buff_id) {
                                     if entry.remove_food(Some(food), event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
@@ -389,8 +405,6 @@ impl Plugin {
                         // player removed
 
                         let id = src.id;
-
-                        #[cfg_attr(not(feature = "log"), allow(unused))]
                         let removed = self.tracker.remove_player(id);
 
                         #[cfg(feature = "log")]

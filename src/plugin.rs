@@ -195,6 +195,7 @@ impl Plugin {
                         // end encounter
                         self.tracker.end_encounter();
                     }
+                    #[cfg_attr(not(feature = "log"), allow(unused))]
                     statechange => {
                         // TODO: should we restrict this to specific state change kinds?
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages

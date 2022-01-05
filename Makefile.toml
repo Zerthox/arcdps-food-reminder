@@ -12,6 +12,9 @@ condition = { env_not_set = ["ARCDPS_PATH"] }
 script = "cargo build --release"
 clear = true
 
+[tasks.build-demo]
+script = "cargo build --release --features demo"
+
 [tasks.build-dev]
 script = "cargo build --release --features log"
 
@@ -23,12 +26,15 @@ script_runner = "@shell"
 script = "rm \"${ARCDPS_PATH}/arcdps_food_reminder.dll\""
 script_runner = "@shell"
 
-[tasks.dev]
-run_task = { name = ["build-dev", "copy"] }
-watch = true
-
 [tasks.install]
 run_task = { name = ["build", "copy"] }
 
 [tasks.uninstall]
 alias = "remove"
+
+[tasks.demo]
+run_task = { name = ["build-demo", "copy"] }
+
+[tasks.dev]
+run_task = { name = ["build-dev", "copy"] }
+watch = true

@@ -204,6 +204,12 @@ impl Tracker {
                     if ui.small_button(im_str!("Copy Name")) {
                         ui.set_clipboard_text(&im_str!("{}", name));
                     }
+                    if ui.small_button(im_str!("Open Wiki")) {
+                        open::that(format!(
+                            "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
+                            name
+                        ));
+                    }
                 }
                 if ui.small_button(im_str!("Copy ID")) {
                     ui.set_clipboard_text(&im_str!("{}", buff_id));
@@ -221,6 +227,12 @@ impl Tracker {
                 if let Some(name) = name {
                     if ui.small_button(im_str!("Copy Name")) {
                         ui.set_clipboard_text(&im_str!("{}", name));
+                    }
+                    if ui.small_button(im_str!("Open Wiki")) {
+                        open::that(format!(
+                            "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
+                            name
+                        ));
                     }
                 }
                 if ui.small_button(im_str!("Copy ID")) {

@@ -162,7 +162,7 @@ impl Plugin {
                             self.debug.log(format!(
                                 "Log for id {} started with {:?} delta",
                                 target_id, delta
-                            ))
+                            ));
                         }
 
                         // check self buffs

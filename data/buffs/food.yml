@@ -93,11 +93,11 @@ PepperedMeatFlatbread:
   name: Peppered Cured Meat Flatbread
   stats: [-10% Incoming Damage, +100 Condition Damage, + 70 Expertise]
   category: CND
-# CloveMeatFlatbread:
-#   id: UNKNOWN
-#   name: Clove-Spiced Pear and Cured Meat Flatbread
-#   stats: [-20% Incoming Condition Duration, +100 Condition Damage, +70 Expertise]
-#   category: CND
+CloveMeatFlatbread:
+  id: 57072
+  name: Clove-Spiced Pear and Cured Meat Flatbread
+  stats: [-20% Incoming Condition Duration, +100 Condition Damage, +70 Expertise]
+  category: CND
 SesameMeatFlatbread:
   id: 57222
   name: Sesame-Asparagus and Cured Meat Flatbread

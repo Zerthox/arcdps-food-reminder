@@ -186,11 +186,11 @@ impl Tracker {
                 .players
                 .sort_by(|a, b| Reverse(&a.player.character).cmp(&Reverse(&b.player.character))),
 
-            (Sorting::Food, false) => self.players.sort_by_key(|entry| entry.food),
-            (Sorting::Food, true) => self.players.sort_by_key(|entry| Reverse(entry.food)),
+            (Sorting::Food, false) => self.players.sort_by_key(|entry| entry.food.state),
+            (Sorting::Food, true) => self.players.sort_by_key(|entry| Reverse(entry.food.state)),
 
-            (Sorting::Util, false) => self.players.sort_by_key(|entry| entry.util),
-            (Sorting::Util, true) => self.players.sort_by_key(|entry| Reverse(entry.util)),
+            (Sorting::Util, false) => self.players.sort_by_key(|entry| entry.util.state),
+            (Sorting::Util, true) => self.players.sort_by_key(|entry| Reverse(entry.util.state)),
         }
     }
 

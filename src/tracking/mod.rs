@@ -16,7 +16,7 @@ use arcdps::imgui::{
 };
 use buff::{Buff, BuffState, Food, Utility};
 use entry::Entry;
-use std::{cmp::Reverse, slice};
+use std::{cmp::Reverse, collections::HashMap, slice};
 use windows::System::VirtualKey;
 
 /// Player tracker.
@@ -34,8 +34,8 @@ pub struct Tracker {
     /// Current local player (self) id.
     self_id: usize,
 
-    /// Cache for temporarily saved buffs on last character of local player (self).
-    self_cache: Option<(String, Buff<Food>, Buff<Utility>)>,
+    /// Cache for buffs on characters of local player (self).
+    self_cache: HashMap<String, (Buff<Food>, Buff<Utility>)>,
 
     /// Current ongoing encounter.
     encounter: Encounter,
@@ -47,13 +47,13 @@ impl Tracker {
     pub const HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             players: Vec::new(),
             sorting: Sorting::Sub,
             reverse: false,
             self_id: 0,
-            self_cache: None,
+            self_cache: HashMap::new(),
             encounter: Encounter::None,
         }
     }
@@ -67,14 +67,11 @@ impl Tracker {
             // update self id
             self.self_id = entry.player.id;
 
-            // check & reset cache
-            if let Some((character, food, util)) = self.self_cache.take() {
-                // check for same character
-                if character == entry.player.character {
-                    // use cached food
-                    entry.food = food;
-                    entry.util = util;
-                }
+            // check cache
+            if let Some((food, util)) = self.self_cache.remove(&entry.player.character) {
+                // use cached buffs
+                entry.food = food;
+                entry.util = util;
             }
         }
 
@@ -96,9 +93,11 @@ impl Tracker {
 
                 // check for self
                 if id == self.self_id {
-                    // cache character name & buffs in case we stay on same character
-                    self.self_cache =
-                        Some((removed.player.character.clone(), removed.food, removed.util));
+                    // cache own character buffs in case we play it again later
+                    self.self_cache.insert(
+                        removed.player.character.clone(),
+                        (removed.food.clone(), removed.util.clone()),
+                    );
                 }
 
                 // return removed entry

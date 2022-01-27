@@ -12,7 +12,7 @@ use arc_util::{
 use arcdps::imgui::{
     im_str,
     sys::{igTableGetSortSpecs, ImGuiSortDirection_Ascending, ImGuiSortDirection_None},
-    TableColumnFlags, TableFlags, Ui,
+    ImStr, TableColumnFlags, TableFlags, Ui,
 };
 use buff::{Buff, BuffState, Food, Utility};
 use entry::Entry;
@@ -193,52 +193,53 @@ impl Tracker {
         }
     }
 
+    /// Renders a context menu for an item.
+    fn render_context_menu(
+        ui: &Ui,
+        menu_id: &ImStr,
+        title: &ImStr,
+        buff_id: u32,
+        name: Option<&str>,
+    ) {
+        item_context_menu(menu_id, || {
+            ui.text(title);
+            if let Some(name) = name {
+                if ui.small_button(im_str!("Copy Name")) {
+                    ui.set_clipboard_text(&im_str!("{}", name));
+                }
+                if ui.small_button(im_str!("Open Wiki")) {
+                    open::that(format!(
+                        "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
+                        name
+                    ));
+                }
+            }
+            if ui.small_button(im_str!("Copy ID")) {
+                ui.set_clipboard_text(&im_str!("{}", buff_id));
+            }
+        });
+    }
+
     /// Renders a context menu for a food item.
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        item_context_menu(
-            &im_str!("##food-reminder-tracker-context-food-{}", menu_id),
-            || {
-                ui.text(im_str!("Food Options"));
-                if let Some(name) = name {
-                    if ui.small_button(im_str!("Copy Name")) {
-                        ui.set_clipboard_text(&im_str!("{}", name));
-                    }
-                    if ui.small_button(im_str!("Open Wiki")) {
-                        open::that(format!(
-                            "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
-                            name
-                        ));
-                    }
-                }
-                if ui.small_button(im_str!("Copy ID")) {
-                    ui.set_clipboard_text(&im_str!("{}", buff_id));
-                }
-            },
-        );
+        Self::render_context_menu(
+            ui,
+            &im_str!("##food-context-{}", menu_id),
+            im_str!("Food Options"),
+            buff_id,
+            name,
+        )
     }
 
     /// Renders a context menu for a utility item.
     fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        item_context_menu(
-            &im_str!("##food-reminder-tracker-context-util-{}", menu_id),
-            || {
-                ui.text(im_str!("Utility Options"));
-                if let Some(name) = name {
-                    if ui.small_button(im_str!("Copy Name")) {
-                        ui.set_clipboard_text(&im_str!("{}", name));
-                    }
-                    if ui.small_button(im_str!("Open Wiki")) {
-                        open::that(format!(
-                            "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
-                            name
-                        ));
-                    }
-                }
-                if ui.small_button(im_str!("Copy ID")) {
-                    ui.set_clipboard_text(&im_str!("{}", buff_id));
-                }
-            },
-        );
+        Self::render_context_menu(
+            ui,
+            &im_str!("##util-context-{}", menu_id),
+            im_str!("Utility Options"),
+            buff_id,
+            name,
+        )
     }
 }
 
@@ -255,7 +256,7 @@ impl Component for Tracker {
         } else {
             // create table
             if ui.begin_table_with_flags(
-                im_str!("##food-reminder-tracker-table"),
+                im_str!("##squad-table"),
                 4,
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
             ) {

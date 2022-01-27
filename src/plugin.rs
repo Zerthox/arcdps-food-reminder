@@ -499,7 +499,7 @@ impl Plugin {
 
             ui.push_item_width(ui.calc_text_size(im_str!("0000"), false, 0.0)[0]);
             if ui
-                .input_text(im_str!("##food-reminder-tracker-hotkey"), &mut key_buffer)
+                .input_text(im_str!("##hotkey"), &mut key_buffer)
                 .chars_decimal(true)
                 .build()
             {

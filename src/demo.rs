@@ -99,7 +99,7 @@ impl Component for Demo {
         ui.checkbox(im_str!("Tracker"), self.tracker.is_visible_mut());
 
         // player editor
-        if ui.begin_table(im_str!("##food-reminder-demo-table"), 6) {
+        if ui.begin_table(im_str!("##table"), 6) {
             const INPUT_SIZE: f32 = 100.0;
 
             // declare columns
@@ -123,7 +123,7 @@ impl Component for Demo {
                 let mut sub = ImString::with_capacity(2);
                 sub.push_str(&format!("{}", entry.player.subgroup));
                 if ui
-                    .input_text(&im_str!("##food-reminder-demo-sub-{}", id), &mut sub)
+                    .input_text(&im_str!("##sub-{}", id), &mut sub)
                     .chars_decimal(true)
                     .build()
                 {
@@ -140,7 +140,7 @@ impl Component for Demo {
                 char_name.push_str(&entry.player.character);
                 ui.push_item_width(INPUT_SIZE);
                 if ui
-                    .input_text(&im_str!("##food-reminder-demo-char-{}", id), &mut char_name)
+                    .input_text(&im_str!("##char-{}", id), &mut char_name)
                     .build()
                 {
                     entry.player.character = char_name.to_str().into();
@@ -152,7 +152,7 @@ impl Component for Demo {
                 acc_name.push_str(&entry.player.account);
                 ui.push_item_width(INPUT_SIZE);
                 if ui
-                    .input_text(&im_str!("##food-reminder-demo-acc-{}", id), &mut acc_name)
+                    .input_text(&im_str!("##acc-{}", id), &mut acc_name)
                     .build()
                 {
                     entry.player.account = acc_name.to_string();
@@ -174,7 +174,7 @@ impl Component for Demo {
                 ];
                 let mut prof = entry.player.profession as usize;
                 ui.push_item_width(INPUT_SIZE);
-                if ComboBox::new(&im_str!("##food-reminder-demo-class-{}", id)).build_simple(
+                if ComboBox::new(&im_str!("##class-{}", id)).build_simple(
                     ui,
                     &mut prof,
                     &PROF_NAMES,
@@ -191,7 +191,7 @@ impl Component for Demo {
                     .position(|buff| *buff == entry.food.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
-                if ComboBox::new(&im_str!("##food-reminder-demo-food-{}", id)).build_simple(
+                if ComboBox::new(&im_str!("##food-{}", id)).build_simple(
                     ui,
                     &mut food_id,
                     &self.all_foods,
@@ -208,7 +208,7 @@ impl Component for Demo {
                     .position(|buff| *buff == entry.util.state)
                     .unwrap();
                 ui.push_item_width(INPUT_SIZE);
-                if ComboBox::new(&im_str!("##food-reminder-demo-util-{}", id)).build_simple(
+                if ComboBox::new(&im_str!("##util-{}", id)).build_simple(
                     ui,
                     &mut util_id,
                     &self.all_utils,

@@ -57,15 +57,16 @@ impl Tracker {
         // check for self
         if added.player.is_self {
             // check cache
-            self.self_cache
+            if let Some(index) = self
+                .self_cache
                 .iter()
                 .position(|entry| entry.player.character == added.player.character)
-                .map(|index| {
-                    // use cached buffs
-                    let removed = self.self_cache.remove(index);
-                    added.food = removed.food;
-                    added.util = removed.util;
-                });
+            {
+                // use cached buffs
+                let removed = self.self_cache.remove(index);
+                added.food = removed.food;
+                added.util = removed.util;
+            }
         }
 
         // insert entry
@@ -341,68 +342,67 @@ impl Tracker {
     fn render_squad_tab(&mut self, ui: &Ui) {
         if self.players.is_empty() {
             ui.text("No players in range");
-        } else {
-            if ui.begin_table_with_flags(
-                im_str!("##squad-table"),
-                4,
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
-            ) {
-                // columns
-                ui.table_setup_column_with_flags(
-                    im_str!("Sub"),
-                    TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
-                );
-                ui.table_setup_column_with_flags(
-                    im_str!("Player"),
-                    TableColumnFlags::PREFER_SORT_DESCENDING,
-                );
-                ui.table_setup_column_with_flags(
-                    im_str!("Food"),
-                    TableColumnFlags::PREFER_SORT_DESCENDING,
-                );
-                ui.table_setup_column_with_flags(
-                    im_str!("Util"),
-                    TableColumnFlags::PREFER_SORT_DESCENDING,
-                );
-                ui.table_headers_row();
+        } else if ui.begin_table_with_flags(
+            im_str!("##squad-table"),
+            4,
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
+        ) {
+            // columns
+            ui.table_setup_column_with_flags(
+                im_str!("Sub"),
+                TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
+            );
+            ui.table_setup_column_with_flags(
+                im_str!("Player"),
+                TableColumnFlags::PREFER_SORT_DESCENDING,
+            );
+            ui.table_setup_column_with_flags(
+                im_str!("Food"),
+                TableColumnFlags::PREFER_SORT_DESCENDING,
+            );
+            ui.table_setup_column_with_flags(
+                im_str!("Util"),
+                TableColumnFlags::PREFER_SORT_DESCENDING,
+            );
+            ui.table_headers_row();
 
-                // sorting
-                if let Some(sort_specs) = unsafe { ig::igTableGetSortSpecs().as_mut() } {
-                    // check for changes
-                    if sort_specs.SpecsDirty {
-                        let column_specs = unsafe {
-                            slice::from_raw_parts(sort_specs.Specs, sort_specs.SpecsCount as usize)
-                        };
-                        if let Some(sorted_column) = column_specs.iter().find(|column| {
-                            column.SortDirection() as u32 != ig::ImGuiSortDirection_None
-                        }) {
-                            // update sorting state
-                            match sorted_column.ColumnIndex {
-                                0 => self.sorting = Sorting::Sub,
-                                1 => self.sorting = Sorting::Name,
-                                2 => self.sorting = Sorting::Food,
-                                3 => self.sorting = Sorting::Util,
-                                _ => {}
-                            }
-
-                            // ascending is reverse order for us
-                            self.reverse = sorted_column.SortDirection() as u32
-                                == ig::ImGuiSortDirection_Ascending;
-
-                            // refresh sorting
-                            self.refresh_sort();
+            // sorting
+            if let Some(sort_specs) = unsafe { ig::igTableGetSortSpecs().as_mut() } {
+                // check for changes
+                if sort_specs.SpecsDirty {
+                    let column_specs = unsafe {
+                        slice::from_raw_parts(sort_specs.Specs, sort_specs.SpecsCount as usize)
+                    };
+                    if let Some(sorted_column) = column_specs
+                        .iter()
+                        .find(|column| column.SortDirection() as u32 != ig::ImGuiSortDirection_None)
+                    {
+                        // update sorting state
+                        match sorted_column.ColumnIndex {
+                            0 => self.sorting = Sorting::Sub,
+                            1 => self.sorting = Sorting::Name,
+                            2 => self.sorting = Sorting::Food,
+                            3 => self.sorting = Sorting::Util,
+                            _ => {}
                         }
+
+                        // ascending is reverse order for us
+                        self.reverse = sorted_column.SortDirection() as u32
+                            == ig::ImGuiSortDirection_Ascending;
+
+                        // refresh sorting
+                        self.refresh_sort();
                     }
                 }
-
-                // render table content
-                let colors = exports::colors();
-                for entry in &self.players {
-                    Self::render_table_entry(ui, entry, &colors, true);
-                }
-
-                ui.end_table();
             }
+
+            // render table content
+            let colors = exports::colors();
+            for entry in &self.players {
+                Self::render_table_entry(ui, entry, &colors, true);
+            }
+
+            ui.end_table();
         }
     }
 
@@ -410,29 +410,27 @@ impl Tracker {
         let current = self.get_self();
         if current.is_none() && self.self_cache.is_empty() {
             ui.text("No characters found");
-        } else {
-            if ui.begin_table_with_flags(
-                im_str!("##self-table"),
-                4,
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
-            ) {
-                // columns
-                ui.table_setup_column(im_str!("Player"));
-                ui.table_setup_column(im_str!("Food"));
-                ui.table_setup_column(im_str!("Util"));
-                ui.table_headers_row();
+        } else if ui.begin_table_with_flags(
+            im_str!("##self-table"),
+            4,
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+        ) {
+            // columns
+            ui.table_setup_column(im_str!("Player"));
+            ui.table_setup_column(im_str!("Food"));
+            ui.table_setup_column(im_str!("Util"));
+            ui.table_headers_row();
 
-                // render table content
-                let colors = exports::colors();
-                if let Some(entry) = current {
-                    Self::render_table_entry(ui, entry, &colors, false);
-                }
-                for entry in &self.self_cache {
-                    Self::render_table_entry(ui, entry, &colors, false);
-                }
-
-                ui.end_table();
+            // render table content
+            let colors = exports::colors();
+            if let Some(entry) = current {
+                Self::render_table_entry(ui, entry, &colors, false);
             }
+            for entry in &self.self_cache {
+                Self::render_table_entry(ui, entry, &colors, false);
+            }
+
+            ui.end_table();
         }
     }
 }

@@ -9,14 +9,10 @@ use arc_util::{
     settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
-use arcdps::imgui::{
-    im_str,
-    sys::{igTableGetSortSpecs, ImGuiSortDirection_Ascending, ImGuiSortDirection_None},
-    ImStr, TableColumnFlags, TableFlags, Ui,
-};
-use buff::{Buff, BuffState, Food, Utility};
+use arcdps::imgui::{im_str, sys as ig, ImStr, TableColumnFlags, TableFlags, Ui};
+use buff::{BuffState, Food, Utility};
 use entry::Entry;
-use std::{cmp::Reverse, collections::HashMap, slice};
+use std::{cmp::Reverse, ptr, slice};
 use windows::System::VirtualKey;
 
 /// Player tracker.
@@ -31,11 +27,8 @@ pub struct Tracker {
     /// Current sorting direction.
     reverse: bool,
 
-    /// Current local player (self) id.
-    self_id: usize,
-
     /// Cache for buffs on characters of local player (self).
-    self_cache: HashMap<String, (Buff<Food>, Buff<Utility>)>,
+    self_cache: Vec<Entry>,
 
     /// Current ongoing encounter.
     encounter: Encounter,
@@ -43,7 +36,7 @@ pub struct Tracker {
 
 #[allow(unused)]
 impl Tracker {
-    /// Defaullt hotkey for tracker.
+    /// Default hotkey for tracker.
     pub const HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
@@ -52,31 +45,31 @@ impl Tracker {
             players: Vec::new(),
             sorting: Sorting::Sub,
             reverse: false,
-            self_id: 0,
-            self_cache: HashMap::new(),
+            self_cache: Vec::new(),
             encounter: Encounter::None,
         }
     }
 
     /// Adds a new tracked player.
     pub fn add_player(&mut self, player: Player) {
-        let mut entry = Entry::new(player);
+        let mut added = Entry::new(player);
 
         // check for self
-        if entry.player.is_self {
-            // update self id
-            self.self_id = entry.player.id;
-
+        if added.player.is_self {
             // check cache
-            if let Some((food, util)) = self.self_cache.remove(&entry.player.character) {
-                // use cached buffs
-                entry.food = food;
-                entry.util = util;
-            }
+            self.self_cache
+                .iter()
+                .position(|entry| entry.player.character == added.player.character)
+                .map(|index| {
+                    // use cached buffs
+                    let removed = self.self_cache.remove(index);
+                    added.food = removed.food;
+                    added.util = removed.util;
+                });
         }
 
         // insert entry
-        self.players.push(entry);
+        self.players.push(added);
 
         // refresh sorting
         self.refresh_sort();
@@ -92,12 +85,9 @@ impl Tracker {
                 let removed = self.players.remove(index);
 
                 // check for self
-                if id == self.self_id {
+                if removed.player.is_self {
                     // cache own character buffs in case we play it again later
-                    self.self_cache.insert(
-                        removed.player.character.clone(),
-                        (removed.food.clone(), removed.util.clone()),
-                    );
+                    self.self_cache.push(removed.clone());
                 }
 
                 // return removed entry
@@ -105,27 +95,22 @@ impl Tracker {
             })
     }
 
-    /// Checks whether the given id is the local player (self).
-    pub fn is_self(&self, id: usize) -> bool {
-        self.self_id == id
-    }
-
     /// Returns a reference to the local player (self).
     pub fn get_self(&self) -> Option<&Entry> {
-        self.player(self.self_id)
+        self.players.iter().find(|entry| entry.player.is_self)
     }
 
     /// Returns a mutable reference to the local player (self).
     pub fn get_self_mut(&mut self) -> Option<&mut Entry> {
-        self.player_mut(self.self_id)
+        self.players.iter_mut().find(|entry| entry.player.is_self)
     }
 
-    /// Returns a reference to a tracked player entryyy.
+    /// Returns a reference to a tracked player entry.
     pub fn player(&self, id: usize) -> Option<&Entry> {
         self.players.iter().find(|entry| entry.player.id == id)
     }
 
-    /// Returns a mutable reference to a tracked player entryyy.
+    /// Returns a mutable reference to a tracked player entry.
     pub fn player_mut(&mut self, id: usize) -> Option<&mut Entry> {
         self.players.iter_mut().find(|entry| entry.player.id == id)
     }
@@ -241,26 +226,128 @@ impl Tracker {
             name,
         )
     }
-}
 
-impl Default for Tracker {
-    fn default() -> Self {
-        Self::new()
+    /// Renders a player entry in a table.
+    fn render_table_entry(ui: &Ui, entry: &Entry, colors: &exports::Colors, sub: bool) {
+        let player = &entry.player;
+        let red = colors
+            .core(CoreColor::LightRed)
+            .map(|vec| vec.into())
+            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
+        let green = colors
+            .core(CoreColor::LightGreen)
+            .map(|vec| vec.into())
+            .unwrap_or([0.0, 1.0, 0.0, 1.0]);
+        let yellow = colors
+            .core(CoreColor::LightYellow)
+            .map(|vec| vec.into())
+            .unwrap_or([1.0, 1.0, 0.0, 1.0]);
+
+        // new row for each player
+        ui.table_next_row();
+
+        // render subgroup cell
+        if sub {
+            ui.table_next_column();
+            let sub = format!("{:>2}", player.subgroup);
+            match colors.sub_base(player.subgroup) {
+                Some(color) => ui.text_colored(color.into(), sub),
+                None => ui.text(sub),
+            }
+        }
+
+        // render name cell
+        ui.table_next_column();
+        match colors.prof_base(player.profession) {
+            Some(color) => ui.text_colored(color.into(), &player.character),
+            None => ui.text(&player.character),
+        }
+        if ui.is_item_hovered() {
+            ui.tooltip_text(&player.account);
+        }
+
+        // render food cell
+        ui.table_next_column();
+        match entry.food.state {
+            BuffState::Unset => {
+                ui.text("???");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("Uncertain");
+                }
+            }
+            BuffState::None => {
+                ui.text_colored(red, "NONE");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("No Food");
+                }
+            }
+            BuffState::Unknown(id) => {
+                ui.text_colored(yellow, "SOME");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("Unknown Food");
+                }
+                Self::render_food_context_menu(ui, player.id, id, None);
+            }
+            BuffState::Known(food) => {
+                let color = match food {
+                    Food::Malnourished => red,
+                    _ => green,
+                };
+                ui.text_colored(color, food.category().unwrap_or("SOME"));
+                if ui.is_item_hovered() {
+                    ui.tooltip_text(format!("{}\n{}", food.name(), food.stats().join("\n")));
+                }
+                Self::render_food_context_menu(ui, player.id, food.into(), Some(food.name()));
+            }
+        }
+
+        // render util cell
+        ui.table_next_column();
+        match entry.util.state {
+            BuffState::Unset => {
+                ui.text("???");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("Uncertain");
+                }
+            }
+            BuffState::None => {
+                ui.text_colored(red, "NONE");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("No Utility");
+                }
+            }
+            BuffState::Unknown(id) => {
+                ui.text_colored(yellow, "SOME");
+                if ui.is_item_hovered() {
+                    ui.tooltip_text("Unknown Utility");
+                }
+                Self::render_util_context_menu(ui, player.id, id, None);
+            }
+            BuffState::Known(util) => {
+                let color = match util {
+                    Utility::Diminished => red,
+                    _ => green,
+                };
+                ui.text_colored(color, util.category().unwrap_or("SOME"));
+                if ui.is_item_hovered() {
+                    ui.tooltip_text(format!("{}\n{}", util.name(), util.stats().join("\n")));
+                }
+                Self::render_util_context_menu(ui, player.id, util.into(), Some(util.name()));
+            }
+        }
     }
-}
 
-impl Component for Tracker {
-    fn render(&mut self, ui: &Ui) {
+    /// Renders the buff table for the squad.
+    fn render_squad_tab(&mut self, ui: &Ui) {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
-            // create table
             if ui.begin_table_with_flags(
                 im_str!("##squad-table"),
                 4,
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
             ) {
-                // declare columns
+                // columns
                 ui.table_setup_column_with_flags(
                     im_str!("Sub"),
                     TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
@@ -277,21 +364,18 @@ impl Component for Tracker {
                     im_str!("Util"),
                     TableColumnFlags::PREFER_SORT_DESCENDING,
                 );
-
-                // render header
                 ui.table_headers_row();
 
                 // sorting
-                if let Some(sort_specs) = unsafe { igTableGetSortSpecs().as_mut() } {
+                if let Some(sort_specs) = unsafe { ig::igTableGetSortSpecs().as_mut() } {
                     // check for changes
                     if sort_specs.SpecsDirty {
                         let column_specs = unsafe {
                             slice::from_raw_parts(sort_specs.Specs, sort_specs.SpecsCount as usize)
                         };
-                        if let Some(sorted_column) = column_specs
-                            .iter()
-                            .find(|column| column.SortDirection() as u32 != ImGuiSortDirection_None)
-                        {
+                        if let Some(sorted_column) = column_specs.iter().find(|column| {
+                            column.SortDirection() as u32 != ig::ImGuiSortDirection_None
+                        }) {
                             // update sorting state
                             match sorted_column.ColumnIndex {
                                 0 => self.sorting = Sorting::Sub,
@@ -303,7 +387,7 @@ impl Component for Tracker {
 
                             // ascending is reverse order for us
                             self.reverse = sorted_column.SortDirection() as u32
-                                == ImGuiSortDirection_Ascending;
+                                == ig::ImGuiSortDirection_Ascending;
 
                             // refresh sorting
                             self.refresh_sort();
@@ -311,137 +395,80 @@ impl Component for Tracker {
                     }
                 }
 
-                // grab arc colors
+                // render table content
                 let colors = exports::colors();
-                let red = colors
-                    .core(CoreColor::LightRed)
-                    .map(|vec| vec.into())
-                    .unwrap_or([1.0, 0.0, 0.0, 1.0]);
-                let green = colors
-                    .core(CoreColor::LightGreen)
-                    .map(|vec| vec.into())
-                    .unwrap_or([0.0, 1.0, 0.0, 1.0]);
-                let yellow = colors
-                    .core(CoreColor::LightYellow)
-                    .map(|vec| vec.into())
-                    .unwrap_or([1.0, 1.0, 0.0, 1.0]);
-
-                // iterate over tracked players
                 for entry in &self.players {
-                    let player = &entry.player;
-
-                    // new row for each player
-                    ui.table_next_row();
-
-                    // render subgroup cell
-                    ui.table_next_column();
-                    let sub = format!("{:>2}", player.subgroup);
-                    match colors.sub_base(player.subgroup) {
-                        Some(color) => ui.text_colored(color.into(), sub),
-                        None => ui.text(sub),
-                    }
-
-                    // render name cell
-                    ui.table_next_column();
-                    match colors.prof_base(player.profession) {
-                        Some(color) => ui.text_colored(color.into(), &player.character),
-                        None => ui.text(&player.character),
-                    }
-                    if ui.is_item_hovered() {
-                        ui.tooltip_text(&player.account);
-                    }
-
-                    // render food cell
-                    ui.table_next_column();
-                    match entry.food.state {
-                        BuffState::Unset => {
-                            ui.text("???");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Uncertain");
-                            }
-                        }
-                        BuffState::None => {
-                            ui.text_colored(red, "NONE");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("No Food");
-                            }
-                        }
-                        BuffState::Unknown(id) => {
-                            ui.text_colored(yellow, "SOME");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Unknown Food");
-                            }
-                            Self::render_food_context_menu(ui, player.id, id, None);
-                        }
-                        BuffState::Known(food) => {
-                            let color = match food {
-                                Food::Malnourished => red,
-                                _ => green,
-                            };
-                            ui.text_colored(color, food.category().unwrap_or("SOME"));
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text(format!(
-                                    "{}\n{}",
-                                    food.name(),
-                                    food.stats().join("\n")
-                                ));
-                            }
-                            Self::render_food_context_menu(
-                                ui,
-                                player.id,
-                                food.into(),
-                                Some(food.name()),
-                            );
-                        }
-                    }
-
-                    // render util cell
-                    ui.table_next_column();
-                    match entry.util.state {
-                        BuffState::Unset => {
-                            ui.text("???");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Uncertain");
-                            }
-                        }
-                        BuffState::None => {
-                            ui.text_colored(red, "NONE");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("No Utility");
-                            }
-                        }
-                        BuffState::Unknown(id) => {
-                            ui.text_colored(yellow, "SOME");
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text("Unknown Utility");
-                            }
-                            Self::render_util_context_menu(ui, player.id, id, None);
-                        }
-                        BuffState::Known(util) => {
-                            let color = match util {
-                                Utility::Diminished => red,
-                                _ => green,
-                            };
-                            ui.text_colored(color, util.category().unwrap_or("SOME"));
-                            if ui.is_item_hovered() {
-                                ui.tooltip_text(format!(
-                                    "{}\n{}",
-                                    util.name(),
-                                    util.stats().join("\n")
-                                ));
-                            }
-                            Self::render_util_context_menu(
-                                ui,
-                                player.id,
-                                util.into(),
-                                Some(util.name()),
-                            );
-                        }
-                    }
+                    Self::render_table_entry(ui, entry, &colors, true);
                 }
 
                 ui.end_table();
             }
+        }
+    }
+
+    fn render_self_tab(&mut self, ui: &Ui) {
+        let current = self.get_self();
+        if current.is_none() && self.self_cache.is_empty() {
+            ui.text("No characters found");
+        } else {
+            if ui.begin_table_with_flags(
+                im_str!("##self-table"),
+                4,
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            ) {
+                // columns
+                ui.table_setup_column(im_str!("Player"));
+                ui.table_setup_column(im_str!("Food"));
+                ui.table_setup_column(im_str!("Util"));
+                ui.table_headers_row();
+
+                // render table content
+                let colors = exports::colors();
+                if let Some(entry) = current {
+                    Self::render_table_entry(ui, entry, &colors, false);
+                }
+                for entry in &self.self_cache {
+                    Self::render_table_entry(ui, entry, &colors, false);
+                }
+
+                ui.end_table();
+            }
+        }
+    }
+}
+
+impl Default for Tracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl Component for Tracker {
+    fn render(&mut self, ui: &Ui) {
+        if unsafe {
+            ig::igBeginTabBar(im_str!("##tabs").as_ptr(), ig::ImGuiTabBarFlags_None as i32)
+        } {
+            if unsafe {
+                ig::igBeginTabItem(
+                    im_str!("Squad").as_ptr(),
+                    ptr::null_mut(),
+                    ig::ImGuiTabItemFlags_None as i32,
+                )
+            } {
+                self.render_squad_tab(ui);
+                unsafe { ig::igEndTabItem() };
+            }
+            if unsafe {
+                ig::igBeginTabItem(
+                    im_str!("Characters").as_ptr(),
+                    ptr::null_mut(),
+                    ig::ImGuiTabItemFlags_None as i32,
+                )
+            } {
+                self.render_self_tab(ui);
+                unsafe { ig::igEndTabItem() };
+            }
+            unsafe { ig::igEndTabBar() };
         }
     }
 }

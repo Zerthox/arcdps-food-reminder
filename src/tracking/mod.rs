@@ -359,7 +359,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        BuffState::None | BuffState::Known(Food::Malnourished) => {
+                        BuffState::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Food");
@@ -373,7 +373,11 @@ impl Component for Tracker {
                             Self::render_food_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(food) => {
-                            ui.text_colored(green, food.category().unwrap_or("SOME"));
+                            let color = match food {
+                                Food::Malnourished => red,
+                                _ => green,
+                            };
+                            ui.text_colored(color, food.category().unwrap_or("SOME"));
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",
@@ -399,7 +403,7 @@ impl Component for Tracker {
                                 ui.tooltip_text("Uncertain");
                             }
                         }
-                        BuffState::None | BuffState::Known(Utility::Diminished) => {
+                        BuffState::None => {
                             ui.text_colored(red, "NONE");
                             if ui.is_item_hovered() {
                                 ui.tooltip_text("No Utility");
@@ -413,7 +417,11 @@ impl Component for Tracker {
                             Self::render_util_context_menu(ui, player.id, id, None);
                         }
                         BuffState::Known(util) => {
-                            ui.text_colored(green, util.category().unwrap_or("SOME"));
+                            let color = match util {
+                                Utility::Diminished => red,
+                                _ => green,
+                            };
+                            ui.text_colored(color, util.category().unwrap_or("SOME"));
                             if ui.is_item_hovered() {
                                 ui.tooltip_text(format!(
                                     "{}\n{}",

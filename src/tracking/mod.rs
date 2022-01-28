@@ -9,10 +9,10 @@ use arc_util::{
     settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
-use arcdps::imgui::{im_str, sys as ig, ImStr, TableColumnFlags, TableFlags, Ui};
+use arcdps::imgui::{im_str, sys as ig, ImStr, TabBar, TabItem, TableColumnFlags, TableFlags, Ui};
 use buff::{BuffState, Food, Utility};
 use entry::Entry;
-use std::{cmp::Reverse, ptr, slice};
+use std::{cmp::Reverse, slice};
 use windows::System::VirtualKey;
 
 /// Player tracker.
@@ -443,31 +443,14 @@ impl Default for Tracker {
 
 impl Component for Tracker {
     fn render(&mut self, ui: &Ui) {
-        if unsafe {
-            ig::igBeginTabBar(im_str!("##tabs").as_ptr(), ig::ImGuiTabBarFlags_None as i32)
-        } {
-            if unsafe {
-                ig::igBeginTabItem(
-                    im_str!("Squad").as_ptr(),
-                    ptr::null_mut(),
-                    ig::ImGuiTabItemFlags_None as i32,
-                )
-            } {
+        TabBar::new(im_str!("##tabs")).build(ui, || {
+            TabItem::new(im_str!("Squad")).build(ui, || {
                 self.render_squad_tab(ui);
-                unsafe { ig::igEndTabItem() };
-            }
-            if unsafe {
-                ig::igBeginTabItem(
-                    im_str!("Characters").as_ptr(),
-                    ptr::null_mut(),
-                    ig::ImGuiTabItemFlags_None as i32,
-                )
-            } {
+            });
+            TabItem::new(im_str!("Characters")).build(ui, || {
                 self.render_self_tab(ui);
-                unsafe { ig::igEndTabItem() };
-            }
-            unsafe { ig::igEndTabBar() };
-        }
+            });
+        });
     }
 }
 

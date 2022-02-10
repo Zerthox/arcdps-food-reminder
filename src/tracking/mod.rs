@@ -1,17 +1,16 @@
 pub mod buff;
 pub mod entry;
+pub mod settings;
 
 use crate::data::Boss;
 use arc_util::{
     api::CoreColor,
     exports,
-    game::Player,
-    settings::HasSettings,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
 use arcdps::imgui::{im_str, sys as ig, ImStr, TabBar, TabItem, TableColumnFlags, TableFlags, Ui};
 use buff::{BuffState, Food, Utility};
-use entry::Entry;
+use entry::{Entry, Player};
 use std::{cmp::Reverse, slice};
 use windows::System::VirtualKey;
 
@@ -27,8 +26,11 @@ pub struct Tracker {
     /// Current sorting direction.
     reverse: bool,
 
-    /// Cache for buffs on characters of local player (self).
-    self_cache: Vec<Entry>,
+    /// Cache for buffs on own characters of local player (self).
+    chars_cache: Vec<Entry>,
+
+    /// Whether to save the buffs on own characters.
+    pub save_chars: bool,
 
     /// Current ongoing encounter.
     encounter: Encounter,
@@ -40,12 +42,13 @@ impl Tracker {
     pub const HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             players: Vec::new(),
             sorting: Sorting::Sub,
             reverse: false,
-            self_cache: Vec::new(),
+            chars_cache: Vec::new(),
+            save_chars: true,
             encounter: Encounter::None,
         }
     }
@@ -58,12 +61,12 @@ impl Tracker {
         if added.player.is_self {
             // check cache
             if let Some(index) = self
-                .self_cache
+                .chars_cache
                 .iter()
                 .position(|entry| entry.player.character == added.player.character)
             {
                 // use cached buffs
-                let removed = self.self_cache.remove(index);
+                let removed = self.chars_cache.remove(index);
                 added.food = removed.food;
                 added.util = removed.util;
             }
@@ -88,7 +91,7 @@ impl Tracker {
                 // check for self
                 if removed.player.is_self {
                     // cache own character buffs in case we play it again later
-                    self.self_cache.push(removed.clone());
+                    self.chars_cache.push(removed.clone());
                 }
 
                 // return removed entry
@@ -338,7 +341,7 @@ impl Tracker {
         }
     }
 
-    /// Renders the buff table for the squad.
+    /// Renders the tracker tab for the squad.
     fn render_squad_tab(&mut self, ui: &Ui) {
         if self.players.is_empty() {
             ui.text("No players in range");
@@ -406,9 +409,10 @@ impl Tracker {
         }
     }
 
+    /// Renders the tracker tab for own characters.
     fn render_self_tab(&mut self, ui: &Ui) {
         let current = self.get_self();
-        if current.is_none() && self.self_cache.is_empty() {
+        if current.is_none() && self.chars_cache.is_empty() {
             ui.text("No characters found");
         } else if ui.begin_table_with_flags(
             im_str!("##self-table"),
@@ -426,7 +430,7 @@ impl Tracker {
             if let Some(entry) = current {
                 Self::render_table_entry(ui, entry, &colors, false);
             }
-            for entry in &self.self_cache {
+            for entry in &self.chars_cache {
                 Self::render_table_entry(ui, entry, &colors, false);
             }
 
@@ -461,17 +465,6 @@ impl Windowed for Tracker {
             .visible(false)
             .auto_resize(true)
     }
-}
-
-// required to save window settings
-impl HasSettings for Tracker {
-    type Settings = ();
-
-    const SETTINGS_ID: &'static str = "tracker";
-
-    fn current_settings(&self) -> Self::Settings {}
-
-    fn load_settings(&mut self, _: Self::Settings) {}
 }
 
 /// Possible encounter states.

@@ -1,6 +1,7 @@
-pub use crate::data::{Food, Utility};
 use serde::{Deserialize, Serialize};
 use std::cmp::{Ordering, PartialOrd};
+
+pub use crate::data::{Food, Utility};
 
 /// Struct representing a buff.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

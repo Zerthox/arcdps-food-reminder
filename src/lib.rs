@@ -2,7 +2,7 @@ mod data;
 mod plugin;
 mod reminder;
 mod tracking;
-mod win;
+mod util;
 
 #[cfg(feature = "demo")]
 mod demo;

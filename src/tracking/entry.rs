@@ -1,12 +1,12 @@
-pub use super::buff::{Buff, BuffState, Food, Utility};
-use arc_util::game::Player;
-pub use arc_util::game::{Profession, Specialization};
+use super::buff::{Buff, BuffState, Food, Utility};
 use serde::{Deserialize, Serialize};
 use std::cmp;
 
+pub use arc_util::game::{Player, Profession, Specialization};
+
 // TODO: track buff duration & reset to unset when duration runs out?
 
-/// Struct representing a player.
+/// Struct representing a tracker entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Entry {
     /// Player this entry corresponds to.
@@ -22,10 +22,19 @@ pub struct Entry {
 impl Entry {
     /// Creates a new entry.
     pub const fn new(player: Player) -> Self {
+        Self::with_states(player, BuffState::Unset, BuffState::Unset)
+    }
+
+    /// Creates a new entry with initial buff states.
+    pub const fn with_states(
+        player: Player,
+        food: BuffState<Food>,
+        util: BuffState<Utility>,
+    ) -> Self {
         Self {
             player,
-            food: Buff::new(BuffState::Unset, 0, 0),
-            util: Buff::new(BuffState::Unset, 0, 0),
+            food: Buff::new(food, 0, 0),
+            util: Buff::new(util, 0, 0),
         }
     }
 

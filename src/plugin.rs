@@ -1,8 +1,8 @@
 use crate::{
     data::{Boss, Food, FoodProc, Utility},
     reminder::Reminder,
-    tracking::{entry::BuffState, Encounter, Tracker},
-    win,
+    tracking::{buff::BuffState, Encounter, Tracker},
+    util,
 };
 use arc_util::{
     api::{BuffRemove, StateChange},
@@ -516,11 +516,16 @@ impl Plugin {
             let name = self
                 .tracker
                 .hotkey()
-                .map(|keycode| win::keycode_to_name(keycode as u32))
+                .map(|keycode| util::keycode_to_name(keycode as u32))
                 .flatten()
                 .unwrap_or_default();
             ui.text(name);
         });
+
+        ui.checkbox(
+            im_str!("Save own characters between game sessions"),
+            &mut self.tracker.save_chars,
+        );
 
         ui.checkbox(
             im_str!("Remind on encounter start"),

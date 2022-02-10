@@ -280,7 +280,7 @@ impl HasSettings for Demo {
     const SETTINGS_ID: &'static str = "demo";
 
     fn current_settings(&self) -> Self::Settings {
-        DemoSettings {
+        Self::Settings {
             players: self.tracker.all_players().cloned().collect(),
             tracker: self.tracker.is_visible(),
         }

@@ -482,10 +482,23 @@ impl Plugin {
 
     /// Callback for option UI creation.
     pub fn render_options(&mut self, ui: &Ui) {
-        let mut align = LeftAlign::with_margin(10.0);
-        ui.align_text_to_frame_padding();
+        // tracker settings
+        ui.spacing();
+        ui.text_disabled(im_str!("Tracker"));
 
-        align.item(ui, || ui.text(im_str!("Tracker Hotkey")));
+        // tracker save chars
+        ui.checkbox(
+            im_str!("Save own characters between game sessions"),
+            &mut self.tracker.save_chars,
+        );
+
+        // tracker hotkey
+        let mut align = LeftAlign::with_margin(10.0);
+
+        align.item(ui, || {
+            ui.align_text_to_frame_padding();
+            ui.text(im_str!("Tracker Hotkey"))
+        });
 
         align.item(ui, || {
             let mut key_buffer = ImString::with_capacity(3);
@@ -522,10 +535,9 @@ impl Plugin {
             ui.text(name);
         });
 
-        ui.checkbox(
-            im_str!("Save own characters between game sessions"),
-            &mut self.tracker.save_chars,
-        );
+        // reminder settings
+        ui.spacing();
+        ui.text_disabled(im_str!("Reminder"));
 
         ui.checkbox(
             im_str!("Remind on encounter start"),
@@ -548,6 +560,7 @@ impl Plugin {
             &mut self.reminder.settings.always_mal_dim,
         );
 
+        // reminder duration
         let mut duration_buffer = ImString::with_capacity(5);
         duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
 
@@ -562,6 +575,11 @@ impl Plugin {
             }
         }
 
+        ui.spacing();
+        ui.separator();
+        ui.spacing();
+
+        // reset button
         if ui.button(im_str!("Reset to default"), [0.0, 0.0]) {
             self.tracker.reset_settings();
             self.reminder.reset_settings();

@@ -6,22 +6,6 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
 
-## Development progress
-- [x] Food reminder
-  - [x] Display onscreen
-  - [ ] Notification sound
-- [x] Food tracking
-  - [x] Food/Utility tracker table
-  - [x] Classification of Food/Utility
-  - [x] Tooltips with Food/Utility details
-  - [x] Context menu to copy names/ids
-  - [x] Table sorting
-- [x] Settings
-  - [x] Save window states
-  - [x] Custom hotkeys
-  - [x] Reminder customization
-  - [ ] Custom Food/Utility definitions
-
 ## Buff database
 Known Food & Utility buffs are currently collected in [data/buffs](./data/buffs).
 

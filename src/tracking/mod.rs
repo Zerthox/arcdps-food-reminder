@@ -232,7 +232,13 @@ impl Tracker {
     }
 
     /// Renders a player entry in a table.
-    fn render_table_entry(ui: &Ui, entry: &Entry, colors: &exports::Colors, sub: bool) {
+    fn render_table_entry(
+        ui: &Ui,
+        entry_id: usize,
+        entry: &Entry,
+        colors: &exports::Colors,
+        sub: bool,
+    ) {
         let player = &entry.player;
         let red = colors
             .core(CoreColor::LightRed)
@@ -290,7 +296,7 @@ impl Tracker {
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Unknown Food");
                 }
-                Self::render_food_context_menu(ui, player.id, id, None);
+                Self::render_food_context_menu(ui, entry_id, id, None);
             }
             BuffState::Known(food) => {
                 let color = match food {
@@ -301,7 +307,7 @@ impl Tracker {
                 if ui.is_item_hovered() {
                     ui.tooltip_text(format!("{}\n{}", food.name(), food.stats().join("\n")));
                 }
-                Self::render_food_context_menu(ui, player.id, food.into(), Some(food.name()));
+                Self::render_food_context_menu(ui, entry_id, food.into(), Some(food.name()));
             }
         }
 
@@ -325,7 +331,7 @@ impl Tracker {
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Unknown Utility");
                 }
-                Self::render_util_context_menu(ui, player.id, id, None);
+                Self::render_util_context_menu(ui, entry_id, id, None);
             }
             BuffState::Known(util) => {
                 let color = match util {
@@ -336,7 +342,7 @@ impl Tracker {
                 if ui.is_item_hovered() {
                     ui.tooltip_text(format!("{}\n{}", util.name(), util.stats().join("\n")));
                 }
-                Self::render_util_context_menu(ui, player.id, util.into(), Some(util.name()));
+                Self::render_util_context_menu(ui, entry_id, util.into(), Some(util.name()));
             }
         }
     }
@@ -402,7 +408,7 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             for entry in &self.players {
-                Self::render_table_entry(ui, entry, &colors, true);
+                Self::render_table_entry(ui, entry.player.id, entry, &colors, true);
             }
 
             ui.end_table();
@@ -428,10 +434,10 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             if let Some(entry) = current {
-                Self::render_table_entry(ui, entry, &colors, false);
+                Self::render_table_entry(ui, usize::MAX, entry, &colors, false);
             }
-            for entry in &self.chars_cache {
-                Self::render_table_entry(ui, entry, &colors, false);
+            for (i, entry) in self.chars_cache.iter().enumerate() {
+                Self::render_table_entry(ui, i, entry, &colors, false);
             }
 
             ui.end_table();

@@ -1,0 +1,473 @@
+{
+  "food": [
+    {
+      "id": 57244,
+      "name": "Cilantro Lime Sous-Vide Steak",
+      "stats": ["66% Life Steal Chance", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 57051,
+      "name": "Peppercorn-Crusted Sous-Vide Steak",
+      "stats": ["-10% Incoming Damage", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 57393,
+      "name": "Mushroom Clove Sous-Vide Steak",
+      "stats": ["-20% Incoming Condition Duration", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 57241,
+      "name": "Soy-Sesame Sous-Vide Steak",
+      "stats": ["Health every second", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 57342,
+      "name": "Sous-Vide Steak with Mint-Parsley Sauce",
+      "stats": ["+10% Outgoing Healing", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 17825,
+      "name": "Bowl of Sweet and Spicy Butternut Squash Soup",
+      "stats": ["+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 57883,
+      "name": "Plate of Spicy Moa Wings",
+      "stats": ["+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+
+    {
+      "id": 57260,
+      "name": "Plate of Peppercorn-Spiced Coq Au Vin",
+      "stats": ["-10% Incoming Damage", "+100 Precision", "+70 Power"],
+      "display": "PREC"
+    },
+    {
+      "id": 57290,
+      "name": "Plate of Sesame-Crusted Coq Au Vin",
+      "stats": ["Health every second", "+100 Precision", "+70 Power"],
+      "display": "PREC"
+    },
+    {
+      "id": 57362,
+      "name": "Plate of Coq Au Vin with Mint Garnish",
+      "stats": ["+10% Outgoing Healing", "+100 Precision", "+70 Power"],
+      "display": "PREC"
+    },
+    {
+      "id": 9829,
+      "name": "Bowl of Curry Butternut Squash Soup",
+      "stats": ["+100 Precision", "+70 Power"],
+      "display": "PREC"
+    },
+    {
+      "id": 9769,
+      "name": "Plate of Truffle Steak",
+      "stats": ["+100 Power", "+70 Precision"],
+      "display": "PREC"
+    },
+
+    {
+      "id": 57409,
+      "name": "Cilantro and Cured Meat Flatbread",
+      "stats": ["66% Life Steal Chance", "+100 Condition Damage", "+ 70 Expertise"],
+      "display": "CND"
+    },
+    {
+      "id": 57127,
+      "name": "Peppered Cured Meat Flatbread",
+      "stats": ["-10% Incoming Damage", "+100 Condition Damage", "+ 70 Expertise"],
+      "display": "CND"
+    },
+    {
+      "id": 57072,
+      "name": "Clove-Spiced Pear and Cured Meat Flatbread",
+      "stats": ["-20% Incoming Condition Duration", "+100 Condition Damage", "+70 Expertise"],
+      "display": "CND"
+    },
+    {
+      "id": 57222,
+      "name": "Sesame-Asparagus and Cured Meat Flatbread",
+      "stats": ["Health every second", "+100 Condition Damage", "+70 Expertise"],
+      "display": "CND"
+    },
+    {
+      "id": 49686,
+      "name": "Plate of Beef Rendang",
+      "stats": ["+100 Condition Damage", "+70 Expertise"],
+      "display": "CND"
+    },
+
+    {
+      "id": 57269,
+      "name": "Salsa-Topped Veggie Flatbread",
+      "stats": ["66% Life Steal Chance", "+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 57382,
+      "name": "Peppercorn and Veggie Flatbread",
+      "stats": ["-10% Incoming Damage", "+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 57050,
+      "name": "Sesame Veggie Flatbread",
+      "stats": ["Health every second", "+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 57263,
+      "name": "Mint and Veggie Flatbread",
+      "stats": ["+10% Outgoing Healing", "+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 46273,
+      "name": "Red Lentil Saobosa",
+      "stats": ["+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 10009,
+      "name": "Rare Veggie Pizza",
+      "stats": ["+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 10119,
+      "name": "Bowl of Fire Meat Chili",
+      "stats": ["+15% Burning Duration", "+70 Precision"],
+      "display": "EXP"
+    },
+
+    {
+      "id": 57114,
+      "name": "Plate of Peppercorn-Spiced Beef Carpaccio",
+      "stats": ["-10% Incoming Damage", "+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+    {
+      "id": 57231,
+      "name": "Plate of Sesame-Ginger Beef Carpaccio",
+      "stats": ["Health every second", "+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+    {
+      "id": 53222,
+      "name": "Soul Pastry",
+      "stats": ["+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+
+    {
+      "id": 57117,
+      "name": "Salsa Eggs Benedict",
+      "stats": ["66% Life Steal Chance", "+100 Concentration", "+70 Expertise"],
+      "display": "CCON"
+    },
+    {
+      "id": 57084,
+      "name": "Sesame Eggs Benedict",
+      "stats": ["Health every second", "+100 Concentration", "+70 Expertise"],
+      "display": "CCON"
+    },
+    {
+      "id": 57187,
+      "name": "Plage of Eggs Benedict",
+      "stats": ["+100 Concentration", "+70 Expertise"],
+      "display": "CCON"
+    },
+
+    {
+      "id": 57276,
+      "name": "Bowl of Spiced Fruit Salad",
+      "stats": ["-10% Incoming Damage", "+100 Healing Power", "+70 Concentration"],
+      "display": "HEAL"
+    },
+    {
+      "id": 57100,
+      "name": "Bowl of Fruit Salad with Mint Garnish",
+      "stats": ["+10% Outgoing Healing", "+100 Healing Power", "+70 Concentration"],
+      "display": "HEAL"
+    },
+    {
+      "id": 26529,
+      "name": "Delicious Rice Ball",
+      "stats": ["+10% Outgoing Healing", "+100 Healing Power"],
+      "display": "HEAL"
+    },
+
+    {
+      "id": 9750,
+      "name": "Dragon's Breath Bun",
+      "stats": ["+200 Power on Kill", "+70 Ferocity"],
+      "display": "KILL",
+      "proc": 10110
+    },
+    {
+      "id": 9756,
+      "name": "Saffron Stuffed Mushroom",
+      "stats": ["+200 Condition Damage on Kill", "+70 Precision"],
+      "display": "KILL",
+      "proc": 10104
+    },
+
+    {
+      "id": 57165,
+      "name": "Spherified Peppercorn-Spiced Oyster Soup",
+      "stats": ["-10% Incoming Damage", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
+      "id": 57374,
+      "name": "Spherified Clove-Spiced Oyster Soup",
+      "stats": ["-20% Incoming Condition Duration", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
+      "id": 57037,
+      "name": "Spherified Sesame Oyster Soup",
+      "stats": ["Health every second", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
+      "id": 57201,
+      "name": "Spherified Oyster Soup with Mint Garnish",
+      "stats": ["+10% Outgoing Healing", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
+      "id": 19451,
+      "name": "Dragon's Revelry Starcake",
+      "stats": ["+45 All Attributes"],
+      "display": "ALL"
+    }
+  ],
+
+  "utility": [
+    {
+      "id": 9963,
+      "name": "Superior Sharpening Stone",
+      "stats": ["3% Power from Precision", "6% Power from Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 34211,
+      "name": "Tin of Fruitcake",
+      "stats": ["3% Power from Precision", "6% Power from Ferocity"],
+      "display": "PWR"
+    },
+    {
+      "id": 25882,
+      "name": "Furious Sharpening Stone",
+      "stats": ["3% Power from Precision", "3% Ferocity from Precision"],
+      "display": "PWR"
+    },
+
+    {
+      "id": 21828,
+      "name": "Toxic Focusing Crystal",
+      "stats": ["3% Condition Damage from Power", "3% Condition Damage from Precision"],
+      "display": "CND"
+    },
+    {
+      "id": 9967,
+      "name": "Master Tuning Crystal",
+      "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
+      "display": "EXP"
+    },
+    {
+      "id": 34206,
+      "name": "Tuning Icicle",
+      "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
+      "display": "EXP"
+    },
+
+    {
+      "id": 53374,
+      "name": "Potent Lucent Oil",
+      "stats": ["3% Concentration from Power", "3% Concentration from Precision"],
+      "display": "PCON"
+    },
+    {
+      "id": 53304,
+      "name": "Enhanced Lucent Oil",
+      "stats": ["6% Concentration from Condition Damage", "3% Concentration from Precision"],
+      "display": "PCON"
+    },
+    {
+      "id": 21827,
+      "name": "Toxic Maintenance Oil",
+      "stats": ["3% Concentration from Power", "6% Concentration from Condition Damage"],
+      "display": "CCON"
+    },
+    {
+      "id": 34187,
+      "name": "Peppermint Oil",
+      "stats": ["3% Concentration from Precision", "6% Concentration from Healing Power"],
+      "display": "HCON"
+    },
+    {
+      "id": 38605,
+      "name": "Magnanimous Maintenance Oil",
+      "stats": ["3% Concentration from Vitality", "3% Concentration from Toughness"],
+      "display": "TCON"
+    },
+
+    {
+      "id": 25879,
+      "name": "Bountiful Maintenance Oil",
+      "stats": ["0.6% Outgoing Healing for 100 Healing Power", "0.8% Outgoing Healing for 100 Concentration"],
+      "display": "HEAL"
+    },
+
+    {
+      "id": 33297,
+      "name": "Writ of Masterful Strength",
+      "stats": ["+200 Power above 90% Health"],
+      "display": "WRIT"
+    },
+    {
+      "id": 31970,
+      "name": "Writ of Masterful Accuracy",
+      "stats": ["+200 Precision above 90% Health"],
+      "display": "WRIT"
+    },
+    {
+      "id": 33836,
+      "name": "Writ of Masterful Malice",
+      "stats": ["+200 Condition Damage above 90% Health"],
+      "display": "WRIT"
+    },
+
+    {
+      "id": 9837,
+      "name": "Powerful Potion of Undead Slaying",
+      "stats": ["+10% Damage against Undead", "-10% Damage from Undead"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9845,
+      "name": "Powerful Potion of Centaur Slaying",
+      "stats": ["+10% Damage against Centaur", "-10% Damage from Centaur"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9853,
+      "name": "Powerful Potion of Grawl Slaying",
+      "stats": ["+10% Damage against Grawl", "-10% Damage from Grawl"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9861,
+      "name": "Powerful Potion of Ice Brood Slaying",
+      "stats": ["+10% Damage against Ice Brood", "-10% Damage from Ice Brood"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9869,
+      "name": "Powerful Potion of Destroyer Slaying",
+      "stats": ["+10% Damage against Destroyers", "-10% Damage from Destroyers"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9877,
+      "name": "Powerful Potion of Ogre Slaying",
+      "stats": ["+10% Damage against Ogres", "-10% Damage from Ogres"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9885,
+      "name": "Powerful Potion of Krait Slaying",
+      "stats": ["+10% Damage against Krait", "-10% Damage from Krait"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9893,
+      "name": "Powerful Potion of Elemental Slaying",
+      "stats": ["+10% Damage against Elementals", "-10% Damage from Elementals"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9901,
+      "name": "Powerful Potion of Demon Slaying",
+      "stats": ["+10% Damage against Demons", "-10% Damage from Demons"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9909,
+      "name": "Powerful Potion of Sons of Svanir Slaying",
+      "stats": ["+10% Damage against Sons of Svanir", "-10% Damage from Sons of Svanir"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9917,
+      "name": "Powerful Potion of Inquest Slaying",
+      "stats": ["+10% Damage against Inquest", "-10% Damage from Inquest"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9925,
+      "name": "Powerful Potion of Flame Legion Slaying",
+      "stats": ["+10% Damage against Flame Legion", "-10% Damage from Flame Legion"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9933,
+      "name": "Powerful Potion of Outlaw Slaying",
+      "stats": ["+10% Damage against Outlaws", "-10% Damage from Outlaws"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9941,
+      "name": "Powerful Potion of Nightmare Court Slaying",
+      "stats": ["+10% Damage against Nightmare Court", "-10% Damage from Nightmare Court"],
+      "display": "SLAY"
+    },
+    {
+      "id": 9949,
+      "name": "Powerful Potion of Dredge Slaying",
+      "stats": ["+10% Damage against Dredge", "-10% Damage from Dredge"],
+      "display": "SLAY"
+    },
+    {
+      "id": 15279,
+      "name": "Powerful Potion of Halloween Slaying",
+      "stats": ["+10% Damage against Halloween Creatures", "-10% Damage from Halloween Creatures"],
+      "display": "SLAY"
+    },
+    {
+      "id": 23228,
+      "name": "Powerful Potion of Slaying Scarlet's Armies",
+      "stats": ["+10% Damage against Scarlet's Armies", "-10% Damage from Scarlet's Armies"],
+      "display": "SLAY"
+    },
+
+    {
+      "id": 25632,
+      "name": "Flask of Pumpkin Oil",
+      "stats": ["+100 Power, Toughness & Vitality after reviving"],
+      "display": "RES"
+    },
+    {
+      "id": 25631,
+      "name": "Lump of Crystallized Nougat",
+      "stats": ["+100 Condition Damage, Precision & Toughness after reviving"],
+      "display": "RES"
+    },
+    {
+      "id": 25630,
+      "name": "Sharpening Skull",
+      "stats": ["+75 All Attributes after reviving"],
+      "display": "RES"
+    }
+  ]
+}

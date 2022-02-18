@@ -1,4 +1,4 @@
-use super::buff::{Buff, BuffState, Food, Utility};
+use super::buff::{Buff, BuffState};
 use serde::{Deserialize, Serialize};
 use std::cmp;
 
@@ -13,24 +13,20 @@ pub struct Entry {
     pub player: Player,
 
     /// Current food buff applied to the player.
-    pub food: Buff<Food>,
+    pub food: Buff,
 
     /// Current utility buff applied to the player.
-    pub util: Buff<Utility>,
+    pub util: Buff,
 }
 
 impl Entry {
     /// Creates a new entry.
     pub const fn new(player: Player) -> Self {
-        Self::with_states(player, BuffState::Unset, BuffState::Unset)
+        Self::with_states(player, BuffState::Unknown, BuffState::Unknown)
     }
 
     /// Creates a new entry with initial buff states.
-    pub const fn with_states(
-        player: Player,
-        food: BuffState<Food>,
-        util: BuffState<Utility>,
-    ) -> Self {
+    pub const fn with_states(player: Player, food: BuffState, util: BuffState) -> Self {
         Self {
             player,
             food: Buff::new(food, 0, 0),
@@ -40,10 +36,10 @@ impl Entry {
 
     /// Sets all unset buffs to none.
     pub fn unset_to_none(&mut self, time: u64, event_id: u64) {
-        if self.food.state == BuffState::Unset {
+        if self.food.state == BuffState::Unknown {
             self.food.update(BuffState::None, time, event_id);
         }
-        if self.util.state == BuffState::Unset {
+        if self.util.state == BuffState::Unknown {
             self.util.update(BuffState::None, time, event_id);
         }
     }
@@ -51,15 +47,8 @@ impl Entry {
     /// Applies a food buff to the player.
     ///
     /// Returns `true` if this update changed the buff state.
-    pub fn apply_food(&mut self, food: Food, time: u64, event_id: u64) -> bool {
-        self.food.update(BuffState::Known(food), time, event_id)
-    }
-
-    /// Applies a unknown food buff to the player.
-    ///
-    /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_food(&mut self, id: u32, time: u64, event_id: u64) -> bool {
-        self.food.update(BuffState::Unknown(id), time, event_id)
+    pub fn apply_food(&mut self, food: u32, time: u64, event_id: u64) -> bool {
+        self.food.update(BuffState::Some(food), time, event_id)
     }
 
     /// Removes the current food buff from the player.
@@ -69,11 +58,10 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_food(&mut self, food: Option<Food>, time: u64, event_id: u64) -> bool {
-        let changed = match (food, self.food.state) {
-            (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
-            (Some(removed), BuffState::Known(applied)) => removed == applied,
-            _ => false,
+    pub fn remove_food(&mut self, food: u32, time: u64, event_id: u64) -> bool {
+        let changed = match self.food.state {
+            BuffState::Some(applied) => food == applied,
+            _ => true,
         };
         if changed {
             self.food.update(BuffState::None, time, event_id)
@@ -85,15 +73,8 @@ impl Entry {
     /// Applies an utility buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_util(&mut self, util: Utility, time: u64, event_id: u64) -> bool {
-        self.util.update(BuffState::Known(util), time, event_id)
-    }
-
-    /// Applies an unknown utility buff to the player.
-    ///
-    /// Returns `false` if this update was ignored.
-    pub fn apply_unknown_util(&mut self, id: u32, time: u64, event_id: u64) -> bool {
-        self.util.update(BuffState::Unknown(id), time, event_id)
+    pub fn apply_util(&mut self, util: u32, time: u64, event_id: u64) -> bool {
+        self.util.update(BuffState::Some(util), time, event_id)
     }
 
     /// Removes the current utility buff from the player.
@@ -103,11 +84,10 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_util(&mut self, util: Option<Utility>, time: u64, event_id: u64) -> bool {
-        let changed = match (util, self.util.state) {
-            (_, BuffState::Unset) | (None, BuffState::Unknown(_)) => true,
-            (Some(removed), BuffState::Known(applied)) => removed == applied,
-            _ => false,
+    pub fn remove_util(&mut self, util: u32, time: u64, event_id: u64) -> bool {
+        let changed = match self.util.state {
+            BuffState::Some(applied) => util == applied,
+            _ => true,
         };
         if changed {
             self.util.update(BuffState::None, time, event_id)

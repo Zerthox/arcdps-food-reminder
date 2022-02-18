@@ -1,5 +1,5 @@
 use super::{
-    buff::{BuffState, Food, Utility},
+    buff::BuffState,
     entry::{Entry, Player},
     Tracker,
 };
@@ -10,12 +10,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SettingsEntry {
     player: Player,
-    food: BuffState<Food>,
-    util: BuffState<Utility>,
+    food: BuffState,
+    util: BuffState,
 }
 
 impl SettingsEntry {
-    pub const fn new(player: Player, food: BuffState<Food>, util: BuffState<Utility>) -> Self {
+    pub const fn new(player: Player, food: BuffState, util: BuffState) -> Self {
         Self { player, food, util }
     }
 }

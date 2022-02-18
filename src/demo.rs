@@ -1,9 +1,10 @@
 //! Dummy windows for demo.
 
 use crate::{
+    defs::{BuffDef, Definitions},
     reminder::Reminder,
     tracking::{
-        buff::{BuffState, Food, Utility},
+        buff::BuffState,
         entry::{Entry, Profession, Specialization},
         Tracker,
     },
@@ -16,60 +17,65 @@ use arc_util::{
 use arcdps::imgui::{im_str, ComboBox, ImStr, ImString, Ui};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
-use strum::IntoEnumIterator;
 
 /// Features demo.
 #[derive(Debug)]
 pub struct Demo {
+    defs: Definitions,
     reminder: Reminder,
-    all_foods: Vec<BuffState<Food>>,
-    all_utils: Vec<BuffState<Utility>>,
+    all_foods: Vec<BuffState>,
+    all_utils: Vec<BuffState>,
     tracker: Window<Tracker>,
 }
 
 impl Demo {
     /// Creates a new demo.
-    pub fn new() -> Self {
+    pub fn new(defs: Definitions) -> Self {
         Self {
+            defs: defs.clone(),
             reminder: Reminder::new(),
-            all_foods: [BuffState::Unset, BuffState::None, BuffState::Unknown(0)]
+            all_foods: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
                 .iter()
                 .copied()
-                .chain(Food::iter().map(BuffState::Known))
+                .chain(defs.all_food().iter().map(|food| BuffState::Some(food.id)))
                 .collect(),
-            all_utils: [BuffState::Unset, BuffState::None, BuffState::Unknown(0)]
+            all_utils: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
                 .iter()
                 .copied()
-                .chain(Utility::iter().map(BuffState::Known))
+                .chain(defs.all_util().iter().map(|util| BuffState::Some(util.id)))
                 .collect(),
-            tracker: Tracker::default().windowed(),
+            tracker: Tracker::new(defs).windowed(),
         }
     }
 
     /// Returns the display name for a given food buff.
-    fn food_name(buff: BuffState<Food>) -> Cow<'static, ImStr> {
+    fn food_name(defs: &Definitions, buff: BuffState) -> Cow<'static, ImStr> {
         match buff {
-            BuffState::Unset => im_str!("Unset").into(),
+            BuffState::Unknown => im_str!("Unset").into(),
             BuffState::None => im_str!("None").into(),
-            BuffState::Unknown(_) => im_str!("Unknown").into(),
-            BuffState::Known(food) => im_str!("{}", food.name()).into(),
+            BuffState::Some(buff) => {
+                if let Some(BuffDef::Food(food)) = defs.get(buff) {
+                    im_str!("{}", food.name).into()
+                } else {
+                    im_str!("Unknown").into()
+                }
+            }
         }
     }
 
     /// Returns the display name for a given utility buff.
-    fn util_name(buff: BuffState<Utility>) -> Cow<'static, ImStr> {
+    fn util_name(defs: &Definitions, buff: BuffState) -> Cow<'static, ImStr> {
         match buff {
-            BuffState::Unset => im_str!("Unset").into(),
+            BuffState::Unknown => im_str!("Unset").into(),
             BuffState::None => im_str!("None").into(),
-            BuffState::Unknown(_) => im_str!("Unknown").into(),
-            BuffState::Known(util) => im_str!("{}", util.name()).into(),
+            BuffState::Some(buff) => {
+                if let Some(BuffDef::Util(util)) = defs.get(buff) {
+                    im_str!("{}", util.name).into()
+                } else {
+                    im_str!("Unknown").into()
+                }
+            }
         }
-    }
-}
-
-impl Default for Demo {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -195,7 +201,7 @@ impl Component for Demo {
                     ui,
                     &mut food_id,
                     &self.all_foods,
-                    &|buff| Self::food_name(*buff),
+                    &|buff| Self::food_name(&self.defs, *buff),
                 ) {
                     entry.food.state = self.all_foods[food_id];
                 }
@@ -212,7 +218,7 @@ impl Component for Demo {
                     ui,
                     &mut util_id,
                     &self.all_utils,
-                    &|buff| Self::util_name(*buff),
+                    &|buff| Self::util_name(&self.defs, *buff),
                 ) {
                     entry.util.state = self.all_utils[util_id];
                 }

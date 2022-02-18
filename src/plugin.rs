@@ -1,7 +1,8 @@
 use crate::{
-    data::{Boss, Food, FoodProc, Utility},
+    data::{BOSSES, DIMINISHED, MALNOURISHED},
+    defs::{BuffDef, Definitions},
     reminder::Reminder,
-    tracking::{buff::BuffState, Encounter, Tracker},
+    tracking::{buff::BuffState, Tracker},
     util,
 };
 use arc_util::{
@@ -15,7 +16,7 @@ use arcdps::{
     imgui::{im_str, ImString, Ui},
     Agent, CombatEvent,
 };
-use std::{convert::TryFrom, time::Duration};
+use std::time::Duration;
 
 #[cfg(feature = "demo")]
 use crate::demo::Demo;
@@ -29,9 +30,15 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 /// Settings file name.
 const SETTINGS_FILE: &str = "arcdps_food_reminder.json";
 
+/// Definitions file name.
+const DEFINITIONS_FILE: &str = "arcdps_food_reminder_definitions.json";
+
 /// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
+    /// Definitions.
+    defs: Definitions,
+
     /// Food reminder.
     reminder: Reminder,
 
@@ -50,12 +57,14 @@ pub struct Plugin {
 impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
+        let defs = Definitions::new();
         Self {
+            defs: defs.clone(),
             reminder: Reminder::new(),
-            tracker: Tracker::new().windowed(),
+            tracker: Tracker::new(defs.clone()).windowed(),
 
             #[cfg(feature = "demo")]
-            demo: Demo::new().windowed(),
+            demo: Demo::new(defs).windowed(),
 
             #[cfg(feature = "log")]
             debug: Log::new().windowed_with_name("Food Reminder Debug Log"),
@@ -79,6 +88,9 @@ impl Plugin {
 
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
+
+        // load definitions
+        self.defs.load(DEFINITIONS_FILE);
     }
 
     /// Unloads the plugin.
@@ -147,23 +159,15 @@ impl Plugin {
                             entry.unset_to_none(event.time, event_id);
                         }
 
-                        // grab target id
+                        // start encounter
                         let target_id = event.src_agent;
-
-                        // check for known boss
-                        let boss = Boss::try_from(target_id).ok();
-                        self.tracker.start_encounter(boss);
+                        self.tracker.start_encounter(target_id);
 
                         #[cfg(feature = "log")]
-                        if let Some(boss) = boss {
-                            self.debug
-                                .log(format!("Log for {} started with {:?} delta", boss, delta));
-                        } else {
-                            self.debug.log(format!(
-                                "Log for id {} started with {:?} delta",
-                                target_id, delta
-                            ));
-                        }
+                        self.debug.log(format!(
+                            "Log for id {} started with {:?} delta",
+                            target_id, delta
+                        ));
 
                         // check self buffs
                         // FIXME: need to wait for reports on initial buffs
@@ -178,15 +182,8 @@ impl Plugin {
 
                         #[cfg(feature = "log")]
                         {
-                            // grab target id
                             let target_id = event.src_agent;
-
-                            // check for known boss
-                            if let Ok(boss) = Boss::try_from(target_id) {
-                                self.debug.log(format!("Log for {} ended", boss));
-                            } else {
-                                self.debug.log(format!("Log for id {} ended", target_id));
-                            }
+                            self.debug.log(format!("Log for id {} ended", target_id));
                         }
 
                         // check self buffs
@@ -214,60 +211,68 @@ impl Plugin {
                                         let buff_id = event.skill_id;
 
                                         // check type of buff
-                                        if let Ok(proc) = FoodProc::try_from(buff_id) {
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Food proc {} applied to {:?}",
-                                                proc, entry
-                                            ));
-                                        } else if let Ok(food) = Food::try_from(buff_id) {
-                                            if entry.apply_food(food, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Food {} applied on {:?} to {:?}",
-                                                    food, statechange, entry
-                                                ));
+                                        if let Some(buff_type) = self.defs.get(buff_id) {
+                                            match buff_type {
+                                                BuffDef::Food(food) => {
+                                                    if entry
+                                                        .apply_food(food.id, event.time, event_id)
+                                                    {
+                                                        #[cfg(feature = "log")]
+                                                        self.debug.log(format!(
+                                                            "Food {:?} applied on {:?} to {:?}",
+                                                            food, statechange, entry
+                                                        ));
 
-                                                // trigger reminder on malnourished
-                                                if self.reminder.settings.always_mal_dim
-                                                    && entry.player.is_self
-                                                    && food == Food::Malnourished
-                                                {
-                                                    self.reminder.trigger_food();
+                                                        // trigger reminder on malnourished
+                                                        if self.reminder.settings.always_mal_dim
+                                                            && entry.player.is_self
+                                                            && food.id == MALNOURISHED
+                                                        {
+                                                            self.reminder.trigger_food();
 
-                                                    #[cfg(feature = "log")]
-                                                    self.debug.log(format!(
-                                                        "Food Malnourished reminder triggered on {:?}",
-                                                        statechange
-                                                    ));
+                                                            #[cfg(feature = "log")]
+                                                            self.debug.log(format!(
+                                                                "Food Malnourished reminder triggered on {:?}",
+                                                                statechange
+                                                            ));
+                                                        }
+                                                    }
                                                 }
-                                            }
-                                        } else if let Ok(util) = Utility::try_from(buff_id) {
-                                            if entry.apply_util(util, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Utility {} applied on {:?} to {:?}",
-                                                    util, statechange, entry
-                                                ));
+                                                BuffDef::Util(util) => {
+                                                    if entry
+                                                        .apply_util(util.id, event.time, event_id)
+                                                    {
+                                                        #[cfg(feature = "log")]
+                                                        self.debug.log(format!(
+                                                            "Utility {:?} applied on {:?} to {:?}",
+                                                            util, statechange, entry
+                                                        ));
 
-                                                // trigger reminder on diminished
-                                                if self.reminder.settings.always_mal_dim
-                                                    && entry.player.is_self
-                                                    && util == Utility::Diminished
-                                                {
-                                                    self.reminder.trigger_util();
+                                                        // trigger reminder on diminished
+                                                        if self.reminder.settings.always_mal_dim
+                                                            && entry.player.is_self
+                                                            && util.id == DIMINISHED
+                                                        {
+                                                            self.reminder.trigger_util();
 
+                                                            #[cfg(feature = "log")]
+                                                            self.debug.log(format!(
+                                                                "Utility Diminished reminder triggered on {:?}",
+                                                                statechange,
+                                                            ));
+                                                        }
+                                                    }
+                                                }
+                                                BuffDef::Proc => {
                                                     #[cfg(feature = "log")]
                                                     self.debug.log(format!(
-                                                        "Utility Diminished reminder triggered on {:?}",
-                                                        statechange,
+                                                        "Food proc {} applied to {:?}",
+                                                        buff_id, entry
                                                     ));
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
-                                            if entry
-                                                .apply_unknown_food(buff_id, event.time, event_id)
-                                            {
+                                            if entry.apply_food(buff_id, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Food with id {} applied on {:?} to {:?}",
@@ -275,9 +280,7 @@ impl Plugin {
                                                 ));
                                             }
                                         } else if let Some("Enhancement") = skill_name {
-                                            if entry
-                                                .apply_unknown_util(buff_id, event.time, event_id)
-                                            {
+                                            if entry.apply_util(buff_id, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Unknown Utility with id {} applied on {:?} to {:?}",
@@ -296,44 +299,50 @@ impl Plugin {
                                 let buff_id = event.skill_id;
 
                                 // check type of buff
-                                if let Ok(proc) = FoodProc::try_from(buff_id) {
-                                    #[cfg(feature = "log")]
-                                    self.debug.log(format!(
-                                        "Food proc {} removed from {:?}",
-                                        proc, entry
-                                    ));
-                                } else if let Ok(food) = Food::try_from(buff_id) {
-                                    if entry.remove_food(Some(food), event.time, event_id) {
-                                        #[cfg(feature = "log")]
-                                        self.debug.log(format!(
-                                            "Food {:?} removed on {:?} from {:?}",
-                                            food, statechange, entry
-                                        ));
+                                if let Some(buff_type) = self.defs.get(buff_id) {
+                                    match buff_type {
+                                        BuffDef::Food(food) => {
+                                            if entry.remove_food(food.id, event.time, event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Food {:?} removed on {:?} from {:?}",
+                                                    food, statechange, entry
+                                                ));
 
-                                        // check for food running out
-                                        if self.reminder.settings.during_encounter
-                                            && entry.player.is_self
-                                        {
-                                            self.check_self_food();
+                                                // check for food running out
+                                                if self.reminder.settings.during_encounter
+                                                    && entry.player.is_self
+                                                {
+                                                    self.check_self_food();
+                                                }
+                                            }
                                         }
-                                    }
-                                } else if let Ok(util) = Utility::try_from(buff_id) {
-                                    if entry.remove_util(Some(util), event.time, event_id) {
-                                        #[cfg(feature = "log")]
-                                        self.debug.log(format!(
-                                            "Utility {:?} removed on {:?} from {:?}",
-                                            util, statechange, entry
-                                        ));
+                                        BuffDef::Util(util) => {
+                                            if entry.remove_util(util.id, event.time, event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Utility {:?} removed on {:?} from {:?}",
+                                                    util, statechange, entry
+                                                ));
 
-                                        // check for utility running out
-                                        if self.reminder.settings.during_encounter
-                                            && entry.player.is_self
-                                        {
-                                            self.check_self_util();
+                                                // check for utility running out
+                                                if self.reminder.settings.during_encounter
+                                                    && entry.player.is_self
+                                                {
+                                                    self.check_self_util();
+                                                }
+                                            }
+                                        }
+                                        BuffDef::Proc => {
+                                            #[cfg(feature = "log")]
+                                            self.debug.log(format!(
+                                                "Food proc {} removed from {:?}",
+                                                buff_id, entry
+                                            ));
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
-                                    if entry.remove_food(None, event.time, event_id) {
+                                    if entry.remove_food(buff_id, event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Food with id {} removed on {:?} from {:?}",
@@ -348,7 +357,7 @@ impl Plugin {
                                         }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
-                                    if entry.remove_util(None, event.time, event_id) {
+                                    if entry.remove_util(buff_id, event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Unknown Utility with id {} removed on {:?} from {:?}",
@@ -421,10 +430,9 @@ impl Plugin {
 
     /// Whether the local player can be reminded.
     fn can_remind(&self) -> bool {
-        if self.reminder.settings.only_bosses {
-            matches!(self.tracker.encounter(), Encounter::Boss(_))
-        } else {
-            self.tracker.in_encounter()
+        match self.tracker.encounter() {
+            Some(boss_id) => !self.reminder.settings.only_bosses || BOSSES.contains(&boss_id),
+            None => false,
         }
     }
 
@@ -434,7 +442,7 @@ impl Plugin {
             if self.can_remind()
                 && matches!(
                     entry.food.state,
-                    BuffState::None | BuffState::Known(Food::Malnourished)
+                    BuffState::None | BuffState::Some(MALNOURISHED)
                 )
             {
                 self.reminder.trigger_food();
@@ -451,7 +459,7 @@ impl Plugin {
             if self.can_remind()
                 && matches!(
                     entry.util.state,
-                    BuffState::None | BuffState::Known(Utility::Diminished)
+                    BuffState::None | BuffState::Some(DIMINISHED)
                 )
             {
                 self.reminder.trigger_util();

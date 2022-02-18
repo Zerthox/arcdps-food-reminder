@@ -2,14 +2,17 @@ pub mod buff;
 pub mod entry;
 pub mod settings;
 
-use crate::data::Boss;
+use crate::{
+    data::{DIMINISHED, MALNOURISHED},
+    defs::{BuffDef, Definitions},
+};
 use arc_util::{
     api::CoreColor,
     exports,
     ui::{components::item_context_menu, Component, WindowProps, Windowed},
 };
 use arcdps::imgui::{im_str, sys as ig, ImStr, TabBar, TabItem, TableColumnFlags, TableFlags, Ui};
-use buff::{BuffState, Food, Utility};
+use buff::BuffState;
 use entry::{Entry, Player};
 use std::{cmp::Reverse, slice};
 use windows::System::VirtualKey;
@@ -17,6 +20,9 @@ use windows::System::VirtualKey;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
+    /// Buff definitions.
+    defs: Definitions,
+
     /// Currently tracked players.
     players: Vec<Entry>,
 
@@ -33,23 +39,24 @@ pub struct Tracker {
     pub save_chars: bool,
 
     /// Current ongoing encounter.
-    encounter: Encounter,
+    encounter: Option<usize>,
 }
 
-#[allow(unused)]
+#[allow(dead_code)]
 impl Tracker {
     /// Default hotkey for tracker.
     pub const HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
-    pub const fn new() -> Self {
+    pub const fn new(defs: Definitions) -> Self {
         Self {
+            defs,
             players: Vec::new(),
             sorting: Sorting::Sub,
             reverse: false,
             chars_cache: Vec::new(),
             save_chars: true,
-            encounter: Encounter::None,
+            encounter: None,
         }
     }
 
@@ -139,24 +146,24 @@ impl Tracker {
         self.players.is_empty()
     }
 
-    /// Starts a boss encounter.
-    pub fn start_encounter(&mut self, boss: Option<Boss>) {
-        self.encounter = boss.map(Encounter::Boss).unwrap_or(Encounter::Unknown);
+    /// Starts an encounter.
+    pub fn start_encounter(&mut self, target_id: usize) {
+        self.encounter = Some(target_id);
     }
 
-    /// Ends the current boss encounter.
+    /// Ends the current encounter.
     pub fn end_encounter(&mut self) {
-        self.encounter = Encounter::None;
+        self.encounter = None;
     }
 
     /// Returns the encounter state.
-    pub fn encounter(&self) -> Encounter {
+    pub fn encounter(&self) -> Option<usize> {
         self.encounter
     }
 
     /// Returns `true` if there is an ongoing boss encounter.
     pub fn in_encounter(&self) -> bool {
-        self.encounter != Encounter::None
+        self.encounter.is_some()
     }
 
     /// Sorts the players in the tracker table.
@@ -197,7 +204,7 @@ impl Tracker {
                     ui.set_clipboard_text(&im_str!("{}", name));
                 }
                 if ui.small_button(im_str!("Open Wiki")) {
-                    open::that(format!(
+                    let _ = open::that(format!(
                         "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
                         name
                     ));
@@ -233,6 +240,7 @@ impl Tracker {
 
     /// Renders a player entry in a table.
     fn render_table_entry(
+        &self,
         ui: &Ui,
         entry_id: usize,
         entry: &Entry,
@@ -279,7 +287,7 @@ impl Tracker {
         // render food cell
         ui.table_next_column();
         match entry.food.state {
-            BuffState::Unset => {
+            BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Uncertain");
@@ -291,30 +299,31 @@ impl Tracker {
                     ui.tooltip_text("No Food");
                 }
             }
-            BuffState::Unknown(id) => {
-                ui.text_colored(yellow, "SOME");
-                if ui.is_item_hovered() {
-                    ui.tooltip_text("Unknown Food");
+            BuffState::Some(id) => {
+                if let Some(BuffDef::Food(food)) = self.defs.get(id) {
+                    let color = match food.id {
+                        MALNOURISHED => red,
+                        _ => green,
+                    };
+                    ui.text_colored(color, food.display);
+                    if ui.is_item_hovered() {
+                        ui.tooltip_text(format!("{}\n{}", food.name, food.stats.join("\n")));
+                    }
+                    Self::render_food_context_menu(ui, entry_id, food.id, Some(&food.name));
+                } else {
+                    ui.text_colored(yellow, "SOME");
+                    if ui.is_item_hovered() {
+                        ui.tooltip_text("Unknown Food");
+                    }
+                    Self::render_food_context_menu(ui, entry_id, id, None);
                 }
-                Self::render_food_context_menu(ui, entry_id, id, None);
-            }
-            BuffState::Known(food) => {
-                let color = match food {
-                    Food::Malnourished => red,
-                    _ => green,
-                };
-                ui.text_colored(color, food.category().unwrap_or("SOME"));
-                if ui.is_item_hovered() {
-                    ui.tooltip_text(format!("{}\n{}", food.name(), food.stats().join("\n")));
-                }
-                Self::render_food_context_menu(ui, entry_id, food.into(), Some(food.name()));
             }
         }
 
         // render util cell
         ui.table_next_column();
         match entry.util.state {
-            BuffState::Unset => {
+            BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Uncertain");
@@ -326,23 +335,24 @@ impl Tracker {
                     ui.tooltip_text("No Utility");
                 }
             }
-            BuffState::Unknown(id) => {
-                ui.text_colored(yellow, "SOME");
-                if ui.is_item_hovered() {
-                    ui.tooltip_text("Unknown Utility");
+            BuffState::Some(id) => {
+                if let Some(BuffDef::Util(util)) = self.defs.get(id) {
+                    let color = match util.id {
+                        DIMINISHED => red,
+                        _ => green,
+                    };
+                    ui.text_colored(color, util.display);
+                    if ui.is_item_hovered() {
+                        ui.tooltip_text(format!("{}\n{}", util.name, util.stats.join("\n")));
+                    }
+                    Self::render_util_context_menu(ui, entry_id, util.id, Some(&util.name));
+                } else {
+                    ui.text_colored(yellow, "SOME");
+                    if ui.is_item_hovered() {
+                        ui.tooltip_text("Unknown Utility");
+                    }
+                    Self::render_util_context_menu(ui, entry_id, id, None);
                 }
-                Self::render_util_context_menu(ui, entry_id, id, None);
-            }
-            BuffState::Known(util) => {
-                let color = match util {
-                    Utility::Diminished => red,
-                    _ => green,
-                };
-                ui.text_colored(color, util.category().unwrap_or("SOME"));
-                if ui.is_item_hovered() {
-                    ui.tooltip_text(format!("{}\n{}", util.name(), util.stats().join("\n")));
-                }
-                Self::render_util_context_menu(ui, entry_id, util.into(), Some(util.name()));
             }
         }
     }
@@ -408,7 +418,7 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             for entry in &self.players {
-                Self::render_table_entry(ui, entry.player.id, entry, &colors, true);
+                self.render_table_entry(ui, entry.player.id, entry, &colors, true);
             }
 
             ui.end_table();
@@ -434,20 +444,14 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             if let Some(entry) = current {
-                Self::render_table_entry(ui, usize::MAX, entry, &colors, false);
+                self.render_table_entry(ui, usize::MAX, entry, &colors, false);
             }
             for (i, entry) in self.chars_cache.iter().enumerate() {
-                Self::render_table_entry(ui, i, entry, &colors, false);
+                self.render_table_entry(ui, i, entry, &colors, false);
             }
 
             ui.end_table();
         }
-    }
-}
-
-impl Default for Tracker {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -471,19 +475,6 @@ impl Windowed for Tracker {
             .visible(false)
             .auto_resize(true)
     }
-}
-
-/// Possible encounter states.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Encounter {
-    // No ongoing encounter.
-    None,
-
-    // Ongoing unknown encounter.
-    Unknown,
-
-    // Ongoing encounter with known boss.
-    Boss(Boss),
 }
 
 /// Current column sorted by.

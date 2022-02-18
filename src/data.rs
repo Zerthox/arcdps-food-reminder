@@ -1,50 +1,47 @@
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-use serde::{Deserialize, Serialize};
-use std::convert::TryInto;
-use strum_macros::{Display, EnumIter, IntoStaticStr};
+/// Malnourished buff id.
+pub const MALNOURISHED: u32 = 46587;
 
-// entity enums generated from data
-include!(concat!(env!("OUT_DIR"), "/boss.rs"));
-include!(concat!(env!("OUT_DIR"), "/raidboss.rs"));
-include!(concat!(env!("OUT_DIR"), "/fractalboss.rs"));
+/// Diminished buff id.
+pub const DIMINISHED: u32 = 46668;
 
-impl From<RaidBoss> for Boss {
-    fn from(raid_boss: RaidBoss) -> Self {
-        // raid boss is always a valid boss
-        usize::from(raid_boss).try_into().unwrap()
-    }
-}
-
-impl From<FractalBoss> for Boss {
-    fn from(fractal_boss: FractalBoss) -> Self {
-        // fractal boss is always a valid boss
-        usize::from(fractal_boss).try_into().unwrap()
-    }
-}
-
-// buff enums generated from data
-include!(concat!(env!("OUT_DIR"), "/buff.rs"));
-include!(concat!(env!("OUT_DIR"), "/boon.rs"));
-include!(concat!(env!("OUT_DIR"), "/food.rs"));
-include!(concat!(env!("OUT_DIR"), "/util.rs"));
-
-impl From<Boon> for Buff {
-    fn from(boon: Boon) -> Self {
-        // boon is always a valid buff
-        u32::from(boon).try_into().unwrap()
-    }
-}
-
-impl From<Food> for Buff {
-    fn from(food: Food) -> Self {
-        // food is always a valid buff
-        u32::from(food).try_into().unwrap()
-    }
-}
-
-impl From<Utility> for Buff {
-    fn from(util: Utility) -> Self {
-        // utility is always a valid buff
-        u32::from(util).try_into().unwrap()
-    }
-}
+/// Boss ids.
+pub const BOSSES: &[usize] = &[
+    15438, // Vale Guardian
+    15429, // Gorseval
+    15375, // Sabetha
+    16123, // Slothasor
+    16088, // Berg
+    16137, // Zane
+    16125, // Narella
+    16115, // Matthias
+    16253, // MacLeod
+    16235, // Keep Construct
+    16246, // Xera
+    17194, // Cairn
+    17172, // Mursaat Overseer
+    17188, // Samarog
+    17154, // Deimos
+    19767, // Soulless Horror
+    19828, // Desmina
+    19691, // Broken King
+    19536, // Soul Eater
+    19651, // Eye of Judgement
+    19844, // Eye of Fate
+    19450, // Dhuum
+    43974, // Conjured Amalgamate
+    10142, // Conjured Amalgamate Right Arm
+    37464, // Conjured Amalgamate Left Arm
+    21105, // Nikare
+    21089, // Kenut
+    20934, // Qadim
+    22006, // Adina
+    21964, // Sabir
+    22000, // Qadim the Peerless
+    17021, // MAMA
+    17028, // Siax
+    16948, // Ensolyss
+    17632, // Skorvald
+    17949, // Artsariiv
+    17759, // Arkk
+    23254, // Ai
+];

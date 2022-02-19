@@ -6,10 +6,13 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
 
-## Buff database
-Known Food & Utility buffs are currently collected in [data/buffs](./data/buffs).
+## Buff definitions
+Definitions for Food & Utility buffs are loaded from `arcdps_food_reminder_definitions.json`.
+The file should be created automatically the first time the plugin is loaded.
+Default definitions are collected in [data/definitions.json](./data/definitions.json).  
+The Malnourished & Diminished buffs are currently hardcoded and can not be changed.
 
-**Found an unknown Food/Utility buff that you would like to see added?**  
+**Found an unknown Food/Utility buff that you would like to add?**  
 Right click the entry in the tracker and select `Copy ID`.
 Report the copied buff ID & the Food/Utility that applied it.
 
@@ -19,7 +22,7 @@ Report the copied buff ID & the Food/Utility that applied it.
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.
 
 For the standard release version run `cargo build --release`.
-For development you can include a debug log via the `--feature log` flag.
+For development you can include a debug log using the `--feature log` flag.
 
 There is also a makefile provided for use with [cargo-make](https://github.com/sagiegurari/cargo-make).
 To build & install the plugin run `cargo make install`.

@@ -12,7 +12,7 @@ The file should be created automatically the first time the plugin is loaded.
 Default definitions are collected in [data/definitions.json](./data/definitions.json).  
 The Malnourished & Diminished buffs are currently hardcoded and can not be changed.
 
-**Found an unknown Food/Utility buff that you would like to add?**  
+**Found an unknown Food/Utility buff that you would like to see added?**  
 Right click the entry in the tracker and select `Copy ID`.
 Report the copied buff ID & the Food/Utility that applied it.
 

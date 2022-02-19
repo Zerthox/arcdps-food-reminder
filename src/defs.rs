@@ -45,12 +45,6 @@ impl Definitions {
         let (util_size, _) = util.size_hint();
         let mut data = HashMap::with_capacity(food_size + util_size + 2);
 
-        // insert malnourished & diminished
-        let malnourished = BuffData::simple(MALNOURISHED, "Malnourished", "MALN");
-        let diminished = BuffData::simple(DIMINISHED, "Diminished", "DIM");
-        data.insert(malnourished.id, BuffDef::Food(malnourished));
-        data.insert(diminished.id, BuffDef::Util(diminished));
-
         // insert data
         for entry in food {
             if let Some(proc) = entry.proc {
@@ -64,6 +58,13 @@ impl Definitions {
             }
             data.insert(entry.id, BuffDef::Util(entry));
         }
+
+        // insert malnourished & diminished
+        // we want to overwrite custom definitions with the same id
+        let malnourished = BuffData::simple(MALNOURISHED, "Malnourished", "MALN");
+        let diminished = BuffData::simple(DIMINISHED, "Diminished", "DIM");
+        data.insert(malnourished.id, BuffDef::Food(malnourished));
+        data.insert(diminished.id, BuffDef::Util(diminished));
 
         Self {
             data: Arc::new(data),

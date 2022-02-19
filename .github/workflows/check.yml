@@ -15,7 +15,7 @@ on:
       - Cargo.toml
 
 jobs:
-  test:
+  check:
     name: Check
     runs-on: windows-latest
     steps:
@@ -29,6 +29,7 @@ jobs:
         with:
           command: check
           args: --all-features
+  test:
     name: Test
     runs-on: windows-latest
     steps:

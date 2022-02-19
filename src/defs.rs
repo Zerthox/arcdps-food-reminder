@@ -167,3 +167,13 @@ struct DefData {
     pub food: Vec<BuffData>,
     pub utility: Vec<BuffData>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn definitions() {
+        let _: DefData = serde_json::from_str(DEFINITIONS).expect("invalid definitions file");
+    }
+}

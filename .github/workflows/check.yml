@@ -15,8 +15,8 @@ on:
       - Cargo.toml
 
 jobs:
-  check:
-    name: Check
+  test:
+    name: Test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,7 +27,7 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         with:
-          command: check
+          command: test
           args: --all-features
   clippy:
     name: Clippy

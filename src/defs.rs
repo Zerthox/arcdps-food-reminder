@@ -1,3 +1,4 @@
+use crate::data::{DIMINISHED, MALNOURISHED};
 use arc_util::settings::Settings;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -39,10 +40,18 @@ impl Definitions {
         let food = food.into_iter();
         let util = util.into_iter();
 
+        // allocate hashmap
         let (food_size, _) = food.size_hint();
         let (util_size, _) = util.size_hint();
-        let mut data = HashMap::with_capacity(food_size + util_size);
+        let mut data = HashMap::with_capacity(food_size + util_size + 2);
 
+        // insert malnourished & diminished
+        let malnourished = BuffData::simple(MALNOURISHED, "Malnourished", "MALN");
+        let diminished = BuffData::simple(DIMINISHED, "Diminished", "DIM");
+        data.insert(malnourished.id, BuffDef::Food(malnourished));
+        data.insert(diminished.id, BuffDef::Util(diminished));
+
+        // insert data
         for entry in food {
             if let Some(proc) = entry.proc {
                 data.insert(proc, BuffDef::Proc);
@@ -126,6 +135,31 @@ pub struct BuffData {
     pub display: String,
 
     pub proc: Option<u32>,
+}
+
+#[allow(dead_code)]
+impl BuffData {
+    /// Creates a new buff data entry.
+    pub fn new(
+        id: u32,
+        name: impl Into<String>,
+        stats: impl IntoIterator<Item = String>,
+        display: impl Into<String>,
+        proc: Option<u32>,
+    ) -> Self {
+        Self {
+            id,
+            name: name.into(),
+            stats: stats.into_iter().collect(),
+            display: display.into(),
+            proc,
+        }
+    }
+
+    /// Creates a new buff data entry without stats & proc id.
+    pub fn simple(id: u32, name: impl Into<String>, display: impl Into<String>) -> Self {
+        Self::new(id, name, Vec::new(), display, None)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

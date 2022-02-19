@@ -57,7 +57,7 @@ pub struct Plugin {
 impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
-        let defs = Definitions::new();
+        let defs = Definitions::try_load(DEFINITIONS_FILE);
         Self {
             defs: defs.clone(),
             reminder: Reminder::new(),
@@ -88,9 +88,6 @@ impl Plugin {
 
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
-
-        // load definitions
-        self.defs.load(DEFINITIONS_FILE);
     }
 
     /// Unloads the plugin.

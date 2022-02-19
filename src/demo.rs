@@ -37,12 +37,12 @@ impl Demo {
             all_foods: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
                 .iter()
                 .copied()
-                .chain(defs.all_food().iter().map(|food| BuffState::Some(food.id)))
+                .chain(defs.all_food().map(|food| BuffState::Some(food.id)))
                 .collect(),
             all_utils: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
                 .iter()
                 .copied()
-                .chain(defs.all_util().iter().map(|util| BuffState::Some(util.id)))
+                .chain(defs.all_util().map(|util| BuffState::Some(util.id)))
                 .collect(),
             tracker: Tracker::new(defs).windowed(),
         }

@@ -4,7 +4,7 @@ use std::{
     collections::HashMap,
     fs::{self, File},
     path::Path,
-    sync::{Arc, Mutex},
+    sync::Arc,
 };
 
 /// Default definitions.
@@ -13,25 +13,36 @@ const DEFINITIONS: &str = include_str!("../data/definitions.json");
 /// Shared buff definitions data.
 #[derive(Debug, Clone)]
 pub struct Definitions {
-    data: Arc<Mutex<HashMap<u32, BuffDef>>>,
+    data: Arc<HashMap<u32, BuffDef>>,
 }
 
 #[allow(dead_code)]
 impl Definitions {
     /// Creates an empty set of definitions.
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         Self {
-            data: Arc::new(Mutex::new(HashMap::new())),
+            data: Arc::new(HashMap::new()),
         }
     }
 
-    /// Adds new definitions data.
-    pub fn add_data(
-        &mut self,
+    /// Creates the default set of definitions.
+    pub fn new() -> Self {
+        let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
+        Self::with_data(food, utility)
+    }
+
+    /// Creates a set of definitions from data.
+    pub fn with_data(
         food: impl IntoIterator<Item = BuffData>,
         util: impl IntoIterator<Item = BuffData>,
-    ) {
-        let mut data = self.data.lock().unwrap();
+    ) -> Self {
+        let food = food.into_iter();
+        let util = util.into_iter();
+
+        let (food_size, _) = food.size_hint();
+        let (util_size, _) = util.size_hint();
+        let mut data = HashMap::with_capacity(food_size + util_size);
+
         for entry in food {
             if let Some(proc) = entry.proc {
                 data.insert(proc, BuffDef::Proc);
@@ -44,55 +55,50 @@ impl Definitions {
             }
             data.insert(entry.id, BuffDef::Util(entry));
         }
-    }
 
-    /// Attempts to load definitions from a given file.
-    pub fn load(&mut self, file: impl AsRef<Path>) {
-        if let Some(path) = Settings::config_path(file) {
-            // write out defaults in case the file does not exist
-            if !path.exists() {
-                let _ = fs::write(&path, DEFINITIONS);
-            }
-
-            // try to read definition data from file
-            if let Some(DefData { food, utility }) = File::open(path)
-                .ok()
-                .and_then(|reader| serde_json::from_reader(reader).ok())
-            {
-                self.add_data(food, utility)
-            }
+        Self {
+            data: Arc::new(data),
         }
     }
 
+    /// Attempts to load definitions from a given file.
+    pub fn try_load(file: impl AsRef<Path>) -> Self {
+        if let Some(path) = Settings::config_path(file) {
+            if path.exists() {
+                // try to read definition data from file
+                if let Some(DefData { food, utility }) = File::open(path)
+                    .ok()
+                    .and_then(|reader| serde_json::from_reader(reader).ok())
+                {
+                    return Self::with_data(food, utility);
+                }
+            } else {
+                // write out defaults
+                let _ = fs::write(&path, DEFINITIONS);
+            }
+        }
+        Self::new()
+    }
+
     /// Returns the buff definition with the given id.
-    pub fn get(&self, buff_id: u32) -> Option<BuffDef> {
-        self.data.lock().unwrap().get(&buff_id).cloned()
+    pub fn get(&self, buff_id: u32) -> Option<&BuffDef> {
+        self.data.get(&buff_id)
     }
 
     /// Returns all food definitions.
-    pub fn all_food(&self) -> Vec<BuffData> {
-        self.data
-            .lock()
-            .unwrap()
-            .values()
-            .filter_map(|entry| match entry {
-                BuffDef::Food(data) => Some(data.clone()),
-                _ => None,
-            })
-            .collect()
+    pub fn all_food(&self) -> impl Iterator<Item = &BuffData> {
+        self.data.values().filter_map(|entry| match entry {
+            BuffDef::Food(data) => Some(data),
+            _ => None,
+        })
     }
 
     /// Returns all utility definitions.
-    pub fn all_util(&self) -> Vec<BuffData> {
-        self.data
-            .lock()
-            .unwrap()
-            .values()
-            .filter_map(|entry| match entry {
-                BuffDef::Util(data) => Some(data.clone()),
-                _ => None,
-            })
-            .collect()
+    pub fn all_util(&self) -> impl Iterator<Item = &BuffData> {
+        self.data.values().filter_map(|entry| match entry {
+            BuffDef::Util(data) => Some(data),
+            _ => None,
+        })
     }
 }
 

@@ -305,7 +305,7 @@ impl Tracker {
                         MALNOURISHED => red,
                         _ => green,
                     };
-                    ui.text_colored(color, food.display);
+                    ui.text_colored(color, &food.display);
                     if ui.is_item_hovered() {
                         ui.tooltip_text(format!("{}\n{}", food.name, food.stats.join("\n")));
                     }
@@ -341,7 +341,7 @@ impl Tracker {
                         DIMINISHED => red,
                         _ => green,
                     };
-                    ui.text_colored(color, util.display);
+                    ui.text_colored(color, &util.display);
                     if ui.is_item_hovered() {
                         ui.tooltip_text(format!("{}\n{}", util.name, util.stats.join("\n")));
                     }

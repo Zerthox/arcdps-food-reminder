@@ -45,13 +45,10 @@ version = "0.3.0"
 dependencies = [
  "arc_util",
  "arcdps",
- "num_enum",
  "once_cell",
  "open",
  "serde",
  "serde_json",
- "strum",
- "strum_macros",
  "windows 0.29.0",
 ]
 

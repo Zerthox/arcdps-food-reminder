@@ -3,7 +3,7 @@ name = "arcdps_food_reminder"
 version = "0.3.0"
 edition = "2021"
 authors = ["Zerthox <zerthox@gmail.com>"]
-repository = "https://github.com/zerthox/gw2-arcdps-food-reminder"
+repository = "https://github.com/zerthox/arcdps-food-reminder"
 
 [dependencies]
 arcdps = { git = "https://github.com/greaka/arcdps_bindings", branch = "master" }

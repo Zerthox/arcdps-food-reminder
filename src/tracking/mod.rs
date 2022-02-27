@@ -9,12 +9,14 @@ use crate::{
 use arc_util::{
     api::CoreColor,
     exports,
-    ui::{components::item_context_menu, Component, WindowProps, Windowed},
+    ui::{components::item_context_menu, Component},
 };
-use arcdps::imgui::{im_str, sys as ig, ImStr, TabBar, TabItem, TableColumnFlags, TableFlags, Ui};
+use arcdps::imgui::{
+    TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
+};
 use buff::BuffState;
 use entry::{Entry, Player};
-use std::{cmp::Reverse, slice};
+use std::cmp::Reverse;
 use windows::System::VirtualKey;
 
 /// Player tracker.
@@ -190,28 +192,22 @@ impl Tracker {
     }
 
     /// Renders a context menu for an item.
-    fn render_context_menu(
-        ui: &Ui,
-        menu_id: &ImStr,
-        title: &ImStr,
-        buff_id: u32,
-        name: Option<&str>,
-    ) {
+    fn render_context_menu(ui: &Ui, menu_id: &str, title: &str, buff_id: u32, name: Option<&str>) {
         item_context_menu(menu_id, || {
             ui.text(title);
             if let Some(name) = name {
-                if ui.small_button(im_str!("Copy Name")) {
-                    ui.set_clipboard_text(&im_str!("{}", name));
+                if ui.small_button("Copy Name") {
+                    ui.set_clipboard_text(name);
                 }
-                if ui.small_button(im_str!("Open Wiki")) {
+                if ui.small_button("Open Wiki") {
                     let _ = open::that(format!(
                         "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
                         name
                     ));
                 }
             }
-            if ui.small_button(im_str!("Copy ID")) {
-                ui.set_clipboard_text(&im_str!("{}", buff_id));
+            if ui.small_button("Copy ID") {
+                ui.set_clipboard_text(buff_id.to_string());
             }
         });
     }
@@ -220,8 +216,8 @@ impl Tracker {
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         Self::render_context_menu(
             ui,
-            &im_str!("##food-context-{}", menu_id),
-            im_str!("Food Options"),
+            &format!("##food-context-{}", menu_id),
+            "Food Options",
             buff_id,
             name,
         )
@@ -231,8 +227,8 @@ impl Tracker {
     fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         Self::render_context_menu(
             ui,
-            &im_str!("##util-context-{}", menu_id),
-            im_str!("Utility Options"),
+            &format!("##util-context-{}", menu_id),
+            "Utility Options",
             buff_id,
             name,
         )
@@ -361,67 +357,57 @@ impl Tracker {
     fn render_squad_tab(&mut self, ui: &Ui) {
         if self.players.is_empty() {
             ui.text("No players in range");
-        } else if ui.begin_table_with_flags(
-            im_str!("##squad-table"),
-            4,
-            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
-        ) {
-            // columns
-            ui.table_setup_column_with_flags(
-                im_str!("Sub"),
-                TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
-            );
-            ui.table_setup_column_with_flags(
-                im_str!("Player"),
-                TableColumnFlags::PREFER_SORT_DESCENDING,
-            );
-            ui.table_setup_column_with_flags(
-                im_str!("Food"),
-                TableColumnFlags::PREFER_SORT_DESCENDING,
-            );
-            ui.table_setup_column_with_flags(
-                im_str!("Util"),
-                TableColumnFlags::PREFER_SORT_DESCENDING,
-            );
-            ui.table_headers_row();
+        } else {
+            let col_sub = TableColumnSetup::new("Sub");
+            col_sub.flags =
+                TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT;
 
-            // sorting
-            if let Some(sort_specs) = unsafe { ig::igTableGetSortSpecs().as_mut() } {
-                // check for changes
-                if sort_specs.SpecsDirty {
-                    let column_specs = unsafe {
-                        slice::from_raw_parts(sort_specs.Specs, sort_specs.SpecsCount as usize)
-                    };
-                    if let Some(sorted_column) = column_specs
-                        .iter()
-                        .find(|column| column.SortDirection() as u32 != ig::ImGuiSortDirection_None)
-                    {
-                        // update sorting state
-                        match sorted_column.ColumnIndex {
-                            0 => self.sorting = Sorting::Sub,
-                            1 => self.sorting = Sorting::Name,
-                            2 => self.sorting = Sorting::Food,
-                            3 => self.sorting = Sorting::Util,
-                            _ => {}
+            let col_player = TableColumnSetup::new("Player");
+            col_player.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+
+            let col_food = TableColumnSetup::new("Food");
+            col_food.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+
+            let col_util = TableColumnSetup::new("Util");
+            col_util.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+
+            if let Some(_table) = ui.begin_table_header_with_flags(
+                "##squad-table",
+                [col_player],
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
+            ) {
+                // update sorting if necessary
+                if let Some(sort_specs) = ui.table_sort_specs_mut() {
+                    sort_specs.conditional_sort(|column_specs| {
+                        if let Some(sorted_column) = column_specs
+                            .iter()
+                            .find(|column| column.sort_direction().is_some())
+                        {
+                            // update sorting state
+                            match sorted_column.column_idx() {
+                                0 => self.sorting = Sorting::Sub,
+                                1 => self.sorting = Sorting::Name,
+                                2 => self.sorting = Sorting::Food,
+                                3 => self.sorting = Sorting::Util,
+                                _ => {}
+                            }
+
+                            // ascending is reverse order for us
+                            self.reverse = sorted_column.sort_direction().unwrap()
+                                == TableSortDirection::Ascending;
+
+                            // refresh sorting
+                            self.refresh_sort();
                         }
+                    });
+                }
 
-                        // ascending is reverse order for us
-                        self.reverse = sorted_column.SortDirection() as u32
-                            == ig::ImGuiSortDirection_Ascending;
-
-                        // refresh sorting
-                        self.refresh_sort();
-                    }
+                // render table content
+                let colors = exports::colors();
+                for entry in &self.players {
+                    self.render_table_entry(ui, entry.player.id, entry, &colors, true);
                 }
             }
-
-            // render table content
-            let colors = exports::colors();
-            for entry in &self.players {
-                self.render_table_entry(ui, entry.player.id, entry, &colors, true);
-            }
-
-            ui.end_table();
         }
     }
 
@@ -430,17 +416,15 @@ impl Tracker {
         let current = self.get_self();
         if current.is_none() && self.chars_cache.is_empty() {
             ui.text("No characters found");
-        } else if ui.begin_table_with_flags(
-            im_str!("##self-table"),
-            4,
+        } else if let Some(_table) = ui.begin_table_header_with_flags(
+            "##self-table",
+            [
+                TableColumnSetup::new("Player"),
+                TableColumnSetup::new("Food"),
+                TableColumnSetup::new("Util"),
+            ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
         ) {
-            // columns
-            ui.table_setup_column(im_str!("Player"));
-            ui.table_setup_column(im_str!("Food"));
-            ui.table_setup_column(im_str!("Util"));
-            ui.table_headers_row();
-
             // render table content
             let colors = exports::colors();
             if let Some(entry) = current {
@@ -449,31 +433,22 @@ impl Tracker {
             for (i, entry) in self.chars_cache.iter().enumerate() {
                 self.render_table_entry(ui, i, entry, &colors, false);
             }
-
-            ui.end_table();
         }
     }
 }
 
 impl Component for Tracker {
-    fn render(&mut self, ui: &Ui) {
-        TabBar::new(im_str!("##tabs")).build(ui, || {
-            TabItem::new(im_str!("Squad")).build(ui, || {
+    type Props = ();
+
+    fn render(&mut self, ui: &Ui, _props: &Self::Props) {
+        TabBar::new("##tabs").build(ui, || {
+            TabItem::new("Squad").build(ui, || {
                 self.render_squad_tab(ui);
             });
-            TabItem::new(im_str!("Characters")).build(ui, || {
+            TabItem::new("Characters").build(ui, || {
                 self.render_self_tab(ui);
             });
         });
-    }
-}
-
-impl Windowed for Tracker {
-    fn window_props() -> WindowProps {
-        WindowProps::new("Food Tracker")
-            .hotkey(Tracker::HOTKEY)
-            .visible(false)
-            .auto_resize(true)
     }
 }
 

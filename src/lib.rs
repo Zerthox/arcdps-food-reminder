@@ -11,7 +11,11 @@ mod demo;
 use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
 use once_cell::sync::Lazy;
 use plugin::Plugin;
-use std::sync::Mutex;
+use std::{error::Error, sync::Mutex};
+
+/// Main plugin instance.
+// FIXME: a single mutex for the whole thing is potentially inefficient
+static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 
 // create exports for arcdps
 arcdps_export! {
@@ -26,12 +30,10 @@ arcdps_export! {
     wnd_filter,
 }
 
-/// Main plugin instance.
-// FIXME: a single mutex for the whole thing is potentially inefficient
-static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
-
-fn init() {
-    PLUGIN.lock().unwrap().load()
+fn init() -> Result<(), Box<dyn Error>> {
+    // TODO: use error
+    PLUGIN.lock().unwrap().load();
+    Ok(())
 }
 
 fn release() {

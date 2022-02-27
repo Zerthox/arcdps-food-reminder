@@ -10,12 +10,9 @@ use arc_util::{
     exports,
     game::Player,
     settings::{HasSettings, Settings},
-    ui::{align::LeftAlign, Component, Hideable, Window, Windowed},
+    ui::{align::LeftAlign, Component, Hideable, Window, WindowProps},
 };
-use arcdps::{
-    imgui::{im_str, ImString, Ui},
-    Agent, CombatEvent,
-};
+use arcdps::{imgui::Ui, Agent, CombatEvent};
 use std::time::Duration;
 
 #[cfg(feature = "demo")]
@@ -61,13 +58,13 @@ impl Plugin {
         Self {
             defs: defs.clone(),
             reminder: Reminder::new(),
-            tracker: Tracker::new(defs.clone()).windowed(),
+            tracker: Window::new(Tracker::new(defs.clone())),
 
             #[cfg(feature = "demo")]
-            demo: Demo::new(defs).windowed(),
+            demo: Window::new(Demo::new(defs)),
 
             #[cfg(feature = "log")]
-            debug: Log::new().windowed_with_name("Food Reminder Debug Log"),
+            debug: Window::new(Log::new()),
         }
     }
 
@@ -470,18 +467,29 @@ impl Plugin {
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // reminder, log & demo render always
-        self.reminder.render(ui);
+        self.reminder.render(ui, &());
 
         #[cfg(feature = "demo")]
-        self.demo.render(ui);
+        self.demo.render(ui, &(WindowProps::new("Demo"), ()));
 
         #[cfg(feature = "log")]
-        self.debug.render(ui);
+        self.debug.render(
+            ui,
+            &(
+                WindowProps::new("Food Reminder Debug Log")
+                    .width(600.0)
+                    .height(300.0),
+                (),
+            ),
+        );
 
         // other ui renders conditionally
         let ui_settings = exports::ui_settings();
         if !ui_settings.hidden && (not_loading || ui_settings.draw_always) {
-            self.tracker.render(ui);
+            self.tracker.render(
+                ui,
+                &(WindowProps::new("Food Tracker").auto_resize(true), ()),
+            );
         }
     }
 
@@ -489,11 +497,11 @@ impl Plugin {
     pub fn render_options(&mut self, ui: &Ui) {
         // tracker settings
         ui.spacing();
-        ui.text_disabled(im_str!("Tracker"));
+        ui.text_disabled("Tracker");
 
         // tracker save chars
         ui.checkbox(
-            im_str!("Save own characters between game sessions"),
+            "Save own characters between game sessions",
             &mut self.tracker.save_chars,
         );
 
@@ -502,11 +510,11 @@ impl Plugin {
 
         align.item(ui, || {
             ui.align_text_to_frame_padding();
-            ui.text(im_str!("Tracker Hotkey"))
+            ui.text("Tracker Hotkey")
         });
 
         align.item(ui, || {
-            let mut key_buffer = ImString::with_capacity(3);
+            let mut key_buffer = String::with_capacity(3);
             key_buffer.push_str(
                 &self
                     .tracker
@@ -515,16 +523,15 @@ impl Plugin {
                     .unwrap_or_default(),
             );
 
-            ui.push_item_width(ui.calc_text_size(im_str!("0000"), false, 0.0)[0]);
+            ui.push_item_width(ui.calc_text_size("0000")[0]);
             if ui
-                .input_text(im_str!("##hotkey"), &mut key_buffer)
+                .input_text("##hotkey", &mut key_buffer)
                 .chars_decimal(true)
                 .build()
             {
-                let result = key_buffer.to_str();
-                if result.is_empty() {
+                if key_buffer.is_empty() {
                     self.tracker.set_hotkey(None);
-                } else if let Ok(keycode) = result.parse() {
+                } else if let Ok(keycode) = key_buffer.parse() {
                     self.tracker.set_hotkey(Some(keycode));
                 }
             }
@@ -542,40 +549,40 @@ impl Plugin {
 
         // reminder settings
         ui.spacing();
-        ui.text_disabled(im_str!("Reminder"));
+        ui.text_disabled("Reminder");
 
         ui.checkbox(
-            im_str!("Remind on encounter start"),
+            "Remind on encounter start",
             &mut self.reminder.settings.encounter_start,
         );
         ui.checkbox(
-            im_str!("Remind on encounter end"),
+            "Remind on encounter end",
             &mut self.reminder.settings.encounter_end,
         );
         ui.checkbox(
-            im_str!("Remind during encounter"),
+            "Remind during encounter",
             &mut self.reminder.settings.during_encounter,
         );
         ui.checkbox(
-            im_str!("Restrict reminders for encounters to Raids & Fractal CMs"),
+            "Restrict reminders for encounters to Raids & Fractal CMs",
             &mut self.reminder.settings.only_bosses,
         );
         ui.checkbox(
-            im_str!("Always remind when becoming Malnourished/Diminished"),
+            "Always remind when becoming Malnourished/Diminished",
             &mut self.reminder.settings.always_mal_dim,
         );
 
         // reminder duration
-        let mut duration_buffer = ImString::with_capacity(5);
+        let mut duration_buffer = String::with_capacity(5);
         duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
 
-        ui.push_item_width(ui.calc_text_size(im_str!("000000"), false, 0.0)[0]);
+        ui.push_item_width(ui.calc_text_size("000000")[0]);
         if ui
-            .input_text(im_str!("Reminder duration (ms)"), &mut duration_buffer)
+            .input_text("Reminder duration (ms)", &mut duration_buffer)
             .chars_decimal(true)
             .build()
         {
-            if let Ok(num) = duration_buffer.to_str().parse() {
+            if let Ok(num) = duration_buffer.parse() {
                 self.reminder.settings.duration = Duration::from_millis(num);
             }
         }
@@ -585,7 +592,7 @@ impl Plugin {
         ui.spacing();
 
         // reset button
-        if ui.button(im_str!("Reset to default"), [0.0, 0.0]) {
+        if ui.button("Reset to default") {
             self.tracker.reset_settings();
             self.reminder.reset_settings();
         }
@@ -594,13 +601,13 @@ impl Plugin {
     /// Callback for ArcDPS option checkboxes.
     pub fn render_window_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox(im_str!("Food Tracker"), self.tracker.is_visible_mut());
+            ui.checkbox("Food Tracker", self.tracker.is_visible_mut());
 
             #[cfg(feature = "demo")]
-            ui.checkbox(im_str!("Food Demo"), self.demo.is_visible_mut());
+            ui.checkbox("Food Demo", self.demo.is_visible_mut());
 
             #[cfg(feature = "log")]
-            ui.checkbox(im_str!("Food Debug Log"), self.debug.is_visible_mut());
+            ui.checkbox("Food Debug Log", self.debug.is_visible_mut());
         }
         false
     }

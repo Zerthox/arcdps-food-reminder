@@ -1,7 +1,7 @@
 use arcdps::imgui::ImString;
-use windows::Win32::{
-    Foundation::PSTR,
-    UI::{
+use windows::{
+    core::PSTR,
+    Win32::UI::{
         Input::KeyboardAndMouse::{GetKeyNameTextA, MapVirtualKeyA},
         WindowsAndMessaging::MAPVK_VK_TO_VSC,
     },

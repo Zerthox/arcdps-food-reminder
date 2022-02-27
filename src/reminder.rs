@@ -1,5 +1,5 @@
 use arc_util::{api::CoreColor, exports, settings::HasSettings, ui::Component};
-use arcdps::imgui::{im_str, Condition, ImStr, Ui, Window};
+use arcdps::imgui::{self, Ui};
 use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
 
@@ -53,7 +53,7 @@ impl Reminder {
     }
 
     /// Helper to render text.
-    fn render_text(ui: &Ui, text: &ImStr) {
+    fn render_text(ui: &Ui, text: &str) {
         // grab colors
         let colors = exports::colors();
         let red = colors
@@ -63,7 +63,7 @@ impl Reminder {
 
         // adjust cursor to center text
         let [cursor_x, cursor_y] = ui.cursor_pos();
-        let [text_width, _] = ui.calc_text_size(text, false, 0.0);
+        let [text_width, _] = ui.calc_text_size(text);
         let window_width = ui.window_content_region_width();
         ui.set_cursor_pos([cursor_x + 0.5 * (window_width - text_width), cursor_y]);
 
@@ -73,7 +73,9 @@ impl Reminder {
 }
 
 impl Component for Reminder {
-    fn render(&mut self, ui: &Ui) {
+    type Props = ();
+
+    fn render(&mut self, ui: &Ui, _props: &Self::Props) {
         // check for triggers
         let food = Self::check_trigger(&mut self.food_trigger, self.settings.duration);
         let util = Self::check_trigger(&mut self.util_trigger, self.settings.duration);
@@ -84,8 +86,11 @@ impl Component for Reminder {
             let [screen_width, screen_height] = ui.io().display_size;
 
             // render "invisible" window with text
-            Window::new(im_str!("##food-reminder-reminder"))
-                .position([0.5 * screen_width, 0.2 * screen_height], Condition::Always)
+            imgui::Window::new("##food-reminder-reminder")
+                .position(
+                    [0.5 * screen_width, 0.2 * screen_height],
+                    imgui::Condition::Always,
+                )
                 .position_pivot([0.5, 0.5])
                 .content_size([screen_width, 0.0])
                 .always_auto_resize(true)
@@ -100,10 +105,10 @@ impl Component for Reminder {
 
                     // render text
                     if food {
-                        Self::render_text(ui, im_str!("Food reminder!"));
+                        Self::render_text(ui, "Food reminder!");
                     }
                     if util {
-                        Self::render_text(ui, im_str!("Utility reminder!"));
+                        Self::render_text(ui, "Utility reminder!");
                     }
                 });
         }

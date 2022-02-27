@@ -7,7 +7,7 @@ use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
 
 /// Settings for the tracker.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct TrackerSettings {
     /// Whether to save the buffs on own characters.
@@ -17,12 +17,18 @@ pub struct TrackerSettings {
     pub hotkey: Option<usize>,
 }
 
-impl Default for TrackerSettings {
-    fn default() -> Self {
+impl TrackerSettings {
+    pub const fn new() -> Self {
         Self {
             save_chars: true,
             hotkey: Some(Tracker::DEFAULT_HOTKEY),
         }
+    }
+}
+
+impl Default for TrackerSettings {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -64,7 +70,7 @@ impl HasSettings for Tracker {
 
     fn current_settings(&self) -> Self::Settings {
         Self::Settings {
-            settings: self.settings,
+            settings: self.settings.clone(),
             own_chars: if self.settings.save_chars {
                 self.get_self()
                     .into_iter()

@@ -60,7 +60,7 @@ impl Demo {
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
                 if let Some(BuffDef::Util(util)) = defs.get(buff) {
-                    util.name.into()
+                    util.name.clone().into()
                 } else {
                     "Unknown".into()
                 }

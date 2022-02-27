@@ -84,6 +84,9 @@ impl Plugin {
 
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
+
+        // load definitions
+        self.defs.try_load(DEFINITIONS_FILE);
     }
 
     /// Unloads the plugin.

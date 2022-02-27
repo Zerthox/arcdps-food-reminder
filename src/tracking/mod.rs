@@ -53,7 +53,7 @@ impl Tracker {
             sorting: Sorting::Sub,
             reverse: false,
             chars_cache: Vec::new(),
-            settings: TrackerSettings::default(),
+            settings: TrackerSettings::new(),
             encounter: None,
         }
     }
@@ -355,17 +355,17 @@ impl Tracker {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
-            let col_sub = TableColumnSetup::new("Sub");
+            let mut col_sub = TableColumnSetup::new("Sub");
             col_sub.flags =
                 TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT;
 
-            let col_player = TableColumnSetup::new("Player");
+            let mut col_player = TableColumnSetup::new("Player");
             col_player.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
 
-            let col_food = TableColumnSetup::new("Food");
+            let mut col_food = TableColumnSetup::new("Food");
             col_food.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
 
-            let col_util = TableColumnSetup::new("Util");
+            let mut col_util = TableColumnSetup::new("Util");
             col_util.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
 
             if let Some(_table) = ui.begin_table_header_with_flags(

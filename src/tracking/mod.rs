@@ -22,9 +22,6 @@ use windows::System::VirtualKey;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
-    /// Buff definitions.
-    defs: Definitions,
-
     /// Currently tracked players.
     players: Vec<Entry>,
 
@@ -50,9 +47,8 @@ impl Tracker {
     pub const HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
-    pub const fn new(defs: Definitions) -> Self {
+    pub const fn new() -> Self {
         Self {
-            defs,
             players: Vec::new(),
             sorting: Sorting::Sub,
             reverse: false,
@@ -238,6 +234,7 @@ impl Tracker {
     fn render_table_entry(
         &self,
         ui: &Ui,
+        defs: &Definitions,
         entry_id: usize,
         entry: &Entry,
         colors: &exports::Colors,
@@ -296,7 +293,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Food(food)) = self.defs.get(id) {
+                if let Some(BuffDef::Food(food)) = defs.get(id) {
                     let color = match food.id {
                         MALNOURISHED => red,
                         _ => green,
@@ -332,7 +329,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Util(util)) = self.defs.get(id) {
+                if let Some(BuffDef::Util(util)) = defs.get(id) {
                     let color = match util.id {
                         DIMINISHED => red,
                         _ => green,
@@ -354,7 +351,7 @@ impl Tracker {
     }
 
     /// Renders the tracker tab for the squad.
-    fn render_squad_tab(&mut self, ui: &Ui) {
+    fn render_squad_tab(&mut self, ui: &Ui, defs: &Definitions) {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
@@ -405,14 +402,14 @@ impl Tracker {
                 // render table content
                 let colors = exports::colors();
                 for entry in &self.players {
-                    self.render_table_entry(ui, entry.player.id, entry, &colors, true);
+                    self.render_table_entry(ui, defs, entry.player.id, entry, &colors, true);
                 }
             }
         }
     }
 
     /// Renders the tracker tab for own characters.
-    fn render_self_tab(&mut self, ui: &Ui) {
+    fn render_self_tab(&mut self, ui: &Ui, defs: &Definitions) {
         let current = self.get_self();
         if current.is_none() && self.chars_cache.is_empty() {
             ui.text("No characters found");
@@ -428,25 +425,25 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             if let Some(entry) = current {
-                self.render_table_entry(ui, usize::MAX, entry, &colors, false);
+                self.render_table_entry(ui, defs, usize::MAX, entry, &colors, false);
             }
             for (i, entry) in self.chars_cache.iter().enumerate() {
-                self.render_table_entry(ui, i, entry, &colors, false);
+                self.render_table_entry(ui, defs, i, entry, &colors, false);
             }
         }
     }
 }
 
 impl Component for Tracker {
-    type Props = ();
+    type Props = Definitions;
 
-    fn render(&mut self, ui: &Ui, _props: &Self::Props) {
+    fn render(&mut self, ui: &Ui, defs: &Self::Props) {
         TabBar::new("##tabs").build(ui, || {
             TabItem::new("Squad").build(ui, || {
-                self.render_squad_tab(ui);
+                self.render_squad_tab(ui, defs);
             });
             TabItem::new("Characters").build(ui, || {
-                self.render_self_tab(ui);
+                self.render_self_tab(ui, defs);
             });
         });
     }

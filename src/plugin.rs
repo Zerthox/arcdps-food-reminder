@@ -10,7 +10,7 @@ use arc_util::{
     exports,
     game::Player,
     settings::{HasSettings, Settings},
-    ui::{align::LeftAlign, Component, Hideable, Window, WindowProps},
+    ui::{align::LeftAlign, Component, Hideable, Window},
 };
 use arcdps::{imgui::Ui, Agent, CombatEvent};
 use std::time::Duration;
@@ -54,17 +54,16 @@ pub struct Plugin {
 impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
-        let defs = Definitions::try_load(DEFINITIONS_FILE);
         Self {
-            defs: defs.clone(),
+            defs: Definitions::new(),
             reminder: Reminder::new(),
-            tracker: Window::new(Tracker::new(defs.clone())),
+            tracker: Window::new("Food Tracker", Tracker::new()),
 
             #[cfg(feature = "demo")]
-            demo: Window::new(Demo::new(defs)),
+            demo: Window::new("Food Demo", Demo::new()),
 
             #[cfg(feature = "log")]
-            debug: Window::new(Log::new()),
+            debug: Window::new("Food Debug Log", Log::new()),
         }
     }
 
@@ -470,26 +469,15 @@ impl Plugin {
         self.reminder.render(ui, &());
 
         #[cfg(feature = "demo")]
-        self.demo.render(ui, &(WindowProps::new("Demo"), ()));
+        self.demo.render(ui, &self.defs);
 
         #[cfg(feature = "log")]
-        self.debug.render(
-            ui,
-            &(
-                WindowProps::new("Food Reminder Debug Log")
-                    .width(600.0)
-                    .height(300.0),
-                (),
-            ),
-        );
+        self.debug.render(ui, &());
 
         // other ui renders conditionally
         let ui_settings = exports::ui_settings();
         if !ui_settings.hidden && (not_loading || ui_settings.draw_always) {
-            self.tracker.render(
-                ui,
-                &(WindowProps::new("Food Tracker").auto_resize(true), ()),
-            );
+            self.tracker.render(ui, &self.defs);
         }
     }
 

@@ -12,7 +12,7 @@ use crate::{
 use arc_util::{
     game::Player,
     settings::HasSettings,
-    ui::{align::LeftAlign, Component, Hideable, Window, WindowProps},
+    ui::{align::LeftAlign, Component, Hideable, Window},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 use serde::{Deserialize, Serialize};
@@ -21,7 +21,6 @@ use std::borrow::Cow;
 /// Features demo.
 #[derive(Debug)]
 pub struct Demo {
-    defs: Definitions,
     reminder: Reminder,
     all_foods: Vec<BuffState>,
     all_utils: Vec<BuffState>,
@@ -30,21 +29,12 @@ pub struct Demo {
 
 impl Demo {
     /// Creates a new demo.
-    pub fn new(defs: Definitions) -> Self {
+    pub fn new() -> Self {
         Self {
-            defs: defs.clone(),
             reminder: Reminder::new(),
-            all_foods: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
-                .iter()
-                .copied()
-                .chain(defs.all_food().map(|food| BuffState::Some(food.id)))
-                .collect(),
-            all_utils: [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
-                .iter()
-                .copied()
-                .chain(defs.all_util().map(|util| BuffState::Some(util.id)))
-                .collect(),
-            tracker: Window::new(Tracker::new(defs)),
+            all_foods: Vec::new(),
+            all_utils: Vec::new(),
+            tracker: Window::new("Demo Food Tracker", Tracker::new()),
         }
     }
 
@@ -80,9 +70,25 @@ impl Demo {
 }
 
 impl Component for Demo {
-    type Props = ();
+    type Props = Definitions;
 
-    fn render(&mut self, ui: &Ui, _props: &Self::Props) {
+    fn render(&mut self, ui: &Ui, defs: &Self::Props) {
+        // initialize data
+        if self.all_foods.is_empty() {
+            self.all_foods = [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
+                .iter()
+                .copied()
+                .chain(defs.all_food().map(|food| BuffState::Some(food.id)))
+                .collect();
+        }
+        if self.all_utils.is_empty() {
+            self.all_utils = [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
+                .iter()
+                .copied()
+                .chain(defs.all_util().map(|util| BuffState::Some(util.id)))
+                .collect();
+        }
+
         // main window
 
         // reminder buttons
@@ -199,7 +205,7 @@ impl Component for Demo {
                     format!("##food-{}", id),
                     &mut food_id,
                     &self.all_foods,
-                    |buff| Self::food_name(&self.defs, *buff),
+                    |buff| Self::food_name(&defs, *buff),
                 ) {
                     entry.food.state = self.all_foods[food_id];
                 }
@@ -216,7 +222,7 @@ impl Component for Demo {
                     format!("##util-{}", id),
                     &mut util_id,
                     &self.all_utils,
-                    |buff| Self::util_name(&self.defs, *buff),
+                    |buff| Self::util_name(&defs, *buff),
                 ) {
                     entry.util.state = self.all_utils[util_id];
                 }
@@ -247,8 +253,7 @@ impl Component for Demo {
 
         // render children
         self.reminder.render(ui, &());
-        self.tracker
-            .render(ui, &(WindowProps::new("Demo Food Tracker"), ()));
+        self.tracker.render(ui, &defs);
     }
 }
 

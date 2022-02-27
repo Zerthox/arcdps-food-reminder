@@ -5,74 +5,67 @@ use std::{
     collections::HashMap,
     fs::{self, File},
     path::Path,
-    sync::Arc,
 };
 
 /// Default definitions.
 const DEFINITIONS: &str = include_str!("../data/definitions.json");
 
 /// Shared buff definitions data.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Definitions {
-    data: Arc<HashMap<u32, BuffDef>>,
+    data: HashMap<u32, BuffDef>,
 }
 
 #[allow(dead_code)]
 impl Definitions {
-    /// Creates an empty set of definitions.
-    pub fn empty() -> Self {
-        Self {
-            data: Arc::new(HashMap::new()),
-        }
-    }
-
-    /// Creates the default set of definitions.
+    /// Creates a new set of definitions.
+    ///
+    /// This only includes malnourished & diminished.
     pub fn new() -> Self {
-        let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
-        Self::with_data(food, utility)
-    }
-
-    /// Creates a set of definitions from data.
-    pub fn with_data(
-        food: impl IntoIterator<Item = BuffData>,
-        util: impl IntoIterator<Item = BuffData>,
-    ) -> Self {
-        let food = food.into_iter();
-        let util = util.into_iter();
-
-        // allocate hashmap
-        let (food_size, _) = food.size_hint();
-        let (util_size, _) = util.size_hint();
-        let mut data = HashMap::with_capacity(food_size + util_size + 2);
-
-        // insert data
-        for entry in food {
-            if let Some(proc) = entry.proc {
-                data.insert(proc, BuffDef::Proc);
-            }
-            data.insert(entry.id, BuffDef::Food(entry));
-        }
-        for entry in util {
-            if let Some(proc) = entry.proc {
-                data.insert(proc, BuffDef::Proc);
-            }
-            data.insert(entry.id, BuffDef::Util(entry));
-        }
+        let mut data = HashMap::new();
 
         // insert malnourished & diminished
-        // we want to overwrite custom definitions with the same id
         let malnourished = BuffData::simple(MALNOURISHED, "Malnourished", "MALN");
         let diminished = BuffData::simple(DIMINISHED, "Diminished", "DIM");
         data.insert(malnourished.id, BuffDef::Food(malnourished));
         data.insert(diminished.id, BuffDef::Util(diminished));
 
-        Self {
-            data: Arc::new(data),
+        Self { data }
+    }
+
+    /// Creates a set of definitions from data.
+    pub fn add_data(
+        &mut self,
+        food: impl IntoIterator<Item = BuffData>,
+        util: impl IntoIterator<Item = BuffData>,
+    ) {
+        let food = food.into_iter();
+        let util = util.into_iter();
+
+        // reserve capacity
+        let (food_size, _) = food.size_hint();
+        let (util_size, _) = util.size_hint();
+        self.data.reserve(food_size + util_size);
+
+        // insert data
+        for entry in food {
+            if let Some(proc) = entry.proc {
+                self.data.insert(proc, BuffDef::Proc);
+            }
+            self.data.insert(entry.id, BuffDef::Food(entry));
+        }
+        for entry in util {
+            if let Some(proc) = entry.proc {
+                self.data.insert(proc, BuffDef::Proc);
+            }
+            self.data.insert(entry.id, BuffDef::Util(entry));
         }
     }
 
-    /// Attempts to load definitions from a given file.
-    pub fn try_load(file: impl AsRef<Path>) -> Self {
+    /// Attempts to load custom definitions from a given file.
+    ///
+    /// Saves & uses the default definitions if there is an error.
+    pub fn try_load(&mut self, file: impl AsRef<Path>) {
         if let Some(path) = Settings::config_path(file) {
             if path.exists() {
                 // try to read definition data from file
@@ -80,14 +73,15 @@ impl Definitions {
                     .ok()
                     .and_then(|reader| serde_json::from_reader(reader).ok())
                 {
-                    return Self::with_data(food, utility);
+                    self.add_data(food, utility);
                 }
             } else {
-                // write out defaults
+                // save & use defaults
                 let _ = fs::write(&path, DEFINITIONS);
+                let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
+                self.add_data(food, utility);
             }
         }
-        Self::new()
     }
 
     /// Returns the buff definition with the given id.

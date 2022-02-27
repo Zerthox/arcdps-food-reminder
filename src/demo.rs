@@ -2,7 +2,7 @@
 
 use crate::{
     defs::{BuffDef, Definitions},
-    reminder::Reminder,
+    remind::Reminder,
     tracking::{
         buff::BuffState,
         entry::{Entry, Profession, Specialization},

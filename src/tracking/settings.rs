@@ -6,12 +6,48 @@ use super::{
 use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
 
+/// Settings for the tracker.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TrackerSettings {
+    /// Whether to save the buffs on own characters.
+    pub save_chars: bool,
+
+    /// Hotkey for the tracker window.
+    pub hotkey: Option<usize>,
+}
+
+impl Default for TrackerSettings {
+    fn default() -> Self {
+        Self {
+            save_chars: true,
+            hotkey: Some(Tracker::DEFAULT_HOTKEY),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(default)]
+pub struct TrackerState {
+    pub settings: TrackerSettings,
+    pub own_chars: Vec<SettingsEntry>,
+}
+
+impl Default for TrackerState {
+    fn default() -> Self {
+        Self {
+            settings: TrackerSettings::default(),
+            own_chars: Vec::new(),
+        }
+    }
+}
+
 /// Saved Player entry.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SettingsEntry {
-    player: Player,
-    food: BuffState,
-    util: BuffState,
+    pub player: Player,
+    pub food: BuffState,
+    pub util: BuffState,
 }
 
 impl SettingsEntry {
@@ -20,32 +56,16 @@ impl SettingsEntry {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(default)]
-pub struct TrackerSettings {
-    save_chars: bool,
-    own_chars: Vec<SettingsEntry>,
-}
-
-impl Default for TrackerSettings {
-    fn default() -> Self {
-        Self {
-            save_chars: true,
-            own_chars: Vec::new(),
-        }
-    }
-}
-
 // required to save window settings
 impl HasSettings for Tracker {
-    type Settings = TrackerSettings;
+    type Settings = TrackerState;
 
     const SETTINGS_ID: &'static str = "tracker";
 
     fn current_settings(&self) -> Self::Settings {
         Self::Settings {
-            save_chars: self.save_chars,
-            own_chars: if self.save_chars {
+            settings: self.settings,
+            own_chars: if self.settings.save_chars {
                 self.get_self()
                     .into_iter()
                     .chain(&self.chars_cache)
@@ -60,8 +80,8 @@ impl HasSettings for Tracker {
     }
 
     fn load_settings(&mut self, loaded: Self::Settings) {
-        self.save_chars = loaded.save_chars;
-        if self.save_chars {
+        self.settings = loaded.settings;
+        if self.settings.save_chars {
             self.chars_cache = loaded
                 .own_chars
                 .into_iter()

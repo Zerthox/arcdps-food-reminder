@@ -16,12 +16,15 @@ use arcdps::imgui::{
 };
 use buff::BuffState;
 use entry::{Entry, Player};
+use settings::TrackerSettings;
 use std::cmp::Reverse;
 use windows::System::VirtualKey;
 
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
+    pub settings: TrackerSettings,
+
     /// Currently tracked players.
     players: Vec<Entry>,
 
@@ -34,9 +37,6 @@ pub struct Tracker {
     /// Cache for buffs on own characters of local player (self).
     chars_cache: Vec<Entry>,
 
-    /// Whether to save the buffs on own characters.
-    pub save_chars: bool,
-
     /// Current ongoing encounter.
     encounter: Option<usize>,
 }
@@ -44,7 +44,7 @@ pub struct Tracker {
 #[allow(dead_code)]
 impl Tracker {
     /// Default hotkey for tracker.
-    pub const HOTKEY: usize = VirtualKey::F.0 as usize;
+    pub const DEFAULT_HOTKEY: usize = VirtualKey::F.0 as usize;
 
     /// Creates a new tracker.
     pub const fn new() -> Self {
@@ -53,7 +53,7 @@ impl Tracker {
             sorting: Sorting::Sub,
             reverse: false,
             chars_cache: Vec::new(),
-            save_chars: true,
+            settings: TrackerSettings::default(),
             encounter: None,
         }
     }

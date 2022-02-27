@@ -1,12 +1,11 @@
-use arc_util::{api::CoreColor, exports, settings::HasSettings, ui::Component};
+pub mod settings;
+
+use arc_util::{api::CoreColor, exports, ui::Component};
 use arcdps::imgui::{self, Ui};
-use serde::{Deserialize, Serialize};
+use settings::ReminderSettings;
 use std::time::{Duration, Instant};
 
 // TODO: alert component with custom text instead of this?
-
-/// Default duration used by the reminder.
-pub const DEFAULT_DURATION: Duration = Duration::from_secs(5);
 
 /// Font size used by the reminder.
 const FONT_SIZE: f32 = 2.0;
@@ -20,6 +19,9 @@ pub struct Reminder {
 }
 
 impl Reminder {
+    /// Default duration used by the reminder.
+    pub const DEFAULT_DURATION: Duration = Duration::from_secs(5);
+
     /// Creates a new reminder.
     pub const fn new() -> Self {
         Self {
@@ -118,50 +120,5 @@ impl Component for Reminder {
 impl Default for Reminder {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(default)]
-pub struct ReminderSettings {
-    pub duration: Duration,
-    pub only_bosses: bool,
-    pub encounter_start: bool,
-    pub encounter_end: bool,
-    pub during_encounter: bool,
-    pub always_mal_dim: bool,
-}
-
-impl ReminderSettings {
-    /// Creates new reminder settings with the defaults.
-    pub const fn new() -> Self {
-        Self {
-            duration: DEFAULT_DURATION,
-            only_bosses: true,
-            encounter_start: true,
-            encounter_end: true,
-            during_encounter: true,
-            always_mal_dim: true,
-        }
-    }
-}
-
-impl Default for ReminderSettings {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl HasSettings for Reminder {
-    type Settings = ReminderSettings;
-
-    const SETTINGS_ID: &'static str = "reminder";
-
-    fn current_settings(&self) -> Self::Settings {
-        self.settings.clone()
-    }
-
-    fn load_settings(&mut self, loaded: Self::Settings) {
-        self.settings = loaded;
     }
 }

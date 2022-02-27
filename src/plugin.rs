@@ -1,7 +1,7 @@
 use crate::{
     data::{BOSSES, DIMINISHED, MALNOURISHED},
     defs::{BuffDef, Definitions},
-    reminder::Reminder,
+    remind::Reminder,
     tracking::{buff::BuffState, Tracker},
     util,
 };
@@ -490,7 +490,7 @@ impl Plugin {
         // tracker save chars
         ui.checkbox(
             "Save own characters between game sessions",
-            &mut self.tracker.save_chars,
+            &mut self.tracker.settings.save_chars,
         );
 
         // tracker hotkey
@@ -506,7 +506,8 @@ impl Plugin {
             key_buffer.push_str(
                 &self
                     .tracker
-                    .hotkey()
+                    .settings
+                    .hotkey
                     .map(|keycode| keycode.to_string())
                     .unwrap_or_default(),
             );
@@ -518,9 +519,9 @@ impl Plugin {
                 .build()
             {
                 if key_buffer.is_empty() {
-                    self.tracker.set_hotkey(None);
+                    self.tracker.settings.hotkey = None;
                 } else if let Ok(keycode) = key_buffer.parse() {
-                    self.tracker.set_hotkey(Some(keycode));
+                    self.tracker.settings.hotkey = Some(keycode);
                 }
             }
         });
@@ -528,7 +529,8 @@ impl Plugin {
         align.item(ui, || {
             let name = self
                 .tracker
-                .hotkey()
+                .settings
+                .hotkey
                 .map(|keycode| util::keycode_to_name(keycode as u32))
                 .flatten()
                 .unwrap_or_default();
@@ -605,7 +607,7 @@ impl Plugin {
         // check for down
         if down && !prev_down {
             // check for hotkeys
-            if Some(key) == self.tracker.hotkey() {
+            if Some(key) == self.tracker.settings.hotkey {
                 self.tracker.toggle_visibility();
                 return false;
             }

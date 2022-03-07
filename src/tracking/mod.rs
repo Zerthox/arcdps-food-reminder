@@ -188,7 +188,13 @@ impl Tracker {
     }
 
     /// Renders a context menu for an item.
-    fn render_context_menu(ui: &Ui, menu_id: &str, title: &str, buff_id: u32, name: Option<&str>) {
+    fn render_context_menu(
+        ui: &Ui,
+        menu_id: impl Into<String>,
+        title: &str,
+        buff_id: u32,
+        name: Option<&str>,
+    ) {
         item_context_menu(menu_id, || {
             ui.text(title);
             if let Some(name) = name {
@@ -212,7 +218,7 @@ impl Tracker {
     fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         Self::render_context_menu(
             ui,
-            &format!("##food-context-{}", menu_id),
+            format!("##food-context-{}", menu_id),
             "Food Options",
             buff_id,
             name,
@@ -223,7 +229,7 @@ impl Tracker {
     fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
         Self::render_context_menu(
             ui,
-            &format!("##util-context-{}", menu_id),
+            format!("##util-context-{}", menu_id),
             "Utility Options",
             buff_id,
             name,

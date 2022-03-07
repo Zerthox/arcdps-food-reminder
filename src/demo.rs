@@ -134,7 +134,7 @@ impl Component for Demo {
                 // sub
                 ui.table_next_column();
                 let mut sub = String::with_capacity(2);
-                sub.push_str(&format!("{}", entry.player.subgroup));
+                sub.push_str(&entry.player.subgroup.to_string());
                 if ui
                     .input_text(format!("##sub-{}", id), &mut sub)
                     .chars_decimal(true)

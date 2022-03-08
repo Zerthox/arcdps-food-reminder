@@ -57,13 +57,15 @@ impl Plugin {
         Self {
             defs: Definitions::new(),
             reminder: Reminder::new(),
-            tracker: Window::new("Food Tracker", Tracker::new()),
+            tracker: Window::new("Food Tracker", Tracker::new()).auto_resize(true),
 
             #[cfg(feature = "demo")]
-            demo: Window::new("Food Demo", Demo::new()),
+            demo: Window::new("Food Demo", Demo::new()).auto_resize(true),
 
             #[cfg(feature = "log")]
-            debug: Window::new("Food Debug Log", Log::new()),
+            debug: Window::new("Food Debug Log", Log::new())
+                .width(600.0)
+                .height(300.0),
         }
     }
 

@@ -1,7 +1,7 @@
 mod data;
 mod defs;
 mod plugin;
-mod remind;
+mod reminder;
 mod tracking;
 mod util;
 

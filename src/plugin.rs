@@ -1,7 +1,7 @@
 use crate::{
     data::{BOSSES, DIMINISHED, MALNOURISHED},
     defs::{BuffDef, Definitions},
-    remind::Reminder,
+    reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
     util,
 };

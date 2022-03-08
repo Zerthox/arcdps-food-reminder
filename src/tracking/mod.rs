@@ -376,7 +376,7 @@ impl Tracker {
 
             if let Some(_table) = ui.begin_table_header_with_flags(
                 "##squad-table",
-                [col_player],
+                [col_sub, col_player, col_food, col_util],
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
             ) {
                 // update sorting if necessary

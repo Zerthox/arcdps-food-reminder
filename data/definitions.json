@@ -141,23 +141,42 @@
       "stats": ["+100 Expertise", "+70 Condition Damage"],
       "display": "EXP"
     },
+
     {
       "id": 10119,
       "name": "Bowl of Fire Meat Chili",
       "stats": ["+15% Burning Duration", "+70 Precision"],
-      "display": "EXP"
+      "display": "DURA"
+    },
+    {
+      "id": 66503,
+      "name": "Fishy Rice Bowl",
+      "stats": ["+15% Burning Duration", "+70 Condition Damage"],
+      "display": "DURA"
+    },
+    {
+      "id": 65769,
+      "name": "Plate of Kimchi Pancakes",
+      "stats": ["+15% Bleed Duration", "+70 Condition Damage"],
+      "display": "DURA"
     },
     {
       "id": 64568,
       "name": "Meaty Asparagus Skewer",
       "stats": ["+15% Torment Duration", "+70 Condition Damage"],
-      "display": "EXP"
+      "display": "DURA"
     },
     {
-      "id": 65197 ,
+      "id": 65197,
       "name": "Bowl of Kimchi Tofu Stew",
       "stats": ["+15% Poison Duration", "+70 Condition Damage"],
-      "display": "EXP"
+      "display": "DURA"
+    },
+    {
+      "id": 65354,
+      "name": "Meaty Rice Bowl",
+      "stats": ["+15% Confusion Duration", "+70 Condition Damage"],
+      "display": "DURA"
     },
 
     {
@@ -230,6 +249,12 @@
       "stats": ["+200 Condition Damage on Kill", "+70 Precision"],
       "display": "KILL",
       "proc": 10104
+    },
+    {
+      "id": 65937,
+      "name": "Block of Tofu",
+      "stats": ["+100 Power & Ferocity on Kill", "+70 Precision"],
+      "display": "KILL"
     },
 
     {

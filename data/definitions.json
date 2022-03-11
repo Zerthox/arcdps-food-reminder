@@ -254,7 +254,8 @@
       "id": 65937,
       "name": "Block of Tofu",
       "stats": ["+100 Power & Ferocity on Kill", "+70 Precision"],
-      "display": "KILL"
+      "display": "KILL",
+      "proc": 64528
     },
 
     {

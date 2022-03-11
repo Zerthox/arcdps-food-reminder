@@ -147,6 +147,18 @@
       "stats": ["+15% Burning Duration", "+70 Precision"],
       "display": "EXP"
     },
+    {
+      "id": 64568,
+      "name": "Meaty Asparagus Skewer",
+      "stats": ["+15% Torment Duration", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 65197 ,
+      "name": "Bowl of Kimchi Tofu Stew",
+      "stats": ["+15% Poison Duration", "+70 Condition Damage"],
+      "display": "EXP"
+    },
 
     {
       "id": 57114,

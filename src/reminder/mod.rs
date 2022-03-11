@@ -58,10 +58,10 @@ impl Reminder {
     fn render_text(ui: &Ui, text: &str) {
         // grab colors
         let colors = exports::colors();
-        let red = colors
-            .core(CoreColor::LightRed)
-            .map(|vec| vec.into())
-            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
+        let red = match colors.core(CoreColor::LightRed) {
+            Some(vec) => vec.into(),
+            None => [1.0, 0.0, 0.0, 1.0],
+        };
 
         // adjust cursor to center text
         let [cursor_x, cursor_y] = ui.cursor_pos();

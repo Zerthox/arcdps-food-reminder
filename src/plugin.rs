@@ -536,8 +536,7 @@ impl Plugin {
                 .tracker
                 .settings
                 .hotkey
-                .map(|keycode| util::keycode_to_name(keycode as u32))
-                .flatten()
+                .and_then(|keycode| util::keycode_to_name(keycode as u32))
                 .unwrap_or_default();
             ui.text(name);
         });

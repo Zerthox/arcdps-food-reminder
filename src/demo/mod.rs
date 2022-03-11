@@ -156,7 +156,7 @@ impl Component for Demo {
                     .input_text(format!("##char-{}", id), &mut char_name)
                     .build()
                 {
-                    entry.player.character = char_name.into();
+                    entry.player.character = char_name;
                 }
 
                 // account name
@@ -205,7 +205,7 @@ impl Component for Demo {
                     format!("##food-{}", id),
                     &mut food_id,
                     &self.all_foods,
-                    |buff| Self::food_name(&defs, *buff),
+                    |buff| Self::food_name(defs, *buff),
                 ) {
                     entry.food.state = self.all_foods[food_id];
                 }
@@ -222,7 +222,7 @@ impl Component for Demo {
                     format!("##util-{}", id),
                     &mut util_id,
                     &self.all_utils,
-                    |buff| Self::util_name(&defs, *buff),
+                    |buff| Self::util_name(defs, *buff),
                 ) {
                     entry.util.state = self.all_utils[util_id];
                 }
@@ -253,6 +253,6 @@ impl Component for Demo {
 
         // render children
         self.reminder.render(ui, &());
-        self.tracker.render(ui, &defs);
+        self.tracker.render(ui, defs);
     }
 }

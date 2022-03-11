@@ -39,12 +39,18 @@ pub struct TrackerState {
     pub own_chars: Vec<SettingsEntry>,
 }
 
-impl Default for TrackerState {
-    fn default() -> Self {
+impl TrackerState {
+    pub const fn new() -> Self {
         Self {
-            settings: TrackerSettings::default(),
+            settings: TrackerSettings::new(),
             own_chars: Vec::new(),
         }
+    }
+}
+
+impl Default for TrackerState {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

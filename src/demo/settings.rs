@@ -10,13 +10,18 @@ pub struct DemoSettings {
     tracker: bool,
 }
 
-#[allow(clippy::derivable_impls)]
-impl Default for DemoSettings {
-    fn default() -> Self {
+impl DemoSettings {
+    pub const fn new() -> Self {
         Self {
             players: Vec::new(),
             tracker: false,
         }
+    }
+}
+
+impl Default for DemoSettings {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

@@ -1,11 +1,6 @@
 use crate::data::{DIMINISHED, MALNOURISHED};
-use arc_util::settings::Settings;
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    fs::{self, File},
-    path::Path,
-};
+use std::{collections::HashMap, fs::File, path::Path};
 
 /// Default definitions.
 const DEFINITIONS: &str = include_str!("../data/definitions.json");
@@ -21,7 +16,7 @@ impl Definitions {
     /// Creates a new set of definitions.
     ///
     /// This only includes malnourished & diminished.
-    pub fn new() -> Self {
+    pub fn empty() -> Self {
         let mut data = HashMap::new();
 
         // insert malnourished & diminished
@@ -31,6 +26,14 @@ impl Definitions {
         data.insert(diminished.id, BuffDef::Util(diminished));
 
         Self { data }
+    }
+
+    /// Creates a new set of definitions with the default definitions.
+    pub fn with_defaults() -> Self {
+        let mut defs = Self::empty();
+        let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
+        defs.add_data(food, utility);
+        defs
     }
 
     /// Creates a set of definitions from data.
@@ -63,25 +66,15 @@ impl Definitions {
     }
 
     /// Attempts to load custom definitions from a given file.
-    ///
-    /// Saves & uses the default definitions if there is an error.
-    pub fn try_load(&mut self, file: impl AsRef<Path>) {
-        if let Some(path) = Settings::config_path(file) {
-            if path.exists() {
-                // try to read definition data from file
-                if let Some(DefData { food, utility }) = File::open(path)
-                    .ok()
-                    .and_then(|reader| serde_json::from_reader(reader).ok())
-                {
-                    self.add_data(food, utility);
-                }
-            } else {
-                // save & use defaults
-                let _ = fs::write(&path, DEFINITIONS);
-                let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
-                self.add_data(food, utility);
-            }
-        }
+    pub fn try_load(&mut self, path: impl AsRef<Path>) -> Result<(), ()> {
+        // open file
+        let reader = File::open(path).map_err(|_| ())?;
+
+        // read & add data
+        let DefData { food, utility } = serde_json::from_reader(reader).map_err(|_| ())?;
+        self.add_data(food, utility);
+
+        Ok(())
     }
 
     /// Returns the buff definition with the given id.
@@ -103,12 +96,6 @@ impl Definitions {
             BuffDef::Util(data) => Some(data),
             _ => None,
         })
-    }
-}
-
-impl Default for Definitions {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -157,7 +144,8 @@ impl BuffData {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
 struct DefData {
     pub food: Vec<BuffData>,
     pub utility: Vec<BuffData>,

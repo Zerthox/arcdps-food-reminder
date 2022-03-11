@@ -13,7 +13,8 @@ use arc_util::{
     ui::{align::LeftAlign, Component, Hideable, Window},
 };
 use arcdps::{imgui::Ui, Agent, CombatEvent};
-use std::time::Duration;
+use semver::Version;
+use std::{fs, time::Duration};
 
 #[cfg(feature = "demo")]
 use crate::demo::Demo;
@@ -55,7 +56,7 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            defs: Definitions::new(),
+            defs: Definitions::with_defaults(),
             reminder: Reminder::new(),
             tracker: Window::new("Food Tracker", Tracker::new()).auto_resize(true),
 
@@ -76,9 +77,16 @@ impl Plugin {
 
         // load settings
         let mut settings = Settings::from_file(SETTINGS_FILE);
+        let settings_version: Option<Version> = settings.load_data("version");
 
         #[cfg(feature = "log")]
-        self.debug.log(format!("Loaded {:?}", settings));
+        self.debug.log(format!(
+            "Loaded settings from version {}",
+            match &settings_version {
+                Some(version) => version.to_string(),
+                None => "unknown".into(),
+            }
+        ));
 
         // load component settings
         settings.load_component(&mut self.tracker);
@@ -87,8 +95,36 @@ impl Plugin {
         #[cfg(feature = "demo")]
         settings.load_component(&mut self.demo);
 
-        // load definitions
-        self.defs.try_load(DEFINITIONS_FILE);
+        // load custom defs
+        if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {
+            const DEFAULTS_CHANGE: Version = Version::new(0, 4, 0);
+
+            // check for minimum version
+            if matches!(settings_version, Some(version) if version >= DEFAULTS_CHANGE) {
+                if defs_path.exists() {
+                    // try loading custom defs
+                    if self.defs.try_load(&defs_path).is_ok() {
+                        #[cfg(feature = "log")]
+                        self.debug.log(format!(
+                            "Loaded custom definitions from \"{}\"",
+                            defs_path.display()
+                        ));
+                    } else {
+                        #[cfg(feature = "log")]
+                        self.debug.log(format!(
+                            "Failed to load custom definitions from \"{}\"",
+                            defs_path.display()
+                        ));
+                    }
+                }
+            } else {
+                // settings are from old version, remove old defs file
+                let _ = fs::remove_file(defs_path);
+
+                #[cfg(feature = "log")]
+                self.debug.log("Removed definitions from old version");
+            }
+        }
     }
 
     /// Unloads the plugin.

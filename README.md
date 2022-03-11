@@ -7,16 +7,18 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 ![Tracker screenshot](./screenshots/tracker.png)
 
 ## Buff definitions
-Definitions for Food & Utility buffs are loaded from `arcdps_food_reminder_definitions.json`.
-The file should be created automatically the first time the plugin is loaded.
-Default definitions are collected in [data/definitions.json](./data/definitions.json).  
-The Malnourished & Diminished buffs are currently hardcoded and can not be changed.
+The default definitions for Food & Utility buffs are collected in [data/definitions.json](./data/definitions.json).
 
 **Found an unknown Food/Utility buff that you would like to see added?**  
 Right click the entry in the tracker and select `Copy ID`.
 Report the copied buff ID & the Food/Utility that applied it.
 
 ![Reporting unknown buff](./screenshots/unknown.png)
+
+**Using custom definitions:**  
+Custom definitions can be set in `arcdps_food_reminder_definitions.json`.
+The file uses the same format as [data/definitions.json](./data/definitions.json).
+Entries using the same id will overwrite the default definition for a Food/Utility buff.
 
 ## Building from source
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.

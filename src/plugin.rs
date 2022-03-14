@@ -41,7 +41,9 @@ pub struct Plugin {
     reminder: Reminder,
 
     /// Whether there is a pending food check for the current encounter.
-    pending_check: bool,
+    ///
+    /// Stores the timestamp of last relevant event.
+    pending_check: Option<u64>,
 
     /// Food tracker window.
     tracker: Window<Tracker>,
@@ -61,7 +63,7 @@ impl Plugin {
         Self {
             defs: Definitions::with_defaults(),
             reminder: Reminder::new(),
-            pending_check: false,
+            pending_check: None,
             tracker: Window::new("Food Tracker", Tracker::new()).auto_resize(true),
 
             #[cfg(feature = "demo")]
@@ -202,7 +204,7 @@ impl Plugin {
                         self.tracker.start_encounter(target_id);
 
                         // set check as pending
-                        self.pending_check = true;
+                        self.pending_check = Some(event.time);
 
                         #[cfg(feature = "log")]
                         self.debug.log(format!(
@@ -410,13 +412,18 @@ impl Plugin {
                         }
 
                         // handle pending check
-                        if self.pending_check && statechange != StateChange::BuffInitial {
-                            self.pending_check = false;
+                        if let Some(time) = self.pending_check {
+                            if statechange == StateChange::BuffInitial {
+                                // initial buffs are still being reported, refresh time
+                                self.pending_check = Some(event.time);
+                            } else if event.time > time {
+                                self.pending_check = None;
 
-                            // check self buffs
-                            if self.reminder.settings.encounter_start {
-                                self.check_self_food();
-                                self.check_self_util();
+                                // check self buffs
+                                if self.reminder.settings.encounter_start {
+                                    self.check_self_food();
+                                    self.check_self_util();
+                                }
                             }
                         }
                     }
@@ -555,7 +562,7 @@ impl Plugin {
 
         align.item(ui, || {
             ui.align_text_to_frame_padding();
-            ui.text("Tracker Hotkey")
+            ui.text("Tracker Hotkey");
         });
 
         align.item(ui, || {

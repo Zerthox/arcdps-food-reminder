@@ -40,6 +40,9 @@ pub struct Plugin {
     /// Food reminder.
     reminder: Reminder,
 
+    /// Whether there is a pending food check for the current encounter.
+    pending_check: bool,
+
     /// Food tracker window.
     tracker: Window<Tracker>,
 
@@ -58,6 +61,7 @@ impl Plugin {
         Self {
             defs: Definitions::with_defaults(),
             reminder: Reminder::new(),
+            pending_check: false,
             tracker: Window::new("Food Tracker", Tracker::new()).auto_resize(true),
 
             #[cfg(feature = "demo")]
@@ -187,28 +191,24 @@ impl Plugin {
                         #[cfg(feature = "log")]
                         let delta = api::calc_delta(event);
 
-                        // change unset buffs to none
+                        // change buffs to none
                         // initial buffs should be reported right after
                         for entry in self.tracker.all_players_mut() {
-                            entry.unset_to_none(event.time, event_id);
+                            entry.buffs_to_none(event.time, event_id);
                         }
 
                         // start encounter
                         let target_id = event.src_agent;
                         self.tracker.start_encounter(target_id);
 
+                        // set check as pending
+                        self.pending_check = true;
+
                         #[cfg(feature = "log")]
                         self.debug.log(format!(
                             "Log for id {} started with {:?} delta",
                             target_id, delta
                         ));
-
-                        // check self buffs
-                        // FIXME: need to wait for reports on initial buffs
-                        if self.reminder.settings.encounter_start {
-                            self.check_self_food();
-                            self.check_self_util();
-                        }
                     }
 
                     StateChange::LogEnd => {
@@ -408,6 +408,17 @@ impl Plugin {
                                 }
                             }
                         }
+
+                        // handle pending check
+                        if self.pending_check && statechange != StateChange::BuffInitial {
+                            self.pending_check = false;
+
+                            // check self buffs
+                            if self.reminder.settings.encounter_start {
+                                self.check_self_food();
+                                self.check_self_util();
+                            }
+                        }
                     }
                 }
             } else {
@@ -473,16 +484,18 @@ impl Plugin {
     /// Checks for missing food on the local player.
     fn check_self_food(&mut self) {
         if let Some(entry) = self.tracker.get_self() {
-            if self.can_remind()
-                && matches!(
-                    entry.food.state,
-                    BuffState::None | BuffState::Some(MALNOURISHED)
-                )
-            {
-                self.reminder.trigger_food();
+            if self.can_remind() {
+                let food = entry.food.state;
 
                 #[cfg(feature = "log")]
-                self.debug.log("Food reminder triggered");
+                self.debug.log(format!("Checking food on self: {:?}", food));
+
+                if let BuffState::None | BuffState::Some(MALNOURISHED) = food {
+                    self.reminder.trigger_food();
+
+                    #[cfg(feature = "log")]
+                    self.debug.log("Food reminder triggered");
+                }
             }
         }
     }
@@ -490,16 +503,19 @@ impl Plugin {
     /// Checks for missing utility on the local player.
     fn check_self_util(&mut self) {
         if let Some(entry) = self.tracker.get_self() {
-            if self.can_remind()
-                && matches!(
-                    entry.util.state,
-                    BuffState::None | BuffState::Some(DIMINISHED)
-                )
-            {
-                self.reminder.trigger_util();
+            if self.can_remind() {
+                let util = entry.util.state;
 
                 #[cfg(feature = "log")]
-                self.debug.log("Utility reminder triggered");
+                self.debug
+                    .log(format!("Checking utility on self: {:?}", util));
+
+                if let BuffState::None | BuffState::Some(DIMINISHED) = util {
+                    self.reminder.trigger_util();
+
+                    #[cfg(feature = "log")]
+                    self.debug.log("Utility reminder triggered");
+                }
             }
         }
     }

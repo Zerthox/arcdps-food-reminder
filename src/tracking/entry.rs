@@ -34,14 +34,10 @@ impl Entry {
         }
     }
 
-    /// Sets all unset buffs to none.
-    pub fn unset_to_none(&mut self, time: u64, event_id: u64) {
-        if self.food.state == BuffState::Unknown {
-            self.food.update(BuffState::None, time, event_id);
-        }
-        if self.util.state == BuffState::Unknown {
-            self.util.update(BuffState::None, time, event_id);
-        }
+    /// Sets all buffs to none.
+    pub fn buffs_to_none(&mut self, time: u64, event_id: u64) {
+        self.food.update(BuffState::None, time, event_id);
+        self.util.update(BuffState::None, time, event_id);
     }
 
     /// Applies a food buff to the player.

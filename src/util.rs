@@ -1,4 +1,4 @@
-use arcdps::imgui::ImString;
+use std::ffi::CString;
 use windows::{
     core::PSTR,
     Win32::UI::{
@@ -8,22 +8,25 @@ use windows::{
 };
 
 /// Converts a keycode to the key's name.
-pub fn keycode_to_name(keycode: u32) -> Option<ImString> {
+pub fn keycode_to_name(keycode: u32) -> Option<String> {
     let scan_code = unsafe { MapVirtualKeyA(keycode, MAPVK_VK_TO_VSC) };
 
-    const SIZE: i32 = 4;
-    let mut buffer = ImString::with_capacity(SIZE as usize);
+    const SIZE: usize = 32;
+    let mut buffer = Vec::with_capacity(SIZE);
 
     let result = unsafe {
         GetKeyNameTextA(
             (scan_code << 16) as i32,
-            PSTR(buffer.as_mut_ptr() as *mut u8),
-            SIZE,
+            PSTR(buffer.as_mut_ptr()),
+            SIZE as i32,
         )
     };
 
     if result > 0 {
-        Some(buffer)
+        unsafe { buffer.set_len(result as usize) }
+        CString::new(buffer)
+            .ok()
+            .and_then(|string| string.into_string().ok())
     } else {
         None
     }

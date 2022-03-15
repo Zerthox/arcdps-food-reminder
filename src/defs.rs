@@ -1,4 +1,3 @@
-use crate::data::{DIMINISHED, MALNOURISHED};
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fs::File, path::Path};
 
@@ -13,19 +12,11 @@ pub struct Definitions {
 
 #[allow(dead_code)]
 impl Definitions {
-    /// Creates a new set of definitions.
-    ///
-    /// This only includes malnourished & diminished.
+    /// Creates a new empty set of definitions.
     pub fn empty() -> Self {
-        let mut data = HashMap::new();
-
-        // insert malnourished & diminished
-        let malnourished = BuffData::simple(MALNOURISHED, "Malnourished", "MALN");
-        let diminished = BuffData::simple(DIMINISHED, "Diminished", "DIM");
-        data.insert(malnourished.id, BuffDef::Food(malnourished));
-        data.insert(diminished.id, BuffDef::Util(diminished));
-
-        Self { data }
+        Self {
+            data: HashMap::new(),
+        }
     }
 
     /// Creates a new set of definitions with the default definitions.

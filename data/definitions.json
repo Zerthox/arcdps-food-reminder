@@ -1,6 +1,12 @@
 {
   "food": [
     {
+      "id": 46587,
+      "name": "Malnourished",
+      "display": "MALN"
+    },
+
+    {
       "id": 57244,
       "name": "Cilantro Lime Sous-Vide Steak",
       "stats": ["66% Life Steal Chance", "+100 Power", "+70 Ferocity"],
@@ -291,6 +297,12 @@
   ],
 
   "utility": [
+    {
+      "id": 46668,
+      "name": "Diminished",
+      "display": "DIM"
+    },
+
     {
       "id": 9963,
       "name": "Superior Sharpening Stone",

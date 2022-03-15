@@ -8,7 +8,7 @@ mod util;
 #[cfg(feature = "demo")]
 mod demo;
 
-use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent};
+use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent, UserInfoIter};
 use once_cell::sync::Lazy;
 use plugin::Plugin;
 use std::{error::Error, sync::Mutex};
@@ -28,6 +28,8 @@ arcdps_export! {
     options_end,
     options_windows,
     wnd_filter,
+    unofficial_extras_init,
+    unofficial_extras_squad_update,
 }
 
 fn init() -> Result<(), Box<dyn Error>> {
@@ -51,7 +53,7 @@ fn combat(
     PLUGIN
         .lock()
         .unwrap()
-        .combat_event(event, src, dest, skill_name, id, revision)
+        .area_event(event, src, dest, skill_name, id, revision)
 }
 
 fn imgui(ui: &Ui, not_loading_or_character_selection: bool) {
@@ -69,7 +71,7 @@ fn options_windows(ui: &Ui, window_name: Option<&str>) -> bool {
 }
 
 fn options_end(ui: &Ui) {
-    PLUGIN.lock().unwrap().render_options(ui)
+    PLUGIN.lock().unwrap().render_settings(ui)
 }
 
 fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {
@@ -77,4 +79,12 @@ fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {
         .lock()
         .unwrap()
         .key_event(key, key_down, prev_key_down)
+}
+
+fn unofficial_extras_init(account_name: Option<&str>, version: Option<&'static str>) {
+    PLUGIN.lock().unwrap().extras_init(account_name, version)
+}
+
+fn unofficial_extras_squad_update(users: UserInfoIter) {
+    PLUGIN.lock().unwrap().extras_squad_update(users)
 }

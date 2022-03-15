@@ -4,7 +4,7 @@ use arc_util::{
     api::CoreColor,
     exports,
     settings::HasSettings,
-    ui::{align::LeftAlign, Component, Hideable},
+    ui::{Component, Hideable},
 };
 use arcdps::imgui::Ui;
 use std::time::Duration;
@@ -51,47 +51,41 @@ impl Plugin {
         );
 
         // tracker hotkey
-        let mut align = LeftAlign::with_margin(10.0);
+        const SPACING: f32 = 5.0;
+        ui.align_text_to_frame_padding();
+        ui.text("Tracker Hotkey");
 
-        align.item(ui, || {
-            ui.align_text_to_frame_padding();
-            ui.text("Tracker Hotkey");
-        });
-
-        align.item(ui, || {
-            let mut key_buffer = String::with_capacity(3);
-            key_buffer.push_str(
-                &self
-                    .tracker
-                    .settings
-                    .hotkey
-                    .map(|keycode| keycode.to_string())
-                    .unwrap_or_default(),
-            );
-
-            ui.push_item_width(ui.calc_text_size("0000")[0]);
-            if ui
-                .input_text("##hotkey", &mut key_buffer)
-                .chars_decimal(true)
-                .build()
-            {
-                if key_buffer.is_empty() {
-                    self.tracker.settings.hotkey = None;
-                } else if let Ok(keycode) = key_buffer.parse() {
-                    self.tracker.settings.hotkey = Some(keycode);
-                }
-            }
-        });
-
-        align.item(ui, || {
-            let name = self
+        let mut key_buffer = String::with_capacity(3);
+        key_buffer.push_str(
+            &self
                 .tracker
                 .settings
                 .hotkey
-                .and_then(|keycode| util::keycode_to_name(keycode as u32))
-                .unwrap_or_default();
-            ui.text(name);
-        });
+                .map(|keycode| keycode.to_string())
+                .unwrap_or_default(),
+        );
+        ui.same_line_with_spacing(0.0, SPACING);
+        ui.push_item_width(ui.calc_text_size("0000")[0]);
+        if ui
+            .input_text("##hotkey", &mut key_buffer)
+            .chars_decimal(true)
+            .build()
+        {
+            if key_buffer.is_empty() {
+                self.tracker.settings.hotkey = None;
+            } else if let Ok(keycode) = key_buffer.parse() {
+                self.tracker.settings.hotkey = Some(keycode);
+            }
+        }
+
+        let name = self
+            .tracker
+            .settings
+            .hotkey
+            .and_then(|keycode| util::keycode_to_name(keycode as u32))
+            .unwrap_or_default();
+        ui.same_line_with_spacing(0.0, SPACING);
+        ui.text(name);
 
         // unofficial extras indicator
         ui.spacing();

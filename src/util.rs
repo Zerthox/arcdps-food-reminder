@@ -31,3 +31,15 @@ pub fn keycode_to_name(keycode: u32) -> Option<String> {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn key_name() {
+        assert_eq!(Some(String::from("ALT")), keycode_to_name(18));
+        assert_eq!(Some(String::from("A")), keycode_to_name(65));
+        assert_eq!(Some(String::from("F")), keycode_to_name(70));
+    }
+}

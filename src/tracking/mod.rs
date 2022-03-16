@@ -33,7 +33,7 @@ pub struct Tracker {
 #[allow(dead_code)]
 impl Tracker {
     /// Default hotkey for tracker.
-    pub const DEFAULT_HOTKEY: usize = VirtualKey::F.0 as usize;
+    pub const DEFAULT_HOTKEY: u32 = VirtualKey::F.0 as u32;
 
     /// Creates a new tracker.
     pub const fn new() -> Self {

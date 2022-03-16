@@ -14,7 +14,7 @@ pub struct TrackerSettings {
     pub save_chars: bool,
 
     /// Hotkey for the tracker window.
-    pub hotkey: Option<usize>,
+    pub hotkey: Option<u32>,
 }
 
 impl TrackerSettings {

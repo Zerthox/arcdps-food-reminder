@@ -55,41 +55,12 @@ impl Plugin {
         );
 
         // tracker hotkey
-        const SPACING: f32 = 5.0;
-        ui.align_text_to_frame_padding();
-        ui.text("Tracker Hotkey:");
-
-        let mut key_buffer = String::with_capacity(3);
-        key_buffer.push_str(
-            &self
-                .tracker
-                .settings
-                .hotkey
-                .map(|keycode| keycode.to_string())
-                .unwrap_or_default(),
+        util::key_input(
+            ui,
+            "##hotkey",
+            "Tracker Hotkey:",
+            &mut self.tracker.settings.hotkey,
         );
-        ui.same_line_with_spacing(0.0, SPACING);
-        ui.push_item_width(ui.calc_text_size("0000")[0]);
-        if ui
-            .input_text("##hotkey", &mut key_buffer)
-            .chars_decimal(true)
-            .build()
-        {
-            if key_buffer.is_empty() {
-                self.tracker.settings.hotkey = None;
-            } else if let Ok(keycode) = key_buffer.parse() {
-                self.tracker.settings.hotkey = Some(keycode);
-            }
-        }
-
-        let name = self
-            .tracker
-            .settings
-            .hotkey
-            .and_then(|keycode| util::keycode_to_name(keycode as u32))
-            .unwrap_or_default();
-        ui.same_line_with_spacing(0.0, SPACING);
-        ui.text(name);
 
         // unofficial extras indicator
         ui.text("Unofficial extras (for subgroup updates):");
@@ -172,7 +143,7 @@ impl Plugin {
         // check for down
         if down && !prev_down {
             // check for hotkeys
-            if Some(key) == self.tracker.settings.hotkey {
+            if matches!(self.tracker.settings.hotkey, Some(hotkey) if hotkey as usize == key) {
                 self.tracker.toggle_visibility();
                 return false;
             }

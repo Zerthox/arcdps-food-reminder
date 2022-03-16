@@ -1,3 +1,7 @@
+#![allow(dead_code)]
+
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+
 /// Malnourished buff id.
 pub const MALNOURISHED: u32 = 46587;
 
@@ -45,3 +49,35 @@ pub const BOSSES: &[usize] = &[
     17759, // Arkk
     23254, // Ai
 ];
+
+/// Buff definitions data.
+#[derive(Debug, Default, Serialize, Deserialize)]
+#[serde(default)]
+pub struct DefData {
+    pub food: Vec<BuffData>,
+    pub utility: Vec<BuffData>,
+    pub ignore: Vec<u32>,
+}
+
+/// Single buff data entry.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BuffData {
+    pub id: u32,
+    pub name: String,
+
+    #[serde(default)]
+    pub stats: Vec<String>,
+
+    pub display: String,
+}
+
+/// Parses JSONC from an input string.
+pub fn parse_jsonc<T>(input: &str) -> Option<T>
+where
+    T: DeserializeOwned,
+{
+    jsonc_parser::parse_to_serde_value(input)
+        .ok()
+        .and_then(|value| value)
+        .and_then(|value| serde_json::from_value(value).ok())
+}

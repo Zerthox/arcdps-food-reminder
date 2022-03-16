@@ -1,4 +1,5 @@
 {
+  // food buff definitions
   "food": [
     {
       "id": 46587,
@@ -6,6 +7,7 @@
       "display": "MALN"
     },
 
+    // power
     {
       "id": 57244,
       "name": "Cilantro Lime Sous-Vide Steak",
@@ -49,6 +51,7 @@
       "display": "PWR"
     },
 
+    // precision
     {
       "id": 57260,
       "name": "Plate of Peppercorn-Spiced Coq Au Vin",
@@ -80,6 +83,7 @@
       "display": "PREC"
     },
 
+    // condi damage
     {
       "id": 57409,
       "name": "Cilantro and Cured Meat Flatbread",
@@ -111,6 +115,7 @@
       "display": "CND"
     },
 
+    // expertise
     {
       "id": 57269,
       "name": "Salsa-Topped Veggie Flatbread",
@@ -148,6 +153,7 @@
       "display": "EXP"
     },
 
+    // condi duration
     {
       "id": 10119,
       "name": "Bowl of Fire Meat Chili",
@@ -185,6 +191,7 @@
       "display": "DURA"
     },
 
+    // concentration
     {
       "id": 57114,
       "name": "Plate of Peppercorn-Spiced Beef Carpaccio",
@@ -203,7 +210,6 @@
       "stats": ["+100 Concentration", "+70 Power"],
       "display": "PCON"
     },
-
     {
       "id": 57117,
       "name": "Salsa Eggs Benedict",
@@ -223,6 +229,7 @@
       "display": "CCON"
     },
 
+    // heal
     {
       "id": 57276,
       "name": "Bowl of Spiced Fruit Salad",
@@ -242,28 +249,27 @@
       "display": "HEAL"
     },
 
+    // on kill
     {
       "id": 9750,
       "name": "Dragon's Breath Bun",
       "stats": ["+200 Power on Kill", "+70 Ferocity"],
-      "display": "KILL",
-      "proc": 10110
+      "display": "KILL"
     },
     {
       "id": 9756,
       "name": "Saffron Stuffed Mushroom",
       "stats": ["+200 Condition Damage on Kill", "+70 Precision"],
-      "display": "KILL",
-      "proc": 10104
+      "display": "KILL"
     },
     {
       "id": 65937,
       "name": "Block of Tofu",
       "stats": ["+100 Power & Ferocity on Kill", "+70 Precision"],
-      "display": "KILL",
-      "proc": 64528
+      "display": "KILL"
     },
 
+    // all stats
     {
       "id": 57165,
       "name": "Spherified Peppercorn-Spiced Oyster Soup",
@@ -296,6 +302,7 @@
     }
   ],
 
+  // utility buff definitions
   "utility": [
     {
       "id": 46668,
@@ -303,6 +310,7 @@
       "display": "DIM"
     },
 
+    // power
     {
       "id": 9963,
       "name": "Superior Sharpening Stone",
@@ -341,6 +349,7 @@
       "display": "EXP"
     },
 
+    // concentration
     {
       "id": 53374,
       "name": "Potent Lucent Oil",
@@ -372,6 +381,7 @@
       "display": "TCON"
     },
 
+    // heal
     {
       "id": 25879,
       "name": "Bountiful Maintenance Oil",
@@ -379,6 +389,7 @@
       "display": "HEAL"
     },
 
+    // writs
     {
       "id": 33297,
       "name": "Writ of Masterful Strength",
@@ -398,6 +409,7 @@
       "display": "WRIT"
     },
 
+    // slaying potions
     {
       "id": 9837,
       "name": "Powerful Potion of Undead Slaying",
@@ -501,6 +513,7 @@
       "display": "SLAY"
     },
 
+    // resurrect
     {
       "id": 25632,
       "name": "Flask of Pumpkin Oil",
@@ -519,5 +532,13 @@
       "stats": ["+75 All Attributes after reviving"],
       "display": "RES"
     }
+  ],
+
+  // ignored buff ids
+  "ignore": [
+    10110, // dragons breath bun proc
+    10104, // saffron stuffed mushroom proc
+    64528, // block of tofu proc
+    65475 // enhancement vs void in dragons end
   ]
 }

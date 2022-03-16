@@ -1,8 +1,10 @@
-use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs::File, path::Path};
+use crate::data::{parse_jsonc, BuffData, DefData};
+use std::{collections::HashMap, fs, path::Path};
 
-/// Default definitions.
-const DEFINITIONS: &str = include_str!("../data/definitions.json");
+/// Returns the default definitions.
+fn default_definitions() -> DefData {
+    include!(concat!(env!("OUT_DIR"), "/definitions.rs"))
+}
 
 /// Shared buff definitions data.
 #[derive(Debug)]
@@ -22,8 +24,12 @@ impl Definitions {
     /// Creates a new set of definitions with the default definitions.
     pub fn with_defaults() -> Self {
         let mut defs = Self::empty();
-        let DefData { food, utility } = serde_json::from_str(DEFINITIONS).unwrap();
-        defs.add_data(food, utility);
+        let DefData {
+            food,
+            utility,
+            ignore,
+        } = default_definitions();
+        defs.add_data(food, utility, ignore);
         defs
     }
 
@@ -32,38 +38,42 @@ impl Definitions {
         &mut self,
         food: impl IntoIterator<Item = BuffData>,
         util: impl IntoIterator<Item = BuffData>,
+        ignore: impl IntoIterator<Item = u32>,
     ) {
         let food = food.into_iter();
         let util = util.into_iter();
+        let ignore = ignore.into_iter();
 
         // reserve capacity
         let (food_size, _) = food.size_hint();
         let (util_size, _) = util.size_hint();
-        self.data.reserve(food_size + util_size);
+        let (ingnore_size, _) = ignore.size_hint();
+        self.data.reserve(food_size + util_size + ingnore_size);
 
         // insert data
         for entry in food {
-            if let Some(proc) = entry.proc {
-                self.data.insert(proc, BuffDef::Proc);
-            }
             self.data.insert(entry.id, BuffDef::Food(entry));
         }
         for entry in util {
-            if let Some(proc) = entry.proc {
-                self.data.insert(proc, BuffDef::Proc);
-            }
             self.data.insert(entry.id, BuffDef::Util(entry));
+        }
+        for id in ignore {
+            self.data.insert(id, BuffDef::Ignore(id));
         }
     }
 
     /// Attempts to load custom definitions from a given file.
     pub fn try_load(&mut self, path: impl AsRef<Path>) -> Result<(), ()> {
-        // open file
-        let reader = File::open(path).map_err(|_| ())?;
+        // read file
+        let content = fs::read_to_string(path).map_err(|_| ())?;
 
-        // read & add data
-        let DefData { food, utility } = serde_json::from_reader(reader).map_err(|_| ())?;
-        self.add_data(food, utility);
+        // parse & add data
+        let DefData {
+            food,
+            utility,
+            ignore,
+        } = parse_jsonc(&content).ok_or(())?;
+        self.add_data(food, utility, ignore);
 
         Ok(())
     }
@@ -94,60 +104,27 @@ impl Definitions {
 pub enum BuffDef {
     Food(BuffData),
     Util(BuffData),
-    Proc,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BuffData {
-    pub id: u32,
-    pub name: String,
-
-    #[serde(default)]
-    pub stats: Vec<String>,
-
-    pub display: String,
-
-    pub proc: Option<u32>,
-}
-
-#[allow(dead_code)]
-impl BuffData {
-    /// Creates a new buff data entry.
-    pub fn new(
-        id: u32,
-        name: impl Into<String>,
-        stats: impl IntoIterator<Item = String>,
-        display: impl Into<String>,
-        proc: Option<u32>,
-    ) -> Self {
-        Self {
-            id,
-            name: name.into(),
-            stats: stats.into_iter().collect(),
-            display: display.into(),
-            proc,
-        }
-    }
-
-    /// Creates a new buff data entry without stats & proc id.
-    pub fn simple(id: u32, name: impl Into<String>, display: impl Into<String>) -> Self {
-        Self::new(id, name, Vec::new(), display, None)
-    }
-}
-
-#[derive(Debug, Default, Serialize, Deserialize)]
-#[serde(default)]
-struct DefData {
-    pub food: Vec<BuffData>,
-    pub utility: Vec<BuffData>,
+    Ignore(u32),
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::data::{DIMINISHED, MALNOURISHED};
 
     #[test]
     fn definitions() {
-        let _: DefData = serde_json::from_str(DEFINITIONS).expect("invalid definitions file");
+        let DefData {
+            food,
+            utility,
+            ignore,
+        } = default_definitions();
+
+        assert!(!food.is_empty());
+        assert!(!utility.is_empty());
+        assert!(!ignore.is_empty());
+
+        assert!(food.iter().any(|entry| entry.id == MALNOURISHED));
+        assert!(utility.iter().any(|entry| entry.id == DIMINISHED));
     }
 }

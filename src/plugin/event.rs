@@ -164,11 +164,11 @@ impl Plugin {
                                                         }
                                                     }
                                                 }
-                                                BuffDef::Proc => {
+                                                BuffDef::Ignore(id) => {
                                                     #[cfg(feature = "log")]
                                                     self.debug.log(format!(
-                                                        "Food proc {} applied to {:?}",
-                                                        buff_id, entry
+                                                        "Ignored application of {} to {:?}",
+                                                        id, entry
                                                     ));
                                                 }
                                             }
@@ -234,11 +234,11 @@ impl Plugin {
                                                 }
                                             }
                                         }
-                                        BuffDef::Proc => {
+                                        BuffDef::Ignore(id) => {
                                             #[cfg(feature = "log")]
                                             self.debug.log(format!(
-                                                "Food proc {} removed from {:?}",
-                                                buff_id, entry
+                                                "Ignored application of {} to {:?}",
+                                                id, entry
                                             ));
                                         }
                                     }

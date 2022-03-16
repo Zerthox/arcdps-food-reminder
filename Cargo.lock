@@ -69,11 +69,13 @@ dependencies = [
  "arc_util",
  "arcdps",
  "arcdps-imgui",
+ "jsonc-parser",
  "once_cell",
  "open",
  "semver",
  "serde",
  "serde_json",
+ "uneval",
  "windows 0.34.0",
 ]
 
@@ -140,6 +142,15 @@ name = "itoa"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aab8fc367588b89dcee83ab0fd66b72b50b72fa1904d7095045ace2b0c81c35"
+
+[[package]]
+name = "jsonc-parser"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34bbb0cd324c4ed32861be1d00c58635b94d03a2d2c70f6aec5f1a419c532783"
+dependencies = [
+ "serde_json",
+]
 
 [[package]]
 name = "libc"
@@ -427,6 +438,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "uneval"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dd4912bc0718734b595c2c65e8f9d0983b3ce4c9df543beadc0e0435791d93b"
+dependencies = [
+ "serde",
+ "thiserror",
 ]
 
 [[package]]

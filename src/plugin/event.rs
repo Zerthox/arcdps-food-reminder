@@ -32,7 +32,9 @@ impl Plugin {
                         // combat enter
 
                         if let Some(entry) = self.tracker.player_mut(src.id) {
-                            entry.player.enter_combat(Some(event.dst_agent));
+                            let player = &mut entry.player;
+                            player.elite = src.elite.into();
+                            player.enter_combat(Some(event.dst_agent));
 
                             #[cfg(feature = "log")]
                             self.debug.log(format!("Combat enter for {:?}", entry));

@@ -62,12 +62,19 @@ impl Plugin {
         );
 
         // unofficial extras indicator
-        ui.text("Unofficial extras (for subgroup updates):");
-        ui.same_line();
-        if self.extras {
-            ui.text_colored(green, "Found");
-        } else {
-            ui.text_colored(yellow, "Missing");
+        ui.group(|| {
+            ui.text("Unofficial extras (for subgroup updates):");
+            ui.same_line();
+            if self.extras {
+                ui.text_colored(green, "Found");
+            } else {
+                ui.text_colored(yellow, "Missing");
+            }
+        });
+        if ui.is_item_hovered() {
+            ui.tooltip_text(
+                "Unofficial extras allows for more frequent updates on player subgroups.",
+            );
         }
 
         // reminder settings
@@ -88,14 +95,24 @@ impl Plugin {
             "Remind during encounter",
             &mut self.reminder.settings.during_encounter,
         );
+
         ui.checkbox(
-            "Restrict reminders for encounters to Raids & Fractal CMs",
+            "Restrict reminders for encounters to bosses",
             &mut self.reminder.settings.only_bosses,
         );
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Default boss list consists of Raids & Fractal CMs.\nYou can add more bosses in a custom definitions file.");
+        }
+
         ui.checkbox(
-            "Always remind when becoming Malnourished/Diminished",
+            "Always remind on Malnourished/Diminished",
             &mut self.reminder.settings.always_mal_dim,
         );
+        if ui.is_item_hovered() {
+            ui.tooltip_text(
+                "Makes the reminder always trigger when Malnourished or Diminished is detected.",
+            );
+        }
 
         // reminder duration
         let mut duration_buffer = String::with_capacity(5);
@@ -110,6 +127,9 @@ impl Plugin {
             if let Ok(num) = duration_buffer.parse() {
                 self.reminder.settings.duration = Duration::from_millis(num);
             }
+        }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("How long the reminder is displayed on screen.");
         }
 
         ui.spacing();

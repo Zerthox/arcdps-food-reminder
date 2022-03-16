@@ -89,7 +89,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn key_name() {
+    fn name_to_code() {
+        assert_eq!(65, name_to_keycode('A' as u8));
+        assert_eq!(70, name_to_keycode('F' as u8));
+    }
+
+    #[test]
+    fn code_to_name() {
         assert_eq!(Some(String::from("ALT")), keycode_to_name(18));
         assert_eq!(Some(String::from("A")), keycode_to_name(65));
         assert_eq!(Some(String::from("F")), keycode_to_name(70));

@@ -44,7 +44,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(BuffDef::Food(food)) = defs.get(buff) {
+                if let Some(BuffDef::Food(food)) = defs.get_buff(buff) {
                     food.name.clone().into()
                 } else {
                     "Unknown".into()
@@ -59,7 +59,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(BuffDef::Util(util)) = defs.get(buff) {
+                if let Some(BuffDef::Util(util)) = defs.get_buff(buff) {
                     util.name.clone().into()
                 } else {
                     "Unknown".into()

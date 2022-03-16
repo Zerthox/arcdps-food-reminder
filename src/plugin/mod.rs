@@ -2,7 +2,7 @@ pub mod event;
 pub mod ui;
 
 use crate::{
-    defs::{Definitions, BOSSES, DIMINISHED, MALNOURISHED},
+    defs::{Definitions, DIMINISHED, MALNOURISHED},
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };
@@ -150,7 +150,9 @@ impl Plugin {
     /// Whether the local player can be reminded.
     fn can_remind(&self) -> bool {
         match self.tracker.encounter() {
-            Some(boss_id) => !self.reminder.settings.only_bosses || BOSSES.contains(&boss_id),
+            Some(boss_id) => {
+                !self.reminder.settings.only_bosses || self.defs.is_boss(boss_id as u32)
+            }
             None => false,
         }
     }

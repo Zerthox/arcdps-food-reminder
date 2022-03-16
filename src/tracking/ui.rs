@@ -122,7 +122,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Food(food)) = defs.get(id) {
+                if let Some(BuffDef::Food(food)) = defs.get_buff(id) {
                     let color = match food.id {
                         MALNOURISHED => red,
                         _ => green,
@@ -158,7 +158,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Util(util)) = defs.get(id) {
+                if let Some(BuffDef::Util(util)) = defs.get_buff(id) {
                     let color = match util.id {
                         DIMINISHED => red,
                         _ => green,

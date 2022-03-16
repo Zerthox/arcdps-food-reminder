@@ -109,7 +109,7 @@ impl Plugin {
                                         let buff_id = event.skill_id;
 
                                         // check type of buff
-                                        if let Some(buff_type) = self.defs.get(buff_id) {
+                                        if let Some(buff_type) = self.defs.get_buff(buff_id) {
                                             match buff_type {
                                                 BuffDef::Food(food) => {
                                                     if entry
@@ -197,7 +197,7 @@ impl Plugin {
                                 let buff_id = event.skill_id;
 
                                 // check type of buff
-                                if let Some(buff_type) = self.defs.get(buff_id) {
+                                if let Some(buff_type) = self.defs.get_buff(buff_id) {
                                     match buff_type {
                                         BuffDef::Food(food) => {
                                             if entry.remove_food(food.id, event.time, event_id) {

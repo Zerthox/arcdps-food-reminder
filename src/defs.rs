@@ -10,48 +10,6 @@ pub const MALNOURISHED: u32 = 46587;
 /// Diminished buff id.
 pub const DIMINISHED: u32 = 46668;
 
-/// Boss ids.
-pub const BOSSES: &[usize] = &[
-    15438, // Vale Guardian
-    15429, // Gorseval
-    15375, // Sabetha
-    16123, // Slothasor
-    16088, // Berg
-    16137, // Zane
-    16125, // Narella
-    16115, // Matthias
-    16253, // MacLeod
-    16235, // Keep Construct
-    16246, // Xera
-    17194, // Cairn
-    17172, // Mursaat Overseer
-    17188, // Samarog
-    17154, // Deimos
-    19767, // Soulless Horror
-    19828, // Desmina
-    19691, // Broken King
-    19536, // Soul Eater
-    19651, // Eye of Judgement
-    19844, // Eye of Fate
-    19450, // Dhuum
-    43974, // Conjured Amalgamate
-    10142, // Conjured Amalgamate Right Arm
-    37464, // Conjured Amalgamate Left Arm
-    21105, // Nikare
-    21089, // Kenut
-    20934, // Qadim
-    22006, // Adina
-    21964, // Sabir
-    22000, // Qadim the Peerless
-    17021, // MAMA
-    17028, // Siax
-    16948, // Ensolyss
-    17632, // Skorvald
-    17949, // Artsariiv
-    17759, // Arkk
-    23254, // Ai
-];
-
 /// Returns the default definitions.
 fn default_definitions() -> DefData {
     include!(concat!(env!("OUT_DIR"), "/definitions.rs"))
@@ -61,6 +19,7 @@ fn default_definitions() -> DefData {
 #[derive(Debug)]
 pub struct Definitions {
     data: HashMap<u32, BuffDef>,
+    bosses: Vec<u32>,
 }
 
 #[allow(dead_code)]
@@ -69,23 +28,23 @@ impl Definitions {
     pub fn empty() -> Self {
         Self {
             data: HashMap::new(),
+            bosses: Vec::new(),
         }
     }
 
     /// Creates a new set of definitions with the default definitions.
     pub fn with_defaults() -> Self {
         let mut defs = Self::empty();
-        let DefData {
-            food,
-            utility,
-            ignore,
-        } = default_definitions();
-        defs.add_data(food, utility, ignore);
+
+        // add default defs data
+        let data = default_definitions();
+        defs.add_data(data);
+
         defs
     }
 
-    /// Creates a set of definitions from data.
-    pub fn add_data(
+    /// Adds new buff definitions.
+    pub fn add_buffs(
         &mut self,
         food: impl IntoIterator<Item = BuffData>,
         util: impl IntoIterator<Item = BuffData>,
@@ -113,25 +72,43 @@ impl Definitions {
         }
     }
 
+    /// Adds new boss ids.
+    pub fn add_bosses(&mut self, bosses: impl IntoIterator<Item = u32>) {
+        self.bosses.extend(bosses);
+    }
+
+    /// Add definitions from a [`DefData`] collection.
+    pub fn add_data(&mut self, data: DefData) {
+        let DefData {
+            food,
+            utility,
+            ignore,
+            bosses,
+        } = data;
+        self.add_buffs(food, utility, ignore);
+        self.add_bosses(bosses);
+    }
+
     /// Attempts to load custom definitions from a given file.
     pub fn try_load(&mut self, path: impl AsRef<Path>) -> Result<(), ()> {
         // read file
         let content = fs::read_to_string(path).map_err(|_| ())?;
 
         // parse & add data
-        let DefData {
-            food,
-            utility,
-            ignore,
-        } = parse_jsonc(&content).ok_or(())?;
-        self.add_data(food, utility, ignore);
+        let data = parse_jsonc(&content).ok_or(())?;
+        self.add_data(data);
 
         Ok(())
     }
 
     /// Returns the buff definition with the given id.
-    pub fn get(&self, buff_id: u32) -> Option<&BuffDef> {
+    pub fn get_buff(&self, buff_id: u32) -> Option<&BuffDef> {
         self.data.get(&buff_id)
+    }
+
+    /// Checks whether the is is in the list of bosses.
+    pub fn is_boss(&self, id: u32) -> bool {
+        self.bosses.contains(&id)
     }
 
     /// Returns all food definitions.
@@ -168,11 +145,13 @@ mod tests {
             food,
             utility,
             ignore,
+            bosses,
         } = default_definitions();
 
         assert!(!food.is_empty());
         assert!(!utility.is_empty());
         assert!(!ignore.is_empty());
+        assert!(!bosses.is_empty());
 
         assert!(food.iter().any(|entry| entry.id == MALNOURISHED));
         assert!(utility.iter().any(|entry| entry.id == DIMINISHED));

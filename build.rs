@@ -1,8 +1,12 @@
 #[path = "src/data.rs"]
 mod data;
 
-use data::{parse_jsonc, DefData};
+#[path = "src/util.rs"]
+mod util;
+
+use data::DefData;
 use std::{env, fs, path::PathBuf};
+use util::parse_jsonc;
 
 fn main() {
     let manifest = env::var_os("CARGO_MANIFEST_DIR").unwrap();

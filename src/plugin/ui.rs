@@ -1,10 +1,9 @@
 use super::Plugin;
-use crate::util;
 use arc_util::{
     api::CoreColor,
     exports,
     settings::HasSettings,
-    ui::{Component, Hideable},
+    ui::{components::key_input, Component, Hideable},
 };
 use arcdps::imgui::Ui;
 use arcdps_imgui::StyleVar;
@@ -55,7 +54,7 @@ impl Plugin {
         );
 
         // tracker hotkey
-        util::key_input(
+        key_input(
             ui,
             "##hotkey",
             "Tracker Hotkey:",

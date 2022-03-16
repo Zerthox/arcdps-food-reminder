@@ -1,8 +1,5 @@
 use super::{BuffState, Entry, Sorting, Tracker};
-use crate::{
-    data::{DIMINISHED, MALNOURISHED},
-    defs::{BuffDef, Definitions},
-};
+use crate::defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::CoreColor,
     exports,

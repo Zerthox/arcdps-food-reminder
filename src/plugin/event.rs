@@ -360,7 +360,7 @@ impl Plugin {
                 ..
             } = user
             {
-                let acc_name = name.strip_prefix(":").unwrap_or(name);
+                let acc_name = name.strip_prefix(':').unwrap_or(name);
                 if let Some(entry) = self
                     .tracker
                     .all_players_mut()

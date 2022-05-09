@@ -330,6 +330,7 @@
       "display": "PWR"
     },
 
+    // condi
     {
       "id": 21828,
       "name": "Toxic Focusing Crystal",
@@ -340,13 +341,13 @@
       "id": 9967,
       "name": "Master Tuning Crystal",
       "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
-      "display": "EXP"
+      "display": "CND"
     },
     {
       "id": 34206,
       "name": "Tuning Icicle",
       "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
-      "display": "EXP"
+      "display": "CND"
     },
 
     // concentration

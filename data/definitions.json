@@ -82,6 +82,12 @@
       "stats": ["+100 Power", "+70 Precision"],
       "display": "PREC"
     },
+    {
+      "id": 9805,
+      "name": "Bowl of Fancy Potato and Leek Soup",
+      "stats": ["+100 Precision", "+70 Condition Damage"],
+      "display": "PREC"
+    },
 
     // condi damage
     {

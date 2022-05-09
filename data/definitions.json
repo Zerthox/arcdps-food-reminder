@@ -355,6 +355,12 @@
       "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
       "display": "CND"
     },
+    {
+      "id": 25878,
+      "name": "Furious Tuning Crystal",
+      "stats": ["3% Condition Damage from Precision", "3% Expertise from Precision"],
+      "display": "EXP"
+    },
 
     // concentration
     {

@@ -1,8 +1,10 @@
+use crate::{defs::Definitions, plugin::DEFINITIONS_FILE};
+
 use super::Plugin;
 use arc_util::{
     api::CoreColor,
     exports,
-    settings::HasSettings,
+    settings::{HasSettings, Settings},
     ui::{components::key_input, Component, Hideable},
 };
 use arcdps::imgui::Ui;
@@ -130,6 +132,33 @@ impl Plugin {
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("How long the reminder is displayed on screen.");
+        }
+
+        ui.spacing();
+        ui.spacing();
+        ui.text_disabled("Custom definitions");
+        if ui.button("Reload definitions file") {
+            if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {
+                // try loading custom defs
+                if self.defs.try_load(&defs_path).is_ok() {
+                    #[cfg(feature = "log")]
+                    self.debug.log(format!(
+                        "Reloaded custom definitions from \"{}\"",
+                        defs_path.display()
+                    ));
+                } else {
+                    #[cfg(feature = "log")]
+                    self.debug.log(format!(
+                        "Failed to reload custom definitions from \"{}\"",
+                        defs_path.display()
+                    ));
+                }
+            }
+        }
+
+        ui.same_line_with_spacing(0.0, 5.0);
+        if ui.button("Reset definitions") {
+            self.defs = Definitions::with_defaults();
         }
 
         ui.spacing();

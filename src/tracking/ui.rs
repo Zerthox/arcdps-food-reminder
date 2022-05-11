@@ -88,7 +88,7 @@ impl Tracker {
             ui.table_next_column();
             let sub = format!("{:>2}", player.subgroup);
             match colors.sub_base(player.subgroup) {
-                Some(color) => ui.text_colored(color.into(), sub),
+                Some(color) => ui.text_colored(color, sub),
                 None => ui.text(sub),
             }
         }
@@ -96,7 +96,7 @@ impl Tracker {
         // render name cell
         ui.table_next_column();
         match colors.prof_base(player.profession) {
-            Some(color) => ui.text_colored(color.into(), &player.character),
+            Some(color) => ui.text_colored(color, &player.character),
             None => ui.text(&player.character),
         }
         if ui.is_item_hovered() {

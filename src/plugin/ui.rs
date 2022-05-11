@@ -5,7 +5,7 @@ use arc_util::{
     api::CoreColor,
     exports,
     settings::{HasSettings, Settings},
-    ui::{components::key_input, Component, Hideable},
+    ui::{ch_width, components::key_input, Component, Hideable},
 };
 use arcdps::imgui::Ui;
 use arcdps_imgui::StyleVar;
@@ -33,21 +33,22 @@ impl Plugin {
     /// Callback for settings UI creation.
     pub fn render_settings(&mut self, ui: &Ui) {
         let colors = exports::colors();
-        let green = match colors.core(CoreColor::LightGreen) {
-            Some(vec) => vec.into(),
-            None => [0.0, 1.0, 0.0, 1.0],
-        };
-        let yellow = match colors.core(CoreColor::LightYellow) {
-            Some(vec) => vec.into(),
-            None => [1.0, 1.0, 0.0, 1.0],
-        };
+        let grey = colors
+            .core(CoreColor::MediumGrey)
+            .unwrap_or([0.5, 0.5, 0.5, 1.0]);
+        let green = colors
+            .core(CoreColor::LightGreen)
+            .unwrap_or([0.0, 1.0, 0.0, 1.0]);
+        let yellow = colors
+            .core(CoreColor::LightYellow)
+            .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
         // use small padding similar to arc & other plugins
         let _style = ui.push_style_var(StyleVar::FramePadding([1.0, 1.0]));
 
         // tracker settings
         ui.spacing();
-        ui.text_disabled("Tracker");
+        ui.text_colored(grey, "Tracker");
 
         // tracker save chars
         ui.checkbox(
@@ -83,7 +84,7 @@ impl Plugin {
         ui.spacing();
         ui.spacing();
 
-        ui.text_disabled("Reminder");
+        ui.text_colored(grey, "Reminder");
 
         ui.checkbox(
             "Remind on encounter start",
@@ -120,7 +121,7 @@ impl Plugin {
         let mut duration_buffer = String::with_capacity(5);
         duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
 
-        ui.push_item_width(ui.calc_text_size("000000")[0]);
+        ui.set_next_item_width(ch_width(ui, 6));
         if ui
             .input_text("Reminder duration (ms)", &mut duration_buffer)
             .chars_decimal(true)
@@ -136,7 +137,7 @@ impl Plugin {
 
         ui.spacing();
         ui.spacing();
-        ui.text_disabled("Custom definitions");
+        ui.text_colored(grey, "Custom definitions");
         if ui.button("Reload definitions file") {
             if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {
                 // try loading custom defs
@@ -175,13 +176,13 @@ impl Plugin {
     /// Callback for ArcDPS option checkboxes.
     pub fn render_window_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox("Food Tracker", self.tracker.is_visible_mut());
+            ui.checkbox("Food Tracker", self.tracker.visible_mut());
 
             #[cfg(feature = "demo")]
-            ui.checkbox("Food Demo", self.demo.is_visible_mut());
+            ui.checkbox("Food Demo", self.demo.visible_mut());
 
             #[cfg(feature = "log")]
-            ui.checkbox("Food Debug Log", self.debug.is_visible_mut());
+            ui.checkbox("Food Debug Log", self.debug.visible_mut());
         }
         false
     }

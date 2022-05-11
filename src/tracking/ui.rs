@@ -70,18 +70,15 @@ impl Tracker {
         sub: bool,
     ) {
         let player = &entry.player;
-        let red = match colors.core(CoreColor::LightRed) {
-            Some(vec) => vec.into(),
-            None => [1.0, 0.0, 0.0, 1.0],
-        };
-        let green = match colors.core(CoreColor::LightGreen) {
-            Some(vec) => vec.into(),
-            None => [0.0, 1.0, 0.0, 1.0],
-        };
-        let yellow = match colors.core(CoreColor::LightYellow) {
-            Some(vec) => vec.into(),
-            None => [1.0, 1.0, 0.0, 1.0],
-        };
+        let red = colors
+            .core(CoreColor::LightRed)
+            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
+        let green = colors
+            .core(CoreColor::LightGreen)
+            .unwrap_or([0.0, 1.0, 0.0, 1.0]);
+        let yellow = colors
+            .core(CoreColor::LightYellow)
+            .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
         // new row for each player
         ui.table_next_row();

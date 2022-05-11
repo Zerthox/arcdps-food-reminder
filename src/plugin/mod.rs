@@ -6,7 +6,10 @@ use crate::{
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };
-use arc_util::{settings::Settings, ui::Window};
+use arc_util::{
+    settings::Settings,
+    ui::{Window, WindowOptions},
+};
 use semver::Version;
 use std::fs;
 
@@ -61,15 +64,37 @@ impl Plugin {
             defs: Definitions::with_defaults(),
             reminder: Reminder::new(),
             pending_check: None,
-            tracker: Window::new("Food Tracker", Tracker::new()).auto_resize(true),
+
+            tracker: Window::with_options(
+                "Food Tracker",
+                Tracker::new(),
+                WindowOptions {
+                    auto_resize: true,
+                    context_menu: true,
+                    ..WindowOptions::new()
+                },
+            ),
 
             #[cfg(feature = "demo")]
-            demo: Window::new("Food Demo", Demo::new()).auto_resize(true),
+            demo: Window::with_options(
+                "Food Demo",
+                Demo::new(),
+                WindowOptions {
+                    auto_resize: true,
+                    ..WindowOptions::new()
+                },
+            ),
 
             #[cfg(feature = "log")]
-            debug: Window::new("Food Debug Log", Log::new())
-                .width(600.0)
-                .height(300.0),
+            debug: Window::with_options(
+                "Food Debug Log",
+                Log::new(),
+                WindowOptions {
+                    width: 600.0,
+                    height: 300.0,
+                    ..WindowOptions::new()
+                },
+            ),
         }
     }
 

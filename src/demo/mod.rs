@@ -13,7 +13,7 @@ use crate::{
 };
 use arc_util::{
     game::Player,
-    ui::{align::LeftAlign, Component, Hideable, Window},
+    ui::{align::LeftAlign, Component, Hideable, Window, WindowOptions},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 use std::borrow::Cow;
@@ -34,7 +34,15 @@ impl Demo {
             reminder: Reminder::new(),
             all_foods: Vec::new(),
             all_utils: Vec::new(),
-            tracker: Window::new("Demo Food Tracker", Tracker::new()),
+            tracker: Window::with_options(
+                "Demo Food Tracker",
+                Tracker::new(),
+                WindowOptions {
+                    auto_resize: true,
+                    context_menu: true,
+                    ..WindowOptions::new()
+                },
+            ),
         }
     }
 
@@ -93,9 +101,11 @@ impl Component for Demo {
 
         // reminder buttons
         let mut align = LeftAlign::build();
-        ui.align_text_to_frame_padding();
-        align.item_with_margin(ui, 10.0, || ui.text("Reminders:"));
         align.item(ui, || {
+            ui.align_text_to_frame_padding();
+            ui.text("Reminders:");
+        });
+        align.item_with_spacing(ui, 10.0, || {
             if ui.button("Trigger Food") {
                 self.reminder.trigger_food();
             }
@@ -110,7 +120,7 @@ impl Component for Demo {
         ui.separator();
         ui.spacing();
 
-        ui.checkbox("Tracker", self.tracker.is_visible_mut());
+        ui.checkbox("Tracker", self.tracker.visible_mut());
 
         // player editor
         if let Some(_table) = ui.begin_table_header(
@@ -151,7 +161,7 @@ impl Component for Demo {
                 ui.table_next_column();
                 let mut char_name = String::with_capacity(19);
                 char_name.push_str(&entry.player.character);
-                ui.push_item_width(INPUT_SIZE);
+                ui.set_next_item_width(INPUT_SIZE);
                 if ui
                     .input_text(format!("##char-{}", id), &mut char_name)
                     .build()
@@ -163,7 +173,7 @@ impl Component for Demo {
                 ui.table_next_column();
                 let mut acc_name = String::with_capacity(19);
                 acc_name.push_str(&entry.player.account);
-                ui.push_item_width(INPUT_SIZE);
+                ui.set_next_item_width(INPUT_SIZE);
                 if ui
                     .input_text(format!("##acc-{}", id), &mut acc_name)
                     .build()
@@ -186,7 +196,7 @@ impl Component for Demo {
                     "Revenant",
                 ];
                 let mut prof = entry.player.profession as usize;
-                ui.push_item_width(INPUT_SIZE);
+                ui.set_next_item_width(INPUT_SIZE);
                 if ui.combo(format!("##class-{}", id), &mut prof, &PROF_NAMES, |prof| {
                     (*prof).into()
                 }) {
@@ -200,7 +210,7 @@ impl Component for Demo {
                     .iter()
                     .position(|buff| *buff == entry.food.state)
                     .unwrap();
-                ui.push_item_width(INPUT_SIZE);
+                ui.set_next_item_width(INPUT_SIZE);
                 if ui.combo(
                     format!("##food-{}", id),
                     &mut food_id,
@@ -217,7 +227,7 @@ impl Component for Demo {
                     .iter()
                     .position(|buff| *buff == entry.util.state)
                     .unwrap();
-                ui.push_item_width(INPUT_SIZE);
+                ui.set_next_item_width(INPUT_SIZE);
                 if ui.combo(
                     format!("##util-{}", id),
                     &mut util_id,

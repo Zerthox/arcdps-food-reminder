@@ -17,7 +17,7 @@ use std::fs;
 use crate::demo::Demo;
 
 #[cfg(feature = "log")]
-use arc_util::ui::components::log::Log;
+use arc_util::ui::log::Log;
 
 /// Plugin version.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -65,35 +65,31 @@ impl Plugin {
             reminder: Reminder::new(),
             pending_check: None,
 
-            tracker: Window::with_options(
-                "Food Tracker",
-                Tracker::new(),
+            tracker: Window::new(
                 WindowOptions {
                     auto_resize: true,
-                    context_menu: true,
-                    ..WindowOptions::new()
+                    ..WindowOptions::new("Food Tracker")
                 },
+                Tracker::new(),
             ),
 
             #[cfg(feature = "demo")]
-            demo: Window::with_options(
-                "Food Demo",
-                Demo::new(),
+            demo: Window::new(
                 WindowOptions {
                     auto_resize: true,
-                    ..WindowOptions::new()
+                    ..WindowOptions::new("Food Demo")
                 },
+                Demo::new(),
             ),
 
             #[cfg(feature = "log")]
-            debug: Window::with_options(
-                "Food Debug Log",
-                Log::new(),
+            debug: Window::new(
                 WindowOptions {
                     width: 600.0,
                     height: 300.0,
-                    ..WindowOptions::new()
+                    ..WindowOptions::new("Food Debug Log")
                 },
+                Log::new(),
             ),
         }
     }

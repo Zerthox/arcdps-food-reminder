@@ -13,7 +13,7 @@ use crate::{
 };
 use arc_util::{
     game::Player,
-    ui::{align::LeftAlign, Component, Hideable, Window, WindowOptions},
+    ui::{align::LeftAlign, Component, Hideable, Window, WindowOptions, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 use std::borrow::Cow;
@@ -34,14 +34,12 @@ impl Demo {
             reminder: Reminder::new(),
             all_foods: Vec::new(),
             all_utils: Vec::new(),
-            tracker: Window::with_options(
-                "Demo Food Tracker",
-                Tracker::new(),
+            tracker: Window::new(
                 WindowOptions {
                     auto_resize: true,
-                    context_menu: true,
-                    ..WindowOptions::new()
+                    ..WindowOptions::new("Demo Food Tracker")
                 },
+                Tracker::new(),
             ),
         }
     }
@@ -265,4 +263,8 @@ impl Component for Demo {
         self.reminder.render(ui, &());
         self.tracker.render(ui, defs);
     }
+}
+
+impl Windowable for Demo {
+    const CONTEXT_MENU: bool = true;
 }

@@ -5,7 +5,7 @@ use arc_util::{
     api::CoreColor,
     exports,
     settings::{HasSettings, Settings},
-    ui::{ch_width, components::key_input, Component, Hideable},
+    ui::{render, Component, Hideable},
 };
 use arcdps::imgui::Ui;
 use arcdps_imgui::StyleVar;
@@ -57,7 +57,7 @@ impl Plugin {
         );
 
         // tracker hotkey
-        key_input(
+        render::key_input(
             ui,
             "##hotkey",
             "Tracker Hotkey:",
@@ -121,7 +121,7 @@ impl Plugin {
         let mut duration_buffer = String::with_capacity(5);
         duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
 
-        ui.set_next_item_width(ch_width(ui, 6));
+        ui.set_next_item_width(render::ch_width(ui, 6));
         if ui
             .input_text("Reminder duration (ms)", &mut duration_buffer)
             .chars_decimal(true)

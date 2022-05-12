@@ -3,7 +3,7 @@ use crate::defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::CoreColor,
     exports,
-    ui::{components::item_context_menu, Component},
+    ui::{render, Component, Windowable},
 };
 use arcdps::imgui::{
     TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
@@ -18,7 +18,7 @@ impl Tracker {
         buff_id: u32,
         name: Option<&str>,
     ) {
-        item_context_menu(menu_id, || {
+        render::item_context_menu(menu_id, || {
             ui.text(title);
             if let Some(name) = name {
                 if ui.small_button("Copy Name") {
@@ -273,4 +273,8 @@ impl Component for Tracker {
             });
         });
     }
+}
+
+impl Windowable for Tracker {
+    const CONTEXT_MENU: bool = true;
 }

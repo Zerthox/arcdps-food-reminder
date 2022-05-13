@@ -1,4 +1,4 @@
-use super::{BuffState, Entry, Sorting, Tracker};
+use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
 use crate::defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::CoreColor,
@@ -70,6 +70,8 @@ impl Tracker {
         sub: bool,
     ) {
         let player = &entry.player;
+        let sub_color = colors.sub_base(player.subgroup);
+        let prof_color = colors.prof_base(player.profession);
         let red = colors
             .core(CoreColor::LightRed)
             .unwrap_or([1.0, 0.0, 0.0, 1.0]);
@@ -87,17 +89,19 @@ impl Tracker {
         if sub {
             ui.table_next_column();
             let sub = format!("{:>2}", player.subgroup);
-            match colors.sub_base(player.subgroup) {
-                Some(color) => ui.text_colored(color, sub),
-                None => ui.text(sub),
+            match (self.settings.color_sub, sub_color, prof_color) {
+                (Color::Sub, Some(color), _) => ui.text_colored(color, sub),
+                (Color::Prof, _, Some(color)) => ui.text_colored(color, sub),
+                _ => ui.text(sub),
             }
         }
 
         // render name cell
         ui.table_next_column();
-        match colors.prof_base(player.profession) {
-            Some(color) => ui.text_colored(color, &player.character),
-            None => ui.text(&player.character),
+        match (self.settings.color_name, sub_color, prof_color) {
+            (Color::Sub, Some(color), _) => ui.text_colored(color, &player.character),
+            (Color::Prof, _, Some(color)) => ui.text_colored(color, &player.character),
+            _ => ui.text(&player.character),
         }
         if ui.is_item_hovered() {
             ui.tooltip_text(&player.account);
@@ -181,24 +185,51 @@ impl Tracker {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
-            let mut col_sub = TableColumnSetup::new("Sub");
-            col_sub.flags =
-                TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT;
+            let col_sub = TableColumnSetup {
+                name: "Sub",
+                user_id: 0.into(),
+                flags: TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
+                init_width_or_weight: 0.0,
+            };
 
-            let mut col_player = TableColumnSetup::new("Player");
-            col_player.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+            let col_player = TableColumnSetup {
+                name: "Player",
+                user_id: 1.into(),
+                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
+                init_width_or_weight: 0.0,
+            };
 
-            let mut col_food = TableColumnSetup::new("Food");
-            col_food.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+            let col_food = TableColumnSetup {
+                name: "Food",
+                user_id: 2.into(),
+                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
+                init_width_or_weight: 0.0,
+            };
 
-            let mut col_util = TableColumnSetup::new("Util");
-            col_util.flags = TableColumnFlags::PREFER_SORT_DESCENDING;
+            let col_util = TableColumnSetup {
+                name: "Util",
+                user_id: 3.into(),
+                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
+                init_width_or_weight: 0.0,
+            };
 
-            if let Some(_table) = ui.begin_table_header_with_flags(
-                "##squad-table",
-                [col_sub, col_player, col_food, col_util],
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
-            ) {
+            const TABLE_ID: &str = "##squad-table";
+            let table_flags =
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE;
+
+            if let Some(_table) = if self.settings.show_sub {
+                ui.begin_table_header_with_flags(
+                    TABLE_ID,
+                    [col_sub, col_player, col_food, col_util],
+                    table_flags,
+                )
+            } else {
+                ui.begin_table_header_with_flags(
+                    TABLE_ID,
+                    [col_player, col_food, col_util],
+                    table_flags,
+                )
+            } {
                 // update sorting if necessary
                 if let Some(sort_specs) = ui.table_sort_specs_mut() {
                     sort_specs.conditional_sort(|column_specs| {
@@ -207,7 +238,7 @@ impl Tracker {
                             .find(|column| column.sort_direction().is_some())
                         {
                             // update sorting state
-                            match sorted_column.column_idx() {
+                            match sorted_column.column_user_id() {
                                 0 => self.sorting = Sorting::Sub,
                                 1 => self.sorting = Sorting::Name,
                                 2 => self.sorting = Sorting::Food,
@@ -228,7 +259,14 @@ impl Tracker {
                 // render table content
                 let colors = exports::colors();
                 for entry in &self.players {
-                    self.render_table_entry(ui, defs, entry.player.id, entry, &colors, true);
+                    self.render_table_entry(
+                        ui,
+                        defs,
+                        entry.player.id,
+                        entry,
+                        &colors,
+                        self.settings.show_sub,
+                    );
                 }
             }
         }
@@ -277,4 +315,50 @@ impl Component for Tracker {
 
 impl Windowable for Tracker {
     const CONTEXT_MENU: bool = true;
+
+    fn render_menu(&mut self, ui: &Ui, _defs: &Self::Props) {
+        let colors = exports::colors();
+        let grey = colors
+            .core(CoreColor::MediumGrey)
+            .unwrap_or([0.5, 0.5, 0.5, 1.0]);
+
+        // hotkey
+        render::input_key(ui, "##hotkey", "Hotkey", &mut self.settings.hotkey);
+
+        ui.spacing();
+
+        // display options
+        ui.menu("Display", || {
+            ui.text_colored(grey, "Display");
+
+            ui.checkbox("Show subgroup", &mut self.settings.show_sub);
+
+            const COLORS: &[Color] = &[Color::None, Color::Sub, Color::Prof];
+            let input_width = render::ch_width(ui, 16);
+
+            let mut sub_index = COLORS
+                .iter()
+                .position(|entry| *entry == self.settings.color_sub)
+                .unwrap();
+
+            ui.set_next_item_width(input_width);
+            if ui.combo("Subgroup color", &mut sub_index, COLORS, |entry| {
+                entry.to_string().into()
+            }) {
+                self.settings.color_sub = COLORS[sub_index];
+            }
+
+            let mut name_index = COLORS
+                .iter()
+                .position(|entry| *entry == self.settings.color_name)
+                .unwrap();
+
+            ui.set_next_item_width(input_width);
+            if ui.combo("Name color", &mut name_index, COLORS, |entry| {
+                entry.to_string().into()
+            }) {
+                self.settings.color_name = COLORS[name_index];
+            }
+        });
+    }
 }

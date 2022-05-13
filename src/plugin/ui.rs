@@ -8,7 +8,6 @@ use arc_util::{
     ui::{render, Component, Hideable},
 };
 use arcdps::imgui::Ui;
-use arcdps_imgui::StyleVar;
 use std::time::Duration;
 
 impl Plugin {
@@ -43,8 +42,8 @@ impl Plugin {
             .core(CoreColor::LightYellow)
             .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
-        // use small padding similar to arc & other plugins
-        let _style = ui.push_style_var(StyleVar::FramePadding([1.0, 1.0]));
+        // use small padding
+        let _style = render::small_padding(ui);
 
         // tracker settings
         ui.spacing();
@@ -57,7 +56,7 @@ impl Plugin {
         );
 
         // tracker hotkey
-        render::key_input(
+        render::input_key(
             ui,
             "##hotkey",
             "Tracker Hotkey:",

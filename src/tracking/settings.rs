@@ -5,6 +5,7 @@ use super::{
 };
 use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
+use std::fmt::{self, Display};
 
 /// Settings for the tracker.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -15,6 +16,15 @@ pub struct TrackerSettings {
 
     /// Hotkey for the tracker window.
     pub hotkey: Option<u32>,
+
+    /// Whether to show the subgroup column.
+    pub show_sub: bool,
+
+    /// Color for subgroup numbers.
+    pub color_sub: Color,
+
+    /// Color for player names.
+    pub color_name: Color,
 }
 
 impl TrackerSettings {
@@ -22,6 +32,9 @@ impl TrackerSettings {
         Self {
             save_chars: true,
             hotkey: Some(Tracker::DEFAULT_HOTKEY),
+            show_sub: true,
+            color_sub: Color::Sub,
+            color_name: Color::Prof,
         }
     }
 }
@@ -99,6 +112,23 @@ impl HasSettings for Tracker {
                 .into_iter()
                 .map(|entry| Entry::with_states(entry.player, entry.food, entry.util))
                 .collect();
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum Color {
+    None,
+    Sub,
+    Prof,
+}
+
+impl Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::None => write!(f, "None"),
+            Self::Sub => write!(f, "Subgroup"),
+            Self::Prof => write!(f, "Profession"),
         }
     }
 }

@@ -4,8 +4,8 @@ version = 3
 
 [[package]]
 name = "arc_util"
-version = "0.6.0"
-source = "git+https://github.com/zerthox/arcdps-utils?branch=0.6.x#5150436277fd110cc450524438a312f93c0b5478"
+version = "0.6.1"
+source = "git+https://github.com/zerthox/arcdps-utils?branch=0.6.x#a3d108d46fd06d1263018090501c99c660e6f94f"
 dependencies = [
  "arcdps",
  "chrono",
@@ -13,7 +13,6 @@ dependencies = [
  "serde",
  "serde_json",
  "strum",
- "strum_macros",
  "windows",
 ]
 
@@ -64,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "arcdps_food_reminder"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "arc_util",
  "arcdps",
@@ -75,6 +74,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "strum",
  "uneval",
  "windows",
 ]
@@ -376,6 +376,9 @@ name = "strum"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e96acfc1b70604b8b2f1ffa4c57e59176c7dbb05d556c71ecd2f5498a1dee7f8"
+dependencies = [
+ "strum_macros",
+]
 
 [[package]]
 name = "strum_macros"

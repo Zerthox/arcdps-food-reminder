@@ -11,6 +11,7 @@ use arc_util::{
     ui::{align::LeftAlign, Component, Hideable, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
+use strum::VariantNames;
 
 impl Component for Demo {
     type Props = Definitions;
@@ -116,29 +117,19 @@ impl Component for Demo {
                     entry.player.account = acc_name;
                 }
 
-                // class
+                // profession select
                 ui.table_next_column();
-                const PROF_NAMES: [&str; 10] = [
-                    "Unknown",
-                    "Guardian",
-                    "Warrior",
-                    "Engineer",
-                    "Ranger",
-                    "Thief",
-                    "Elementalist",
-                    "Mesmer",
-                    "Necromancer",
-                    "Revenant",
-                ];
                 let mut prof = entry.player.profession as usize;
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.combo(format!("##class-{}", id), &mut prof, &PROF_NAMES, |prof| {
-                    (*prof).into()
-                }) {
+                if ui.combo_simple_string(
+                    format!("##prof-{}", id),
+                    &mut prof,
+                    &Profession::VARIANTS,
+                ) {
                     entry.player.profession = (prof as u32).into();
                 }
 
-                // food
+                // food select
                 ui.table_next_column();
                 let mut food_id = self
                     .all_foods

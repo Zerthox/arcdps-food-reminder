@@ -1,3 +1,5 @@
+use crate::builds::Builds;
+
 use super::{
     buff::BuffState,
     entry::{Entry, Player},
@@ -50,6 +52,7 @@ impl Default for TrackerSettings {
 pub struct TrackerState {
     pub settings: TrackerSettings,
     pub own_chars: Vec<SettingsEntry>,
+    pub builds: Builds,
 }
 
 impl TrackerState {
@@ -57,6 +60,7 @@ impl TrackerState {
         Self {
             settings: TrackerSettings::new(),
             own_chars: Vec::new(),
+            builds: Builds::new(),
         }
     }
 }
@@ -101,6 +105,7 @@ impl HasSettings for Tracker {
             } else {
                 Vec::new()
             },
+            builds: self.builds.clone(),
         }
     }
 
@@ -113,6 +118,8 @@ impl HasSettings for Tracker {
                 .map(|entry| Entry::with_states(entry.player, entry.food, entry.util))
                 .collect();
         }
+
+        self.builds.load_settings(loaded.builds);
     }
 }
 

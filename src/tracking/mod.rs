@@ -3,6 +3,7 @@ pub mod entry;
 pub mod settings;
 pub mod ui;
 
+use crate::builds::Builds;
 use buff::BuffState;
 use entry::{Entry, Player};
 use settings::TrackerSettings;
@@ -17,6 +18,9 @@ pub struct Tracker {
     /// Currently tracked players.
     players: Vec<Entry>,
 
+    /// Current ongoing encounter.
+    encounter: Option<usize>,
+
     /// Current sorting.
     sorting: Sorting,
 
@@ -26,8 +30,8 @@ pub struct Tracker {
     /// Cache for buffs on own characters of local player (self).
     chars_cache: Vec<Entry>,
 
-    /// Current ongoing encounter.
-    encounter: Option<usize>,
+    /// User-defined builds.
+    builds: Builds,
 }
 
 #[allow(dead_code)]
@@ -38,12 +42,13 @@ impl Tracker {
     /// Creates a new tracker.
     pub const fn new() -> Self {
         Self {
+            settings: TrackerSettings::new(),
             players: Vec::new(),
+            encounter: None,
             sorting: Sorting::Sub,
             reverse: false,
             chars_cache: Vec::new(),
-            settings: TrackerSettings::new(),
-            encounter: None,
+            builds: Builds::new(),
         }
     }
 

@@ -246,6 +246,20 @@ impl Tracker {
             }
         }
     }
+
+    /// Renders the builds tab for user-defined builds.
+    fn render_builds_tab(&mut self, ui: &Ui, defs: &Definitions) {
+        let current = self.get_self();
+        let prof = current.map(|entry| entry.player.profession);
+        let food = current
+            .map(|entry| entry.food.state)
+            .unwrap_or(BuffState::Unknown);
+        let util = current
+            .map(|entry| entry.util.state)
+            .unwrap_or(BuffState::Unknown);
+
+        self.builds.render(ui, defs, prof, food, util);
+    }
 }
 
 impl Component for Tracker {
@@ -256,9 +270,14 @@ impl Component for Tracker {
             TabItem::new("Squad").build(ui, || {
                 self.render_squad_tab(ui, defs);
             });
+
             TabItem::new("Characters").build(ui, || {
                 self.render_self_tab(ui, defs);
             });
+
+            TabItem::new("Builds").build(ui, || {
+                self.render_builds_tab(ui, defs);
+            })
         });
     }
 }

@@ -7,7 +7,7 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 ![Tracker screenshot](./screenshots/tracker.png)
 
 ## Buff definitions
-The default definitions for Food & Utility buffs are collected in [data/definitions.json](./data/definitions.json).
+The default definitions for Food & Utility buffs are collected in [src/data/definitions.json](./data/definitions.json).
 
 **Found an unknown Food/Utility buff that you would like to see added?**  
 Right click the entry in the tracker and select `Copy ID`.
@@ -17,7 +17,7 @@ Report the copied buff ID & the Food/Utility that applied it.
 
 **Using custom definitions:**  
 Custom definitions can be set in `arcdps_food_reminder_definitions.json`.
-The file uses the same format as [data/definitions.json](./data/definitions.json).
+The file uses the same format as [src/data/definitions.json](./data/definitions.json).
 Entries using the same id will overwrite the default definition for a Food/Utility buff.
 
 ## Building from source

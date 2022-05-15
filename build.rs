@@ -1,4 +1,4 @@
-#[path = "src/data.rs"]
+#[path = "src/data/mod.rs"]
 mod data;
 
 #[path = "src/util.rs"]
@@ -11,7 +11,7 @@ use util::parse_jsonc;
 fn main() {
     let manifest = env::var_os("CARGO_MANIFEST_DIR").unwrap();
 
-    let content = fs::read_to_string(PathBuf::from(manifest).join("data/definitions.json"))
+    let content = fs::read_to_string(PathBuf::from(manifest).join("src/data/definitions.json"))
         .expect("failed to read definitions");
     let defs: DefData = parse_jsonc(&content).expect("failed to parse definitions");
 

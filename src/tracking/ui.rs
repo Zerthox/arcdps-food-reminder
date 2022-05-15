@@ -1,5 +1,8 @@
 use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
-use crate::defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED};
+use crate::{
+    buff_ui,
+    defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED},
+};
 use arc_util::{
     api::CoreColor,
     exports,
@@ -10,55 +13,6 @@ use arcdps::imgui::{
 };
 
 impl Tracker {
-    /// Renders a context menu for an item.
-    fn render_context_menu(
-        ui: &Ui,
-        menu_id: impl Into<String>,
-        title: &str,
-        buff_id: u32,
-        name: Option<&str>,
-    ) {
-        render::item_context_menu(menu_id, || {
-            ui.text(title);
-            if let Some(name) = name {
-                if ui.small_button("Copy Name") {
-                    ui.set_clipboard_text(name);
-                }
-                if ui.small_button("Open Wiki") {
-                    let _ = open::that(format!(
-                        "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
-                        name
-                    ));
-                }
-            }
-            if ui.small_button("Copy ID") {
-                ui.set_clipboard_text(buff_id.to_string());
-            }
-        });
-    }
-
-    /// Renders a context menu for a food item.
-    fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        Self::render_context_menu(
-            ui,
-            format!("##food-context-{}", menu_id),
-            "Food Options",
-            buff_id,
-            name,
-        )
-    }
-
-    /// Renders a context menu for a utility item.
-    fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
-        Self::render_context_menu(
-            ui,
-            format!("##util-context-{}", menu_id),
-            "Utility Options",
-            buff_id,
-            name,
-        )
-    }
-
     /// Renders a player entry in a table.
     fn render_table_entry(
         &self,
@@ -129,16 +83,14 @@ impl Tracker {
                         _ => green,
                     };
                     ui.text_colored(color, &food.display);
-                    if ui.is_item_hovered() {
-                        ui.tooltip_text(format!("{}\n{}", food.name, food.stats.join("\n")));
-                    }
-                    Self::render_food_context_menu(ui, entry_id, food.id, Some(&food.name));
+                    buff_ui::render_buff_tooltip(ui, food);
+                    buff_ui::render_food_context_menu(ui, entry_id, food.id, Some(&food.name));
                 } else {
                     ui.text_colored(yellow, "SOME");
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Food");
                     }
-                    Self::render_food_context_menu(ui, entry_id, id, None);
+                    buff_ui::render_food_context_menu(ui, entry_id, id, None);
                 }
             }
         }
@@ -165,16 +117,14 @@ impl Tracker {
                         _ => green,
                     };
                     ui.text_colored(color, &util.display);
-                    if ui.is_item_hovered() {
-                        ui.tooltip_text(format!("{}\n{}", util.name, util.stats.join("\n")));
-                    }
-                    Self::render_util_context_menu(ui, entry_id, util.id, Some(&util.name));
+                    buff_ui::render_buff_tooltip(ui, util);
+                    buff_ui::render_util_context_menu(ui, entry_id, util.id, Some(&util.name));
                 } else {
                     ui.text_colored(yellow, "SOME");
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Utility");
                     }
-                    Self::render_util_context_menu(ui, entry_id, id, None);
+                    buff_ui::render_util_context_menu(ui, entry_id, id, None);
                 }
             }
         }

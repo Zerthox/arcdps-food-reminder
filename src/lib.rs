@@ -1,3 +1,4 @@
+mod buff_ui;
 mod data;
 mod defs;
 mod plugin;

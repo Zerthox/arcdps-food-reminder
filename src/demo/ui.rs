@@ -121,11 +121,8 @@ impl Component for Demo {
                 ui.table_next_column();
                 let mut prof = entry.player.profession as usize;
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.combo_simple_string(
-                    format!("##prof-{}", id),
-                    &mut prof,
-                    &Profession::VARIANTS,
-                ) {
+                if ui.combo_simple_string(format!("##prof-{}", id), &mut prof, Profession::VARIANTS)
+                {
                     entry.player.profession = (prof as u32).into();
                 }
 

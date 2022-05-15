@@ -34,10 +34,8 @@ impl Builds {
             if ui.button("Done") {
                 self.edit = false;
             }
-        } else {
-            if ui.button("Edit") {
-                self.edit = true;
-            }
+        } else if ui.button("Edit") {
+            self.edit = true;
         }
 
         let mut action = Action::None;
@@ -84,7 +82,7 @@ impl Builds {
                     if ui.combo_simple_string(
                         format!("##prof-{}", i),
                         &mut prof,
-                        &Profession::VARIANTS,
+                        Profession::VARIANTS,
                     ) {
                         build.prof = (prof as u32).into();
                     }

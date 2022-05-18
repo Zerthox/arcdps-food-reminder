@@ -86,7 +86,7 @@ impl Definitions {
         self.bosses.extend(bosses);
 
         // sort
-        self.bosses.sort();
+        self.bosses.sort_unstable();
     }
 
     /// Add definitions from a [`DefData`] collection.

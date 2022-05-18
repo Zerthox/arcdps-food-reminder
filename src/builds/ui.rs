@@ -1,7 +1,7 @@
 use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
-    defs::{BuffDef, Definitions},
+    defs::{DefKind, Definitions},
     tracking::buff::BuffState,
 };
 use arc_util::{
@@ -14,7 +14,8 @@ use arcdps_imgui::{StyleVar, TableColumnSetup, TableFlags};
 use strum::VariantNames;
 
 impl Builds {
-    pub fn render(
+    /// Renders viewing mode contents.
+    fn render_view(
         &mut self,
         ui: &Ui,
         defs: &Definitions,
@@ -22,142 +23,21 @@ impl Builds {
         current_food: BuffState,
         current_util: BuffState,
     ) {
-        let _style = render::small_padding(ui);
-
-        ui.checkbox("Current profession", &mut self.filter);
-        if ui.is_item_hovered() {
-            ui.tooltip_text("Only show builds for current profession");
-        }
-
-        ui.same_line_with_spacing(0.0, 10.0);
-        if self.edit {
-            if ui.button("Done") {
-                self.edit = false;
-            }
-        } else if ui.button("Edit") {
-            self.edit = true;
-        }
-
-        let mut action = Action::None;
-
         // render builds table
-        let table_flags = TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X;
-        if let Some(_table) = if self.edit {
-            ui.begin_table_header_with_flags(
-                "##builds-table",
-                [
-                    TableColumnSetup::new("Prof"),
-                    TableColumnSetup::new("Name"),
-                    TableColumnSetup::new("Food"),
-                    TableColumnSetup::new("Util"),
-                    TableColumnSetup::new(""),
-                ],
-                table_flags,
-            )
-        } else {
-            ui.begin_table_header_with_flags(
-                "##builds-table",
-                [
-                    TableColumnSetup::new("Build"),
-                    TableColumnSetup::new("Food"),
-                    TableColumnSetup::new("Util"),
-                ],
-                table_flags,
-            )
-        } {
+        if let Some(_table) = ui.begin_table_header_with_flags(
+            "##builds-table",
+            [
+                TableColumnSetup::new("Build"),
+                TableColumnSetup::new("Food"),
+                TableColumnSetup::new("Util"),
+            ],
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+        ) {
             let colors = exports::colors();
-            let last = self.entries.len() - 1;
 
             for (i, build) in self.entries.iter_mut().enumerate() {
-                // check for edit mode
-                if self.edit {
-                    const INPUT_SIZE: f32 = 100.0;
-
-                    ui.table_next_row();
-
-                    // prof select
-                    ui.table_next_column();
-                    let mut prof = build.prof as usize;
-                    ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo_simple_string(
-                        format!("##prof-{}", i),
-                        &mut prof,
-                        Profession::VARIANTS,
-                    ) {
-                        build.prof = (prof as u32).into();
-                    }
-
-                    // build name
-                    ui.table_next_column();
-                    let mut char_name = String::with_capacity(19);
-                    char_name.push_str(&build.name);
-                    ui.set_next_item_width(INPUT_SIZE);
-                    if ui
-                        .input_text(format!("##char-{}", i), &mut char_name)
-                        .build()
-                    {
-                        build.name = char_name;
-                    }
-
-                    // food select
-                    ui.table_next_column();
-                    ui.set_next_item_width(INPUT_SIZE);
-                    if let Some(changed) = buff_ui::render_buff_combo(
-                        ui,
-                        format!("##food-{}", i),
-                        build.food,
-                        &defs.all_food().collect::<Vec<_>>(),
-                    ) {
-                        build.food = changed.id;
-                    }
-
-                    // util select
-                    ui.table_next_column();
-                    ui.set_next_item_width(INPUT_SIZE);
-                    if let Some(changed) = buff_ui::render_buff_combo(
-                        ui,
-                        format!("##util-{}", i),
-                        build.util,
-                        &defs.all_util().collect::<Vec<_>>(),
-                    ) {
-                        build.util = changed.id;
-                    }
-
-                    // buttons
-                    ui.table_next_column();
-                    let current_alpha = ui.clone_style().alpha;
-
-                    let is_first = i == 0;
-                    let style = ui.push_style_var(StyleVar::Alpha(if is_first {
-                        0.3
-                    } else {
-                        current_alpha
-                    }));
-                    if ui.button(format!("^##{}", i)) && !is_first {
-                        action = Action::Up(i);
-                    }
-                    style.pop();
-
-                    ui.same_line();
-                    let is_last = i == last;
-                    let style = ui.push_style_var(StyleVar::Alpha(if is_last {
-                        0.3
-                    } else {
-                        current_alpha
-                    }));
-                    if ui.button(format!("v##{}", i)) && !is_last {
-                        action = Action::Down(i);
-                    }
-                    style.pop();
-
-                    ui.same_line();
-                    if ui.button(format!("X##{}", i)) {
-                        action = Action::Remove(i);
-                    }
-                } else if !self.filter
-                    || current_prof.map(|prof| prof == build.prof).unwrap_or(true)
-                {
-                    // display is filtered
+                // filter if necessary
+                if !self.filter || current_prof.map(|prof| prof == build.prof).unwrap_or(true) {
                     ui.table_next_row();
 
                     // name column
@@ -176,7 +56,7 @@ impl Builds {
 
                     // food
                     ui.table_next_column();
-                    if let Some(BuffDef::Food(food)) = defs.get_buff(build.food) {
+                    if let Some(DefKind::Food(food)) = defs.get_buff(build.food) {
                         match current_food {
                             BuffState::Unknown => ui.text(&food.display),
                             BuffState::Some(id) if id == food.id => {
@@ -197,7 +77,7 @@ impl Builds {
 
                     // util
                     ui.table_next_column();
-                    if let Some(BuffDef::Util(util)) = defs.get_buff(build.util) {
+                    if let Some(DefKind::Util(util)) = defs.get_buff(build.util) {
                         match current_util {
                             BuffState::Unknown => ui.text(&util.display),
                             BuffState::Some(id) if id == util.id => {
@@ -218,31 +98,157 @@ impl Builds {
                 }
             }
         }
+    }
 
+    /// Renders edit mode contents.
+    fn render_edit(&mut self, ui: &Ui, defs: &Definitions) {
+        let mut action = Action::None;
+        let last = self.entries.len() - 1;
+
+        // render builds table
+        if let Some(_table) = ui.begin_table_header_with_flags(
+            "##builds-table",
+            [
+                TableColumnSetup::new("Prof"),
+                TableColumnSetup::new("Name"),
+                TableColumnSetup::new("Food"),
+                TableColumnSetup::new("Util"),
+                TableColumnSetup::new(""),
+            ],
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+        ) {
+            for (i, build) in self.entries.iter_mut().enumerate() {
+                const INPUT_SIZE: f32 = 100.0;
+
+                ui.table_next_row();
+
+                // prof select
+                ui.table_next_column();
+                let mut prof = build.prof as usize;
+                ui.set_next_item_width(INPUT_SIZE);
+                if ui.combo_simple_string(format!("##prof-{}", i), &mut prof, Profession::VARIANTS)
+                {
+                    build.prof = (prof as u32).into();
+                }
+
+                // build name
+                ui.table_next_column();
+                let mut char_name = String::with_capacity(19);
+                char_name.push_str(&build.name);
+                ui.set_next_item_width(INPUT_SIZE);
+                if ui
+                    .input_text(format!("##char-{}", i), &mut char_name)
+                    .build()
+                {
+                    build.name = char_name;
+                }
+
+                // food select
+                ui.table_next_column();
+                ui.set_next_item_width(INPUT_SIZE);
+                if let Some(changed) = buff_ui::render_buff_combo(
+                    ui,
+                    format!("##food-{}", i),
+                    build.food,
+                    &defs.all_food().collect::<Vec<_>>(),
+                ) {
+                    build.food = changed.id;
+                }
+
+                // util select
+                ui.table_next_column();
+                ui.set_next_item_width(INPUT_SIZE);
+                if let Some(changed) = buff_ui::render_buff_combo(
+                    ui,
+                    format!("##util-{}", i),
+                    build.util,
+                    &defs.all_util().collect::<Vec<_>>(),
+                ) {
+                    build.util = changed.id;
+                }
+
+                // buttons
+                ui.table_next_column();
+                let current_alpha = ui.clone_style().alpha;
+
+                let is_first = i == 0;
+                let style =
+                    ui.push_style_var(StyleVar::Alpha(if is_first { 0.3 } else { current_alpha }));
+                if ui.button(format!("^##{}", i)) && !is_first {
+                    action = Action::Up(i);
+                }
+                style.pop();
+
+                ui.same_line();
+                let is_last = i == last;
+                let style =
+                    ui.push_style_var(StyleVar::Alpha(if is_last { 0.3 } else { current_alpha }));
+                if ui.button(format!("v##{}", i)) && !is_last {
+                    action = Action::Down(i);
+                }
+                style.pop();
+
+                ui.same_line();
+                if ui.button(format!("X##{}", i)) {
+                    action = Action::Remove(i);
+                }
+            }
+        }
+
+        // perform action
+        match action {
+            Action::None => {}
+            Action::Up(i) => {
+                self.entries.swap(i - 1, i);
+            }
+            Action::Down(i) => {
+                self.entries.swap(i, i + 1);
+            }
+            Action::Remove(i) => {
+                self.entries.remove(i);
+            }
+        }
+
+        // add button
+        if ui.button("Add") {
+            self.entries.push(Build::new(
+                Profession::Unknown,
+                "My Build",
+                defs.all_food().next().unwrap().id,
+                defs.all_util().next().unwrap().id,
+            ));
+        }
+    }
+
+    /// Renders the builds UI.
+    pub fn render(
+        &mut self,
+        ui: &Ui,
+        defs: &Definitions,
+        current_prof: Option<Profession>,
+        current_food: BuffState,
+        current_util: BuffState,
+    ) {
+        let _style = render::small_padding(ui);
+
+        ui.checkbox("Current profession", &mut self.filter);
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Only show builds for current profession");
+        }
+
+        ui.same_line_with_spacing(0.0, 10.0);
         if self.edit {
-            // perform action
-            match action {
-                Action::None => {}
-                Action::Up(i) => {
-                    self.entries.swap(i - 1, i);
-                }
-                Action::Down(i) => {
-                    self.entries.swap(i, i + 1);
-                }
-                Action::Remove(i) => {
-                    self.entries.remove(i);
-                }
+            if ui.button("Done") {
+                self.edit = false;
             }
 
-            // add button
-            if ui.button("Add") {
-                self.entries.push(Build::new(
-                    Profession::Unknown,
-                    "My Build",
-                    defs.all_food().next().unwrap().id,
-                    defs.all_util().next().unwrap().id,
-                ));
+            self.render_edit(ui, defs);
+        } else {
+            if ui.button("Edit") {
+                self.edit = true;
             }
+
+            self.render_view(ui, defs, current_prof, current_food, current_util);
         }
     }
 }

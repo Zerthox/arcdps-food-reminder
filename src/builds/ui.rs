@@ -186,7 +186,13 @@ impl Builds {
                         }
 
                         buff_ui::render_buff_tooltip(ui, food);
-                        buff_ui::render_food_context_menu(ui, i, food.id, Some(&food.name));
+                        buff_ui::render_food_context_menu(
+                            ui,
+                            i,
+                            food.id,
+                            Some(&food.name),
+                            &colors,
+                        );
                     }
 
                     // util
@@ -201,7 +207,13 @@ impl Builds {
                         }
 
                         buff_ui::render_buff_tooltip(ui, util);
-                        buff_ui::render_util_context_menu(ui, i, util.id, Some(&util.name));
+                        buff_ui::render_util_context_menu(
+                            ui,
+                            i,
+                            util.id,
+                            Some(&util.name),
+                            &colors,
+                        );
                     }
                 }
             }

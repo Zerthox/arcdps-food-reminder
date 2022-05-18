@@ -1,5 +1,9 @@
 use crate::data::BuffData;
-use arc_util::ui::{render, Ui};
+use arc_util::{
+    api::CoreColor,
+    exports,
+    ui::{render, Ui},
+};
 
 /// Renders a tooltip for a buff.
 pub fn render_buff_tooltip(ui: &Ui, buff: &BuffData) {
@@ -15,9 +19,13 @@ pub fn render_buff_context_menu(
     title: &str,
     buff_id: u32,
     name: Option<&str>,
+    colors: &exports::Colors,
 ) {
     render::item_context_menu(menu_id, || {
-        ui.text(title);
+        match colors.core(CoreColor::MediumGrey) {
+            Some(color) => ui.text_colored(color, title),
+            None => ui.text(title),
+        }
         if let Some(name) = name {
             if ui.small_button("Copy Name") {
                 ui.set_clipboard_text(name);
@@ -36,24 +44,38 @@ pub fn render_buff_context_menu(
 }
 
 /// Renders a context menu for a food item.
-pub fn render_food_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
+pub fn render_food_context_menu(
+    ui: &Ui,
+    menu_id: usize,
+    buff_id: u32,
+    name: Option<&str>,
+    colors: &exports::Colors,
+) {
     render_buff_context_menu(
         ui,
         format!("##food-context-{}", menu_id),
         "Food Options",
         buff_id,
         name,
+        colors,
     )
 }
 
 /// Renders a context menu for a utility item.
-pub fn render_util_context_menu(ui: &Ui, menu_id: usize, buff_id: u32, name: Option<&str>) {
+pub fn render_util_context_menu(
+    ui: &Ui,
+    menu_id: usize,
+    buff_id: u32,
+    name: Option<&str>,
+    colors: &exports::Colors,
+) {
     render_buff_context_menu(
         ui,
         format!("##util-context-{}", menu_id),
         "Utility Options",
         buff_id,
         name,
+        colors,
     )
 }
 

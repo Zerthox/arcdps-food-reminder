@@ -84,13 +84,19 @@ impl Tracker {
                     };
                     ui.text_colored(color, &food.display);
                     buff_ui::render_buff_tooltip(ui, food);
-                    buff_ui::render_food_context_menu(ui, entry_id, food.id, Some(&food.name));
+                    buff_ui::render_food_context_menu(
+                        ui,
+                        entry_id,
+                        food.id,
+                        Some(&food.name),
+                        colors,
+                    );
                 } else {
                     ui.text_colored(yellow, "SOME");
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Food");
                     }
-                    buff_ui::render_food_context_menu(ui, entry_id, id, None);
+                    buff_ui::render_food_context_menu(ui, entry_id, id, None, colors);
                 }
             }
         }
@@ -118,13 +124,19 @@ impl Tracker {
                     };
                     ui.text_colored(color, &util.display);
                     buff_ui::render_buff_tooltip(ui, util);
-                    buff_ui::render_util_context_menu(ui, entry_id, util.id, Some(&util.name));
+                    buff_ui::render_util_context_menu(
+                        ui,
+                        entry_id,
+                        util.id,
+                        Some(&util.name),
+                        colors,
+                    );
                 } else {
                     ui.text_colored(yellow, "SOME");
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Utility");
                     }
-                    buff_ui::render_util_context_menu(ui, entry_id, id, None);
+                    buff_ui::render_util_context_menu(ui, entry_id, id, None, colors);
                 }
             }
         }

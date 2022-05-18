@@ -8,7 +8,7 @@ use crate::{
 };
 use arc_util::{
     game::Player,
-    ui::{align::LeftAlign, Component, Hideable, Windowable},
+    ui::{align::LeftAlign, render, Component, Hideable, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 use strum::VariantNames;
@@ -34,6 +34,7 @@ impl Component for Demo {
         }
 
         // main window
+        let _style = render::small_padding(ui);
 
         // reminder buttons
         let mut align = LeftAlign::build();

@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::defs::{BuffDef, DIMINISHED, MALNOURISHED};
+use crate::defs::{DefKind, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::{BuffRemove, StateChange},
     game::Player,
@@ -111,7 +111,7 @@ impl Plugin {
                                         // check type of buff
                                         if let Some(buff_type) = self.defs.get_buff(buff_id) {
                                             match buff_type {
-                                                BuffDef::Food(food) => {
+                                                DefKind::Food(food) => {
                                                     if entry
                                                         .apply_food(food.id, event.time, event_id)
                                                     {
@@ -136,7 +136,7 @@ impl Plugin {
                                                         }
                                                     }
                                                 }
-                                                BuffDef::Util(util) => {
+                                                DefKind::Util(util) => {
                                                     if entry
                                                         .apply_util(util.id, event.time, event_id)
                                                     {
@@ -161,11 +161,11 @@ impl Plugin {
                                                         }
                                                     }
                                                 }
-                                                BuffDef::Ignore(id) => {
+                                                DefKind::Ignore => {
                                                     #[cfg(feature = "log")]
                                                     self.debug.log(format!(
                                                         "Ignored application of {} to {:?}",
-                                                        id, entry
+                                                        buff_id, entry
                                                     ));
                                                 }
                                             }
@@ -199,7 +199,7 @@ impl Plugin {
                                 // check type of buff
                                 if let Some(buff_type) = self.defs.get_buff(buff_id) {
                                     match buff_type {
-                                        BuffDef::Food(food) => {
+                                        DefKind::Food(food) => {
                                             if entry.remove_food(food.id, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
@@ -215,7 +215,7 @@ impl Plugin {
                                                 }
                                             }
                                         }
-                                        BuffDef::Util(util) => {
+                                        DefKind::Util(util) => {
                                             if entry.remove_util(util.id, event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
@@ -231,11 +231,11 @@ impl Plugin {
                                                 }
                                             }
                                         }
-                                        BuffDef::Ignore(id) => {
+                                        DefKind::Ignore => {
                                             #[cfg(feature = "log")]
                                             self.debug.log(format!(
                                                 "Ignored application of {} to {:?}",
-                                                id, entry
+                                                buff_id, entry
                                             ));
                                         }
                                     }

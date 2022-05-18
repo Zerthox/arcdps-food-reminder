@@ -1,7 +1,7 @@
 use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
 use crate::{
     buff_ui,
-    defs::{BuffDef, Definitions, DIMINISHED, MALNOURISHED},
+    defs::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
 };
 use arc_util::{
     api::CoreColor,
@@ -103,7 +103,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Food(food)) = defs.get_buff(id) {
+                if let Some(DefKind::Food(food)) = defs.get_buff(id) {
                     let color = match food.id {
                         MALNOURISHED => red,
                         _ => green,
@@ -143,7 +143,7 @@ impl Tracker {
                 }
             }
             BuffState::Some(id) => {
-                if let Some(BuffDef::Util(util)) = defs.get_buff(id) {
+                if let Some(DefKind::Util(util)) = defs.get_buff(id) {
                     let color = match util.id {
                         DIMINISHED => red,
                         _ => green,

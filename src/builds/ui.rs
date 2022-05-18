@@ -150,7 +150,7 @@ impl Builds {
                     ui,
                     format!("##food-{}", i),
                     build.food,
-                    &defs.all_food().collect::<Vec<_>>(),
+                    defs.all_food(),
                 ) {
                     build.food = changed.id;
                 }
@@ -162,7 +162,7 @@ impl Builds {
                     ui,
                     format!("##util-{}", i),
                     build.util,
-                    &defs.all_util().collect::<Vec<_>>(),
+                    defs.all_util(),
                 ) {
                     build.util = changed.id;
                 }

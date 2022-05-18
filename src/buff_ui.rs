@@ -4,6 +4,7 @@ use arc_util::{
     exports,
     ui::{render, Ui},
 };
+use arcdps::imgui::Selectable;
 
 /// Renders a tooltip for a buff.
 pub fn render_buff_tooltip(ui: &Ui, buff: &BuffData) {
@@ -84,15 +85,36 @@ pub fn render_buff_combo<'b>(
     ui: &Ui,
     label: impl AsRef<str>,
     selected_id: u32,
-    buffs: &[&'b BuffData],
+    buffs: impl IntoIterator<Item = &'b BuffData>,
 ) -> Option<&'b BuffData> {
-    let mut index = buffs
-        .iter()
-        .position(|entry| entry.id == selected_id)
-        .unwrap();
-    if ui.combo(label, &mut index, buffs, |buff| buff.name.as_str().into()) {
-        Some(buffs[index])
-    } else {
-        None
+    let mut buffs = buffs.into_iter();
+    let preview = buffs
+        .by_ref()
+        .find_map(|entry| {
+            if entry.id == selected_id {
+                Some(entry.name.clone())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_default();
+
+    let mut result = None;
+
+    // TODO: search?
+    if let Some(_token) = ui.begin_combo(label, preview) {
+        for entry in buffs {
+            let selected = entry.id == selected_id;
+            if Selectable::new(&entry.name).selected(selected).build(ui) {
+                result = Some(entry);
+            }
+
+            // handle focus
+            if selected {
+                ui.set_item_default_focus();
+            }
+        }
     }
+
+    result
 }

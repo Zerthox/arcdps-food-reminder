@@ -13,6 +13,32 @@ use arcdps::imgui::{
 };
 
 impl Tracker {
+    /// Renders reset buttons for squad & characters.
+    pub fn render_reset_buttons<const SAME_LINE: bool>(&mut self, ui: &Ui) {
+        // reset squad
+        if ui.button("Reset squad") {
+            for entry in &mut self.players {
+                entry.reset_buffs();
+            }
+        }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Reset all buff states for the squad/party.");
+        }
+
+        // optional same line
+        if SAME_LINE {
+            ui.same_line_with_spacing(0.0, 5.0);
+        }
+
+        // reset characters
+        if ui.button("Reset characters") {
+            self.chars_cache.clear();
+        }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Clear the cache for own characters.");
+        }
+    }
+
     /// Renders a player entry in a table.
     fn render_table_entry(
         &self,
@@ -235,8 +261,9 @@ impl Tracker {
     }
 
     /// Renders the tracker tab for own characters.
-    fn render_self_tab(&mut self, ui: &Ui, defs: &Definitions) {
+    fn render_characters_tab(&mut self, ui: &Ui, defs: &Definitions) {
         let current = self.get_self();
+
         if current.is_none() && self.chars_cache.is_empty() {
             ui.text("No characters found");
         } else if let Some(_table) = ui.begin_table_header_with_flags(
@@ -284,7 +311,7 @@ impl Component for Tracker {
             });
 
             TabItem::new("Characters").build(ui, || {
-                self.render_self_tab(ui, defs);
+                self.render_characters_tab(ui, defs);
             });
 
             TabItem::new("Builds").build(ui, || {
@@ -305,6 +332,11 @@ impl Windowable for Tracker {
 
         // hotkey
         render::input_key(ui, "##hotkey", "Hotkey", &mut self.settings.hotkey);
+
+        ui.spacing();
+
+        // reset buttons
+        self.render_reset_buttons::<false>(ui);
 
         ui.spacing();
 

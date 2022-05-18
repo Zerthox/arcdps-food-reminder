@@ -16,11 +16,11 @@ pub struct Buff {
 
 impl Buff {
     /// Creates a new buff.
-    pub const fn new(state: BuffState, time: u64, event_id: u64) -> Self {
+    pub const fn new(state: BuffState) -> Self {
         Self {
             state,
-            time,
-            event_id,
+            time: 0,
+            event_id: 0,
         }
     }
 

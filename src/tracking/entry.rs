@@ -29,9 +29,15 @@ impl Entry {
     pub const fn with_states(player: Player, food: BuffState, util: BuffState) -> Self {
         Self {
             player,
-            food: Buff::new(food, 0, 0),
-            util: Buff::new(util, 0, 0),
+            food: Buff::new(food),
+            util: Buff::new(util),
         }
+    }
+
+    /// Resets all buffs.
+    pub fn reset_buffs(&mut self) {
+        self.food = Buff::new(BuffState::Unknown);
+        self.util = Buff::new(BuffState::Unknown);
     }
 
     /// Sets all buffs to none.

@@ -9,6 +9,9 @@ use arcdps::{Agent, CombatEvent, UserInfo, UserInfoIter, UserRole};
 #[cfg(feature = "log")]
 use arc_util::api;
 
+/// Minimum time (ms) since the last [`StateChange::BuffInitial`] event for the buff check to trigger.
+const CHECK_TIME_DIFF: u64 = 100;
+
 impl Plugin {
     /// Handles a combat event from area stats.
     pub fn area_event(
@@ -274,11 +277,11 @@ impl Plugin {
                         }
 
                         // handle pending check
-                        if let Some(time) = self.pending_check {
+                        if let Some(last_time) = self.pending_check {
                             if statechange == StateChange::BuffInitial {
                                 // initial buffs are still being reported, refresh time
                                 self.pending_check = Some(event.time);
-                            } else if event.time > time {
+                            } else if event.time >= last_time + CHECK_TIME_DIFF {
                                 self.pending_check = None;
 
                                 // check self buffs

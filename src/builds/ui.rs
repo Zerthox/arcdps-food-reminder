@@ -3,6 +3,7 @@ use crate::{
     buff_ui,
     defs::{DefKind, Definitions},
     tracking::buff::BuffState,
+    util::with_alpha,
 };
 use arc_util::{
     api::CoreColor,
@@ -10,7 +11,7 @@ use arc_util::{
     game::Profession,
     ui::{render, Ui},
 };
-use arcdps_imgui::{StyleVar, TableColumnSetup, TableFlags};
+use arcdps::imgui::{StyleVar, TableColumnSetup, TableFlags};
 use strum::VariantNames;
 
 impl Builds {
@@ -50,7 +51,7 @@ impl Builds {
                     // name column
                     ui.table_next_column();
                     match colors.prof_base(build.prof) {
-                        Some(color) => ui.text_colored(color, &build.name),
+                        Some(color) => ui.text_colored(with_alpha(color, 1.0), &build.name),
                         None => ui.text(&build.name),
                     }
                     if ui.is_item_hovered() {

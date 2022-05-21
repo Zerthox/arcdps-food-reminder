@@ -78,10 +78,8 @@ impl Builds {
                     if self.display_tags {
                         ui.table_next_column();
                         ui.text(&build.tags);
-                    } else {
-                        if !build.tags.is_empty() && ui.is_item_hovered() {
-                            ui.tooltip_text(&build.tags);
-                        }
+                    } else if !build.tags.is_empty() && ui.is_item_hovered() {
+                        ui.tooltip_text(&build.tags);
                     }
 
                     // food
@@ -269,10 +267,8 @@ impl Builds {
             if ui.button("Done") {
                 self.edit = false;
             }
-        } else {
-            if ui.button("Edit") {
-                self.edit = true;
-            }
+        } else if ui.button("Edit") {
+            self.edit = true;
         }
 
         // search field

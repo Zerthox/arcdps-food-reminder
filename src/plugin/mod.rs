@@ -117,7 +117,10 @@ impl Plugin {
         settings.load_component(&mut self.reminder);
 
         #[cfg(feature = "demo")]
-        settings.load_component(&mut self.demo);
+        {
+            settings.load_component(&mut self.demo);
+            self.refresh_demo_settings();
+        }
 
         // load custom defs
         if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {
@@ -215,6 +218,14 @@ impl Plugin {
                 }
             }
         }
+    }
+
+    /// Propagates settings from reminder & tracker to demo versions.
+    #[cfg(feature = "demo")]
+    fn refresh_demo_settings(&mut self) {
+        let demo = &mut *self.demo;
+        demo.reminder.settings = self.reminder.settings.clone();
+        demo.tracker.settings = self.tracker.settings.clone();
     }
 }
 

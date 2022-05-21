@@ -173,6 +173,9 @@ impl Plugin {
             self.tracker.reset_settings();
             self.reminder.reset_settings();
         }
+
+        #[cfg(feature = "demo")]
+        self.refresh_demo_settings();
     }
 
     /// Callback for ArcDPS option checkboxes.

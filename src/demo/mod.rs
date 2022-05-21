@@ -14,19 +14,19 @@ use std::borrow::Cow;
 /// Features demo.
 #[derive(Debug)]
 pub struct Demo {
-    reminder: Reminder,
     all_foods: Vec<BuffState>,
     all_utils: Vec<BuffState>,
-    tracker: Window<Tracker>,
+    pub reminder: Reminder,
+    pub tracker: Window<Tracker>,
 }
 
 impl Demo {
     /// Creates a new demo.
     pub fn new() -> Self {
         Self {
-            reminder: Reminder::new(),
             all_foods: Vec::new(),
             all_utils: Vec::new(),
+            reminder: Reminder::new(),
             tracker: Window::new(
                 WindowOptions {
                     auto_resize: true,

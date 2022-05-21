@@ -30,7 +30,7 @@ impl Demo {
             tracker: Window::new(
                 WindowOptions {
                     auto_resize: true,
-                    ..WindowOptions::new("Demo Food Tracker")
+                    ..WindowOptions::new("Food Tracker##demo")
                 },
                 Tracker::new(),
             ),

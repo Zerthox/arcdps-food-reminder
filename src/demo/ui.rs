@@ -58,7 +58,7 @@ impl Component for Demo {
             ui.separator();
             ui.spacing();
 
-            ui.checkbox("Tracker", self.tracker.visible_mut());
+            ui.checkbox("Demo Tracker", self.tracker.visible_mut());
 
             // player editor
             if let Some(_table) = ui.begin_table_header(
@@ -79,45 +79,32 @@ impl Component for Demo {
                     ui.table_next_row();
                     let entry = self.tracker.player_mut(id).unwrap();
 
-                    // sub
+                    // subgroup
+                    let mut sub = entry.player.subgroup as i32;
                     ui.table_next_column();
-                    let mut sub = String::with_capacity(2);
-                    sub.push_str(&entry.player.subgroup.to_string());
+                    ui.set_next_item_width(render::ch_width(ui, 3));
                     if ui
-                        .input_text(format!("##sub-{}", id), &mut sub)
-                        .chars_decimal(true)
+                        .input_int(format!("##sub-{}", id), &mut sub)
+                        .step(0)
                         .build()
                     {
-                        entry.player.subgroup = match sub.parse() {
-                            Ok(num) if num > 15 => 15,
-                            Ok(0) | Err(_) => 1,
-                            Ok(num) => num,
+                        entry.player.subgroup = match sub {
+                            1..=15 => sub as usize,
+                            _ => 0,
                         };
                     }
 
                     // character name
                     ui.table_next_column();
-                    let mut char_name = String::with_capacity(19);
-                    char_name.push_str(&entry.player.character);
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui
-                        .input_text(format!("##char-{}", id), &mut char_name)
-                        .build()
-                    {
-                        entry.player.character = char_name;
-                    }
+                    ui.input_text(format!("##char-{}", id), &mut entry.player.character)
+                        .build();
 
                     // account name
                     ui.table_next_column();
-                    let mut acc_name = String::with_capacity(19);
-                    acc_name.push_str(&entry.player.account);
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui
-                        .input_text(format!("##acc-{}", id), &mut acc_name)
-                        .build()
-                    {
-                        entry.player.account = acc_name;
-                    }
+                    ui.input_text(format!("##acc-{}", id), &mut entry.player.account)
+                        .build();
 
                     // profession select
                     ui.table_next_column();

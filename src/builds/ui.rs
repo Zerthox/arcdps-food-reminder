@@ -138,21 +138,15 @@ impl Builds {
 
                 // build name
                 ui.table_next_column();
-                let mut name = String::with_capacity(256);
-                name.push_str(&build.name);
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.input_text(format!("##name-{}", i), &mut name).build() {
-                    build.name = name;
-                }
+                ui.input_text(format!("##name-{}", i), &mut build.name)
+                    .build();
 
                 // build description
                 ui.table_next_column();
-                let mut desc = String::with_capacity(256);
-                desc.push_str(&build.description);
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.input_text(format!("##desc-{}", i), &mut desc).build() {
-                    build.description = desc;
-                }
+                ui.input_text(format!("##desc-{}", i), &mut build.description)
+                    .build();
 
                 // food select
                 ui.table_next_column();

@@ -85,11 +85,10 @@ pub fn render_buff_combo<'b>(
     ui: &Ui,
     label: impl AsRef<str>,
     selected_id: u32,
-    buffs: impl IntoIterator<Item = &'b BuffData>,
+    buffs: impl Iterator<Item = &'b BuffData> + Clone,
 ) -> Option<&'b BuffData> {
-    let mut buffs = buffs.into_iter();
     let preview = buffs
-        .by_ref()
+        .clone()
         .find_map(|entry| {
             if entry.id == selected_id {
                 Some(entry.name.clone())

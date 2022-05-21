@@ -130,7 +130,7 @@ impl Definitions {
     }
 
     /// Returns all food definitions.
-    pub fn all_food(&self) -> impl Iterator<Item = &BuffData> {
+    pub fn all_food(&self) -> impl Iterator<Item = &BuffData> + Clone {
         self.data.iter().filter_map(|entry| match &entry.def {
             DefKind::Food(data) => Some(data),
             _ => None,
@@ -138,7 +138,7 @@ impl Definitions {
     }
 
     /// Returns all utility definitions.
-    pub fn all_util(&self) -> impl Iterator<Item = &BuffData> {
+    pub fn all_util(&self) -> impl Iterator<Item = &BuffData> + Clone {
         self.data.iter().filter_map(|entry| match &entry.def {
             DefKind::Util(data) => Some(data),
             _ => None,

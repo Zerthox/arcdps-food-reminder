@@ -119,7 +119,7 @@ impl Tracker {
     }
 
     /// Returns an iterator over all tracked player entries.
-    pub fn all_players(&self) -> impl Iterator<Item = &Entry> {
+    pub fn all_players(&self) -> impl Iterator<Item = &Entry> + Clone {
         self.players.iter()
     }
 

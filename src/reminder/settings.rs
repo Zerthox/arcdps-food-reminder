@@ -7,6 +7,7 @@ use std::time::Duration;
 #[serde(default)]
 pub struct ReminderSettings {
     pub duration: Duration,
+    pub position: f32,
     pub only_bosses: bool,
     pub encounter_start: bool,
     pub encounter_end: bool,
@@ -19,6 +20,7 @@ impl ReminderSettings {
     pub const fn new() -> Self {
         Self {
             duration: Reminder::DEFAULT_DURATION,
+            position: 0.2,
             only_bosses: true,
             encounter_start: true,
             encounter_end: true,

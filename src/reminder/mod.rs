@@ -2,6 +2,7 @@ pub mod settings;
 
 use arc_util::{api::CoreColor, exports, ui::Component};
 use arcdps::imgui::{self, Ui};
+use imgui::Condition;
 use settings::ReminderSettings;
 use std::time::{Duration, Instant};
 
@@ -89,8 +90,8 @@ impl Component for Reminder {
             // render "invisible" window with text
             imgui::Window::new("##food-reminder-reminder")
                 .position(
-                    [0.5 * screen_width, 0.2 * screen_height],
-                    imgui::Condition::Always,
+                    [0.5 * screen_width, self.settings.position * screen_height],
+                    Condition::Always,
                 )
                 .position_pivot([0.5, 0.5])
                 .content_size([screen_width, 0.0])

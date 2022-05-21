@@ -1,13 +1,15 @@
-use crate::{defs::Definitions, plugin::DEFINITIONS_FILE};
-
 use super::Plugin;
+use crate::{defs::Definitions, plugin::DEFINITIONS_FILE};
 use arc_util::{
     api::CoreColor,
     exports,
     settings::{HasSettings, Settings},
-    ui::{render, Component, Hideable},
+    ui::{
+        render::{self, input_float_with_format},
+        Component, Hideable,
+    },
 };
-use arcdps::imgui::Ui;
+use arcdps::imgui::{InputTextFlags, Ui};
 use std::time::Duration;
 
 impl Plugin {
@@ -30,6 +32,7 @@ impl Plugin {
     }
 
     /// Callback for settings UI creation.
+    // TODO: split settings UI into components
     pub fn render_settings(&mut self, ui: &Ui) {
         let colors = exports::colors();
         let grey = colors
@@ -44,6 +47,8 @@ impl Plugin {
 
         // use small padding
         let _style = render::small_padding(ui);
+
+        let input_width = render::ch_width(ui, 16);
 
         // tracker settings
         ui.spacing();
@@ -120,25 +125,40 @@ impl Plugin {
         }
 
         // reminder duration
-        let mut duration_buffer = String::with_capacity(5);
-        duration_buffer.push_str(&self.reminder.settings.duration.as_millis().to_string());
-
-        ui.set_next_item_width(render::ch_width(ui, 6));
+        let mut dura = self.reminder.settings.duration.as_millis() as i32;
+        ui.set_next_item_width(input_width);
         if ui
-            .input_text("Reminder duration (ms)", &mut duration_buffer)
-            .chars_decimal(true)
+            .input_int("Duration (ms)", &mut dura)
+            .step(100)
+            .step_fast(1000)
             .build()
         {
-            if let Ok(num) = duration_buffer.parse() {
-                self.reminder.settings.duration = Duration::from_millis(num);
-            }
+            self.reminder.settings.duration = Duration::from_millis(dura.max(0) as u64);
         }
         if ui.is_item_hovered() {
             ui.tooltip_text("How long the reminder is displayed on screen.");
         }
 
+        // reminder position
+        let mut pos = self.reminder.settings.position * 100.0;
+        ui.set_next_item_width(input_width);
+        if input_float_with_format(
+            "Position (%)",
+            &mut pos,
+            1.0,
+            10.0,
+            "%.1f",
+            InputTextFlags::empty(),
+        ) {
+            self.reminder.settings.position = pos / 100.0;
+        }
+        if ui.is_item_hovered() {
+            ui.tooltip_text("Vertical position of the reminder displayed on screen.");
+        }
+
         ui.spacing();
         ui.spacing();
+
         ui.text_colored(grey, "Custom definitions");
         if ui.button("Reload definitions file") {
             if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {

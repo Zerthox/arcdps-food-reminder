@@ -25,20 +25,39 @@ impl Builds {
         current_util: BuffState,
     ) {
         // render builds table
-        if let Some(_table) = ui.begin_table_header_with_flags(
-            "##builds-table",
-            [
-                TableColumnSetup::new("Build"),
-                TableColumnSetup::new("Food"),
-                TableColumnSetup::new("Util"),
-            ],
-            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
-        ) {
+        if let Some(_table) = if self.display_tags {
+            ui.begin_table_header_with_flags(
+                "##builds-table",
+                [
+                    TableColumnSetup::new("Build"),
+                    TableColumnSetup::new("Tags"),
+                    TableColumnSetup::new("Food"),
+                    TableColumnSetup::new("Util"),
+                ],
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            )
+        } else {
+            ui.begin_table_header_with_flags(
+                "##builds-table",
+                [
+                    TableColumnSetup::new("Build"),
+                    TableColumnSetup::new("Food"),
+                    TableColumnSetup::new("Util"),
+                ],
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            )
+        } {
             let colors = exports::colors();
 
             for (i, build) in self.entries.iter_mut().enumerate() {
-                // filter if necessary
-                if !self.filter || current_prof.map(|prof| prof == build.prof).unwrap_or(true) {
+                // check if filters match
+                let prof_matches = !self.filter_prof
+                    || current_prof.map(|prof| prof == build.prof).unwrap_or(true);
+                let search_matches = self.search.is_empty()
+                    || build.name.to_lowercase().contains(&self.search)
+                    || build.tags.to_lowercase().contains(&self.search);
+
+                if prof_matches && search_matches {
                     ui.table_next_row();
 
                     let red = colors
@@ -48,14 +67,21 @@ impl Builds {
                         .core(CoreColor::LightGreen)
                         .unwrap_or([0.0, 1.0, 0.0, 1.0]);
 
-                    // name column
+                    // name
                     ui.table_next_column();
                     match colors.prof_base(build.prof) {
                         Some(color) => ui.text_colored(with_alpha(color, 1.0), &build.name),
                         None => ui.text(&build.name),
                     }
-                    if ui.is_item_hovered() {
-                        ui.tooltip_text(&build.description);
+
+                    // tags as column or tooltip
+                    if self.display_tags {
+                        ui.table_next_column();
+                        ui.text(&build.tags);
+                    } else {
+                        if !build.tags.is_empty() && ui.is_item_hovered() {
+                            ui.tooltip_text(&build.tags);
+                        }
                     }
 
                     // food
@@ -115,7 +141,7 @@ impl Builds {
             [
                 TableColumnSetup::new("Profession"),
                 TableColumnSetup::new("Name"),
-                TableColumnSetup::new("Description"),
+                TableColumnSetup::new("Tags"),
                 TableColumnSetup::new("Food"),
                 TableColumnSetup::new("Utility"),
                 TableColumnSetup::new(""),
@@ -136,16 +162,16 @@ impl Builds {
                     build.prof = (prof as u32).into();
                 }
 
-                // build name
+                // name input
                 ui.table_next_column();
                 ui.set_next_item_width(INPUT_SIZE);
                 ui.input_text(format!("##name-{}", i), &mut build.name)
                     .build();
 
-                // build description
+                // tags input
                 ui.table_next_column();
                 ui.set_next_item_width(INPUT_SIZE);
-                ui.input_text(format!("##desc-{}", i), &mut build.description)
+                ui.input_text(format!("##tags-{}", i), &mut build.tags)
                     .build();
 
                 // food select
@@ -231,25 +257,31 @@ impl Builds {
     ) {
         let _style = render::small_padding(ui);
 
-        ui.checkbox("Current profession", &mut self.filter);
+        // profession filter
+        ui.checkbox("Current profession", &mut self.filter_prof);
         if ui.is_item_hovered() {
             ui.tooltip_text("Only show builds for current profession");
         }
 
-        // TODO: category filter or search?
-
+        // edit mode button
         ui.same_line_with_spacing(0.0, 10.0);
         if self.edit {
             if ui.button("Done") {
                 self.edit = false;
             }
-
-            self.render_edit(ui, defs);
         } else {
             if ui.button("Edit") {
                 self.edit = true;
             }
+        }
 
+        // search field
+        ui.input_text("##search", &mut self.search).build();
+
+        // contents
+        if self.edit {
+            self.render_edit(ui, defs);
+        } else {
             self.render_view(ui, defs, current_prof, current_food, current_util);
         }
     }

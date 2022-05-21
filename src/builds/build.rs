@@ -9,7 +9,7 @@ use crate::defs::{DIMINISHED, MALNOURISHED};
 pub struct Build {
     pub prof: Profession,
     pub name: String,
-    pub description: String,
+    pub tags: String,
     pub food: u32,
     pub util: u32,
 }
@@ -19,14 +19,14 @@ impl Build {
     pub fn new(
         prof: Profession,
         name: impl Into<String>,
-        description: impl Into<String>,
+        tags: impl Into<String>,
         food: u32,
         util: u32,
     ) -> Self {
         Self {
             prof,
             name: name.into(),
-            description: description.into(),
+            tags: tags.into(),
             food,
             util,
         }

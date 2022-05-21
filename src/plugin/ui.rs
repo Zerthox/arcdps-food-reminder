@@ -85,7 +85,7 @@ impl Plugin {
         }
 
         // reset buttons
-        self.tracker.render_reset_buttons::<true>(ui);
+        self.tracker.render_reset_buttons(ui, true);
 
         // reminder settings
         ui.spacing();

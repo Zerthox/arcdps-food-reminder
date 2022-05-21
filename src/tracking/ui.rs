@@ -15,7 +15,7 @@ use arcdps::imgui::{
 
 impl Tracker {
     /// Renders reset buttons for squad & characters.
-    pub fn render_reset_buttons<const SAME_LINE: bool>(&mut self, ui: &Ui) {
+    pub fn render_reset_buttons(&mut self, ui: &Ui, same_line: bool) {
         // reset squad
         if ui.button("Reset squad") {
             for entry in &mut self.players {
@@ -27,7 +27,7 @@ impl Tracker {
         }
 
         // optional same line
-        if SAME_LINE {
+        if same_line {
             ui.same_line_with_spacing(0.0, 5.0);
         }
 
@@ -341,7 +341,7 @@ impl Windowable for Tracker {
         ui.spacing();
 
         // reset buttons
-        self.render_reset_buttons::<false>(ui);
+        self.render_reset_buttons(ui, false);
 
         ui.spacing();
 
@@ -349,7 +349,9 @@ impl Windowable for Tracker {
         ui.menu("Display", || {
             ui.text_colored(grey, "Display");
 
+            // table column checkboxes
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
+            ui.checkbox("Show build tags", &mut self.builds.display_tags);
 
             const COLORS: &[Color] = &[Color::None, Color::Sub, Color::Prof];
             let input_width = render::ch_width(ui, 16);

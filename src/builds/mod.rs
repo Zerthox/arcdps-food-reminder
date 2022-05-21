@@ -13,8 +13,8 @@ pub struct Builds {
     /// User-defined builds
     pub entries: Vec<Build>,
 
-    /// Whether to display tags as table column.
-    pub display_tags: bool,
+    /// Whether to display notes as table column.
+    pub display_notes: bool,
 
     /// Whether to filter builds by profession.
     pub filter_prof: bool,
@@ -31,7 +31,7 @@ impl Builds {
     pub const fn new() -> Self {
         Self {
             entries: Vec::new(),
-            display_tags: true,
+            display_notes: true,
             filter_prof: false,
             search: String::new(),
             edit: false,

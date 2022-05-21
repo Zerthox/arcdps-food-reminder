@@ -351,7 +351,7 @@ impl Windowable for Tracker {
 
             // table column checkboxes
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
-            ui.checkbox("Show build tags", &mut self.builds.display_tags);
+            ui.checkbox("Show build notes", &mut self.builds.display_notes);
 
             const COLORS: &[Color] = &[Color::None, Color::Sub, Color::Prof];
             let input_width = render::ch_width(ui, 16);

@@ -25,12 +25,12 @@ impl Builds {
         current_util: BuffState,
     ) {
         // render builds table
-        if let Some(_table) = if self.display_tags {
+        if let Some(_table) = if self.display_notes {
             ui.begin_table_header_with_flags(
                 "##builds-table",
                 [
                     TableColumnSetup::new("Build"),
-                    TableColumnSetup::new("Tags"),
+                    TableColumnSetup::new("Notes"),
                     TableColumnSetup::new("Food"),
                     TableColumnSetup::new("Util"),
                 ],
@@ -55,7 +55,7 @@ impl Builds {
                     || current_prof.map(|prof| prof == build.prof).unwrap_or(true);
                 let search_matches = self.search.is_empty()
                     || build.name.to_lowercase().contains(&self.search)
-                    || build.tags.to_lowercase().contains(&self.search);
+                    || build.notes.to_lowercase().contains(&self.search);
 
                 if prof_matches && search_matches {
                     ui.table_next_row();
@@ -74,12 +74,12 @@ impl Builds {
                         None => ui.text(&build.name),
                     }
 
-                    // tags as column or tooltip
-                    if self.display_tags {
+                    // notes as column or tooltip
+                    if self.display_notes {
                         ui.table_next_column();
-                        ui.text(&build.tags);
-                    } else if !build.tags.is_empty() && ui.is_item_hovered() {
-                        ui.tooltip_text(&build.tags);
+                        ui.text(&build.notes);
+                    } else if !build.notes.is_empty() && ui.is_item_hovered() {
+                        ui.tooltip_text(&build.notes);
                     }
 
                     // food
@@ -139,7 +139,7 @@ impl Builds {
             [
                 TableColumnSetup::new("Profession"),
                 TableColumnSetup::new("Name"),
-                TableColumnSetup::new("Tags"),
+                TableColumnSetup::new("Notes"),
                 TableColumnSetup::new("Food"),
                 TableColumnSetup::new("Utility"),
                 TableColumnSetup::new(""),
@@ -166,10 +166,10 @@ impl Builds {
                 ui.input_text(format!("##name-{}", i), &mut build.name)
                     .build();
 
-                // tags input
+                // notes input
                 ui.table_next_column();
                 ui.set_next_item_width(INPUT_SIZE);
-                ui.input_text(format!("##tags-{}", i), &mut build.tags)
+                ui.input_text(format!("##notes-{}", i), &mut build.notes)
                     .build();
 
                 // food select

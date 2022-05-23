@@ -1,7 +1,7 @@
 use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
-    data::{DefKind, Definitions},
+    data::{DefKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
     util::with_alpha,
 };
@@ -12,7 +12,6 @@ use arc_util::{
     ui::{render, Ui},
 };
 use arcdps::imgui::{StyleVar, TableColumnSetup, TableFlags};
-use strum::VariantNames;
 
 impl Builds {
     /// Renders viewing mode contents.
@@ -153,11 +152,15 @@ impl Builds {
 
                 // prof select
                 ui.table_next_column();
-                let mut prof = build.prof as usize;
+                let mut index = PROFESSIONS
+                    .iter()
+                    .position(|prof| *prof == build.prof)
+                    .unwrap();
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.combo_simple_string(format!("##prof-{}", i), &mut prof, Profession::VARIANTS)
-                {
-                    build.prof = (prof as u32).into();
+                if ui.combo(format!("##prof-{}", i), &mut index, PROFESSIONS, |prof| {
+                    <&str>::from(prof).into()
+                }) {
+                    build.prof = PROFESSIONS[index];
                 }
 
                 // name input

@@ -1,6 +1,6 @@
 use super::Demo;
 use crate::{
-    data::Definitions,
+    data::{Definitions, PROFESSIONS},
     tracking::{
         buff::BuffState,
         entry::{Profession, Specialization},
@@ -11,7 +11,6 @@ use arc_util::{
     ui::{align::LeftAlign, render, Component, Hideable, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
-use strum::VariantNames;
 
 impl Component for Demo {
     type Props = Definitions;
@@ -108,14 +107,15 @@ impl Component for Demo {
 
                     // profession select
                     ui.table_next_column();
-                    let mut prof = entry.player.profession as usize;
+                    let mut index = PROFESSIONS
+                        .iter()
+                        .position(|prof| *prof == entry.player.profession)
+                        .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo_simple_string(
-                        format!("##prof-{}", id),
-                        &mut prof,
-                        Profession::VARIANTS,
-                    ) {
-                        entry.player.profession = (prof as u32).into();
+                    if ui.combo(format!("##prof-{}", id), &mut index, PROFESSIONS, |prof| {
+                        <&str>::from(prof).into()
+                    }) {
+                        entry.player.profession = PROFESSIONS[index];
                     }
 
                     // food select

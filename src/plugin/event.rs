@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::defs::{DefKind, DIMINISHED, MALNOURISHED};
+use crate::data::{DefKind, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::{BuffRemove, StateChange},
     game::Player,

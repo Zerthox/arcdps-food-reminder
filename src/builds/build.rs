@@ -1,7 +1,7 @@
 use arc_util::game::Profession;
 use serde::{Deserialize, Serialize};
 
-use crate::defs::{DIMINISHED, MALNOURISHED};
+use crate::data::{DIMINISHED, MALNOURISHED};
 
 /// Build data.
 #[derive(Debug, Clone, Serialize, Deserialize)]

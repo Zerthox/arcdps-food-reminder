@@ -1,11 +1,11 @@
-#[path = "src/data/mod.rs"]
-mod data;
+#[path = "src/data/structs.rs"]
+mod structs;
 
 #[path = "src/util.rs"]
 mod util;
 
-use data::DefData;
 use std::{env, fs, path::PathBuf};
+use structs::DefData;
 use util::parse_jsonc;
 
 fn main() {

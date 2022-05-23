@@ -1,7 +1,6 @@
 mod buff_ui;
 mod builds;
 mod data;
-mod defs;
 mod plugin;
 mod reminder;
 mod tracking;

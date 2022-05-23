@@ -1,7 +1,7 @@
 use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
 use crate::{
     buff_ui,
-    defs::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
+    data::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
     util::with_alpha,
 };
 use arc_util::{

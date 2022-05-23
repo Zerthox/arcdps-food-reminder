@@ -2,7 +2,7 @@ pub mod event;
 pub mod ui;
 
 use crate::{
-    defs::{Definitions, DIMINISHED, MALNOURISHED},
+    data::{Definitions, DIMINISHED, MALNOURISHED},
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };

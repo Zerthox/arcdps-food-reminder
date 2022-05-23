@@ -1,5 +1,5 @@
 use super::Plugin;
-use crate::{defs::Definitions, plugin::DEFINITIONS_FILE};
+use crate::{data::Definitions, plugin::DEFINITIONS_FILE};
 use arc_util::{
     api::CoreColor,
     exports,

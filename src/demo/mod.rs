@@ -4,7 +4,7 @@ pub mod settings;
 pub mod ui;
 
 use crate::{
-    defs::{DefKind, Definitions},
+    data::{DefKind, Definitions},
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };

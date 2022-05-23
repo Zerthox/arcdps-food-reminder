@@ -1,6 +1,6 @@
 use super::Demo;
 use crate::{
-    defs::Definitions,
+    data::Definitions,
     tracking::{
         buff::BuffState,
         entry::{Profession, Specialization},

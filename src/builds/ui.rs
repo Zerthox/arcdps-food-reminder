@@ -1,7 +1,7 @@
 use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
-    defs::{DefKind, Definitions},
+    data::{DefKind, Definitions},
     tracking::buff::BuffState,
     util::with_alpha,
 };

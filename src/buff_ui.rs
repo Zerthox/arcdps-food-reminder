@@ -112,6 +112,11 @@ pub fn render_buff_combo<'b>(
             if selected {
                 ui.set_item_default_focus();
             }
+
+            // tooltip
+            if ui.is_item_hovered() {
+                render_buff_tooltip(ui, entry);
+            }
         }
     }
 

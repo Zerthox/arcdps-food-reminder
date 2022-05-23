@@ -10,6 +10,7 @@ jobs:
     name: Release
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v2
       - uses: ./.github/workflows/build.yml
       - uses: softprops/action-gh-release@v1
         with:

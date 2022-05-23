@@ -11,7 +11,19 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/workflows/build.yml
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-pc-windows-msvc
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release
+      - uses: actions/upload-artifact@v2
+        with:
+          name: arcdps_food_reminder
+          path: target/release/arcdps_food_reminder.dll
       - uses: softprops/action-gh-release@v1
         with:
           files: target/release/arcdps_food_reminder.dll

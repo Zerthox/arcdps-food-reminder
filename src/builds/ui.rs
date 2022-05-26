@@ -3,7 +3,6 @@ use crate::{
     buff_ui,
     data::{DefKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
-    util::with_alpha,
 };
 use arc_util::{
     api::CoreColor,
@@ -69,7 +68,7 @@ impl Builds {
                     // name
                     ui.table_next_column();
                     match colors.prof_base(build.prof) {
-                        Some(color) => ui.text_colored(with_alpha(color, 1.0), &build.name),
+                        Some(color) => ui.text_colored(render::with_alpha(color, 1.0), &build.name),
                         None => ui.text(&build.name),
                     }
 

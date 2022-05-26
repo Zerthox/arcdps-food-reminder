@@ -2,7 +2,6 @@ use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
 use crate::{
     buff_ui,
     data::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
-    util::with_alpha,
 };
 use arc_util::{
     api::CoreColor,
@@ -53,10 +52,10 @@ impl Tracker {
         let player = &entry.player;
         let sub_color = colors
             .sub_base(player.subgroup)
-            .map(|color| with_alpha(color, 1.0));
+            .map(|color| render::with_alpha(color, 1.0));
         let prof_color = colors
             .prof_base(player.profession)
-            .map(|color| with_alpha(color, 1.0));
+            .map(|color| render::with_alpha(color, 1.0));
         let red = colors
             .core(CoreColor::LightRed)
             .unwrap_or([1.0, 0.0, 0.0, 1.0]);

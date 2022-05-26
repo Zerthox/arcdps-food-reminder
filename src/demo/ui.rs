@@ -12,7 +12,7 @@ use arc_util::{
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 
-impl Component for Demo {
+impl Component<'_> for Demo {
     type Props = Definitions;
 
     fn render(&mut self, ui: &Ui, defs: &Self::Props) {
@@ -183,6 +183,6 @@ impl Component for Demo {
     }
 }
 
-impl Windowable for Demo {
+impl Windowable<'_> for Demo {
     const CONTEXT_MENU: bool = true;
 }

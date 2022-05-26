@@ -74,7 +74,7 @@ impl Reminder {
     }
 }
 
-impl Component for Reminder {
+impl Component<'_> for Reminder {
     type Props = ();
 
     fn render(&mut self, ui: &Ui, _props: &Self::Props) {

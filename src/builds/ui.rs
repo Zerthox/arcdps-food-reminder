@@ -9,7 +9,7 @@ use arc_util::{
     api::CoreColor,
     exports,
     game::Profession,
-    ui::{render, Ui},
+    ui::{render, Component, Ui},
 };
 use arcdps::imgui::{StyleVar, TableColumnSetup, TableFlags};
 
@@ -246,16 +246,13 @@ impl Builds {
             self.entries.push(Build::empty());
         }
     }
+}
+
+impl<'p> Component<'p> for Builds {
+    type Props = (&'p Definitions, Option<Profession>, BuffState, BuffState);
 
     /// Renders the builds UI.
-    pub fn render(
-        &mut self,
-        ui: &Ui,
-        defs: &Definitions,
-        current_prof: Option<Profession>,
-        current_food: BuffState,
-        current_util: BuffState,
-    ) {
+    fn render(&mut self, ui: &Ui, (defs, current_prof, current_food, current_util): &Self::Props) {
         let _style = render::small_padding(ui);
 
         // profession filter
@@ -281,7 +278,7 @@ impl Builds {
         if self.edit {
             self.render_edit(ui, defs);
         } else {
-            self.render_view(ui, defs, current_prof, current_food, current_util);
+            self.render_view(ui, defs, *current_prof, *current_food, *current_util);
         }
     }
 }

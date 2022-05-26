@@ -302,11 +302,11 @@ impl Tracker {
             .map(|entry| entry.util.state)
             .unwrap_or(BuffState::Unknown);
 
-        self.builds.render(ui, defs, prof, food, util);
+        self.builds.render(ui, &(defs, prof, food, util));
     }
 }
 
-impl Component for Tracker {
+impl Component<'_> for Tracker {
     type Props = Definitions;
 
     fn render(&mut self, ui: &Ui, defs: &Self::Props) {
@@ -326,7 +326,7 @@ impl Component for Tracker {
     }
 }
 
-impl Windowable for Tracker {
+impl Windowable<'_> for Tracker {
     const CONTEXT_MENU: bool = true;
 
     fn render_menu(&mut self, ui: &Ui, _defs: &Self::Props) {

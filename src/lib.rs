@@ -21,7 +21,7 @@ static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 // create exports for arcdps
 arcdps_export! {
     name: "Food Reminder",
-    sig: 0x642baaae , // random id
+    sig: 0x642baaae, // random id
     init,
     release,
     combat,

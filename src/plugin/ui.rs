@@ -111,7 +111,7 @@ impl Plugin {
             &mut self.reminder.settings.only_bosses,
         );
         if ui.is_item_hovered() {
-            ui.tooltip_text("Uses the default & user-defined bosses from Arc.\nYou can add additional bosses only for reminders in a custom definitions file.");
+            ui.tooltip_text("Only remind for the default or custom bosses set in Arc.");
         }
 
         ui.checkbox(

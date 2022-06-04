@@ -7,7 +7,6 @@ pub struct DefData {
     pub food: Vec<BuffData>,
     pub utility: Vec<BuffData>,
     pub ignore: Vec<u32>,
-    pub bosses: Vec<u32>,
 }
 
 /// Single buff data entry.

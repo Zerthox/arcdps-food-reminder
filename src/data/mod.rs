@@ -19,21 +19,13 @@ pub struct Definitions {
     ///
     /// Sorted alphabetically for UI usage.
     data: Vec<DefEntry>,
-
-    /// Boss ids.
-    ///
-    /// Sorted by id.
-    bosses: Vec<u32>,
 }
 
 #[allow(dead_code)]
 impl Definitions {
     /// Creates a new empty set of definitions.
     pub const fn empty() -> Self {
-        Self {
-            data: Vec::new(),
-            bosses: Vec::new(),
-        }
+        Self { data: Vec::new() }
     }
 
     /// Creates a new set of definitions with the default definitions.
@@ -77,25 +69,9 @@ impl Definitions {
         self.data.sort_by(|a, b| a.def.name().cmp(b.def.name()));
     }
 
-    /// Adds new boss ids.
-    pub fn add_bosses(&mut self, bosses: impl IntoIterator<Item = u32>) {
-        // insert
-        self.bosses.extend(bosses);
-
-        // sort
-        self.bosses.sort_unstable();
-    }
-
     /// Add definitions from a [`DefData`] collection.
     pub fn add_data(&mut self, data: DefData) {
-        let DefData {
-            food,
-            utility,
-            ignore,
-            bosses,
-        } = data;
-        self.add_buffs(food, utility, ignore);
-        self.add_bosses(bosses);
+        self.add_buffs(data.food, data.utility, data.ignore);
     }
 
     /// Attempts to load custom definitions from a given file.
@@ -119,11 +95,6 @@ impl Definitions {
                 None
             }
         })
-    }
-
-    /// Checks whether the is is in the list of bosses.
-    pub fn is_boss(&self, id: u32) -> bool {
-        self.bosses.binary_search(&id).is_ok()
     }
 
     /// Returns all food definitions.
@@ -200,13 +171,11 @@ mod tests {
             food,
             utility,
             ignore,
-            bosses,
         } = default_definitions();
 
         assert!(!food.is_empty());
         assert!(!utility.is_empty());
         assert!(!ignore.is_empty());
-        assert!(!bosses.is_empty());
 
         assert!(food.iter().any(|entry| entry.id == MALNOURISHED));
         assert!(utility.iter().any(|entry| entry.id == DIMINISHED));

@@ -174,9 +174,8 @@ impl Plugin {
     /// Whether the local player can be reminded.
     fn can_remind(&self) -> bool {
         match self.tracker.encounter() {
-            Some(boss_id) => {
-                !self.reminder.settings.only_bosses || self.defs.is_boss(boss_id as u32)
-            }
+            Some(boss_id) if self.reminder.settings.only_bosses => boss_id > 1,
+            Some(_) => true,
             None => false,
         }
     }

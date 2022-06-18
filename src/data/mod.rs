@@ -2,7 +2,7 @@ mod constants;
 mod structs;
 
 use crate::util::parse_jsonc;
-use std::{fs, path::Path};
+use std::{fs, io, path::Path};
 
 pub use constants::*;
 pub use structs::*;
@@ -75,12 +75,15 @@ impl Definitions {
     }
 
     /// Attempts to load custom definitions from a given file.
-    pub fn try_load(&mut self, path: impl AsRef<Path>) -> Result<(), ()> {
+    pub fn try_load(&mut self, path: impl AsRef<Path>) -> Result<(), LoadError> {
         // read file
-        let content = fs::read_to_string(path).map_err(|_| ())?;
+        let content = fs::read_to_string(path).map_err(|err| match err.kind() {
+            io::ErrorKind::NotFound => LoadError::NotFound,
+            _ => LoadError::FailedToRead,
+        })?;
 
         // parse & add data
-        let data = parse_jsonc(&content).ok_or(())?;
+        let data = parse_jsonc(&content).ok_or(LoadError::InvalidJSON)?;
         self.add_data(data);
 
         Ok(())
@@ -159,6 +162,13 @@ impl DefKind {
             DefKind::Ignore => "",
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum LoadError {
+    NotFound,
+    FailedToRead,
+    InvalidJSON,
 }
 
 #[cfg(test)]

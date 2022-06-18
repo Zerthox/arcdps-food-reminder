@@ -1,5 +1,8 @@
 use super::Plugin;
-use crate::{data::Definitions, plugin::DEFINITIONS_FILE};
+use crate::{
+    data::{Definitions, LoadError},
+    plugin::DEFINITIONS_FILE,
+};
 use arc_util::{
     api::CoreColor,
     exports,
@@ -38,6 +41,9 @@ impl Plugin {
         let grey = colors
             .core(CoreColor::MediumGrey)
             .unwrap_or([0.5, 0.5, 0.5, 1.0]);
+        let red = colors
+            .core(CoreColor::LightRed)
+            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
         let green = colors
             .core(CoreColor::LightGreen)
             .unwrap_or([0.0, 1.0, 0.0, 1.0]);
@@ -111,7 +117,7 @@ impl Plugin {
             &mut self.reminder.settings.only_bosses,
         );
         if ui.is_item_hovered() {
-            ui.tooltip_text("Only remind for the default or custom bosses set in Arc.");
+            ui.tooltip_text("Only remind for the default & custom bosses set in Arc.");
         }
 
         ui.checkbox(
@@ -160,10 +166,21 @@ impl Plugin {
         ui.spacing();
 
         ui.text_colored(grey, "Custom definitions");
+        ui.text("Status:");
+        ui.same_line();
+        match self.defs_state {
+            Ok(()) => ui.text_colored(green, "Loaded"),
+            Err(LoadError::NotFound) => ui.text("Not found"),
+            Err(LoadError::FailedToRead) => ui.text_colored(red, "Failed to read file"),
+            Err(LoadError::InvalidJSON) => ui.text_colored(red, "Failed to parse JSON"),
+        }
+
         if ui.button("Reload definitions file") {
             if let Some(defs_path) = Settings::config_path(DEFINITIONS_FILE) {
                 // try loading custom defs
-                if self.defs.try_load(&defs_path).is_ok() {
+                self.defs_state = self.defs.try_load(&defs_path);
+
+                if self.defs_state.is_ok() {
                     #[cfg(feature = "log")]
                     self.debug.log(format!(
                         "Reloaded custom definitions from \"{}\"",
@@ -182,6 +199,7 @@ impl Plugin {
         ui.same_line_with_spacing(0.0, 5.0);
         if ui.button("Reset definitions") {
             self.defs = Definitions::with_defaults();
+            self.defs_state = Err(LoadError::NotFound);
         }
 
         ui.spacing();

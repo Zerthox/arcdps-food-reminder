@@ -2,7 +2,7 @@ pub mod event;
 pub mod ui;
 
 use crate::{
-    data::{Definitions, DIMINISHED, MALNOURISHED},
+    data::{Definitions, LoadError, DIMINISHED, MALNOURISHED},
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };
@@ -31,10 +31,14 @@ const DEFINITIONS_FILE: &str = "arcdps_food_reminder_definitions.json";
 /// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
+    /// Whether unofficial extras has been initialized.
     extras: bool,
 
     /// Definitions.
     defs: Definitions,
+
+    /// State of loading custom definitions.
+    defs_state: Result<(), LoadError>,
 
     /// Food reminder.
     reminder: Reminder,
@@ -62,6 +66,7 @@ impl Plugin {
         Self {
             extras: false,
             defs: Definitions::with_defaults(),
+            defs_state: Err(LoadError::NotFound),
             reminder: Reminder::new(),
             pending_check: None,
 
@@ -130,7 +135,9 @@ impl Plugin {
             if matches!(settings_version, Some(version) if version >= DEFAULTS_CHANGE) {
                 if defs_path.exists() {
                     // try loading custom defs
-                    if self.defs.try_load(&defs_path).is_ok() {
+                    self.defs_state = self.defs.try_load(&defs_path);
+
+                    if self.defs_state.is_ok() {
                         #[cfg(feature = "log")]
                         self.debug.log(format!(
                             "Loaded custom definitions from \"{}\"",

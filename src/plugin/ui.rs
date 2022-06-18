@@ -51,6 +51,8 @@ impl Plugin {
             .core(CoreColor::LightYellow)
             .unwrap_or([1.0, 1.0, 0.0, 1.0]);
 
+        const SPACING: f32 = 5.0;
+
         // use small padding
         let _style = render::small_padding(ui);
 
@@ -196,7 +198,7 @@ impl Plugin {
             }
         }
 
-        ui.same_line_with_spacing(0.0, 5.0);
+        ui.same_line_with_spacing(0.0, SPACING);
         if ui.button("Reset definitions") {
             self.defs = Definitions::with_defaults();
             self.defs_state = Err(LoadError::NotFound);
@@ -207,9 +209,25 @@ impl Plugin {
         ui.spacing();
 
         // reset button
-        if ui.button("Reset to default") {
-            self.tracker.reset_settings();
-            self.reminder.reset_settings();
+        if !self.reset_confirm {
+            if ui.button("Reset to default") {
+                self.reset_confirm = true;
+            }
+        } else {
+            ui.align_text_to_frame_padding();
+            ui.text("Reset to default?");
+
+            ui.same_line();
+            if ui.button("Confirm") {
+                self.tracker.reset_settings();
+                self.reminder.reset_settings();
+                self.reset_confirm = false;
+            }
+
+            ui.same_line_with_spacing(0.0, SPACING);
+            if ui.button("Cancel") {
+                self.reset_confirm = false;
+            }
         }
 
         #[cfg(feature = "demo")]

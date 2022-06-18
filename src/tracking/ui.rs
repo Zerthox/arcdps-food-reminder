@@ -15,6 +15,8 @@ use arcdps::imgui::{
 impl Tracker {
     /// Renders reset buttons for squad & characters.
     pub fn render_reset_buttons(&mut self, ui: &Ui, same_line: bool) {
+        const SPACING: f32 = 5.0;
+
         // reset squad
         if ui.button("Reset squad") {
             for entry in &mut self.players {
@@ -27,15 +29,31 @@ impl Tracker {
 
         // optional same line
         if same_line {
-            ui.same_line_with_spacing(0.0, 5.0);
+            ui.same_line_with_spacing(0.0, SPACING);
         }
 
         // reset characters
-        if ui.button("Reset characters") {
-            self.chars_cache.clear();
-        }
-        if ui.is_item_hovered() {
-            ui.tooltip_text("Clear the cache for own characters.");
+        if !self.chars_reset {
+            if ui.button("Reset characters") {
+                self.chars_reset = true;
+            }
+            if ui.is_item_hovered() {
+                ui.tooltip_text("Clear the cache for own characters.");
+            }
+        } else {
+            ui.align_text_to_frame_padding();
+            ui.text("Reset characters?");
+
+            ui.same_line();
+            if ui.button("Confirm") {
+                self.chars_cache.clear();
+                self.chars_reset = false;
+            }
+
+            ui.same_line_with_spacing(0.0, SPACING);
+            if ui.button("Cancel") {
+                self.chars_reset = false;
+            }
         }
     }
 

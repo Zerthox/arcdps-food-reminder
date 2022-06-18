@@ -13,6 +13,7 @@ use windows::System::VirtualKey;
 /// Player tracker.
 #[derive(Debug)]
 pub struct Tracker {
+    /// Current tracker settings.
     pub settings: TrackerSettings,
 
     /// Currently tracked players.
@@ -29,6 +30,9 @@ pub struct Tracker {
 
     /// Cache for buffs on own characters of local player (self).
     chars_cache: Vec<Entry>,
+
+    /// Reset confirm state for own characters.
+    chars_reset: bool,
 
     /// User-defined builds.
     builds: Builds,
@@ -48,6 +52,7 @@ impl Tracker {
             sorting: Sorting::Sub,
             reverse: false,
             chars_cache: Vec::new(),
+            chars_reset: false,
             builds: Builds::new(),
         }
     }

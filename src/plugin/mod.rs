@@ -58,6 +58,9 @@ pub struct Plugin {
     /// Debug log window.
     #[cfg(feature = "log")]
     debug: Window<Log>,
+
+    /// Confirmation for reset.
+    reset_confirm: bool,
 }
 
 impl Plugin {
@@ -96,6 +99,8 @@ impl Plugin {
                 },
                 Log::new(),
             ),
+
+            reset_confirm: false,
         }
     }
 

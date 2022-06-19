@@ -305,6 +305,14 @@
       "name": "Dragon's Revelry Starcake",
       "stats": ["+45 All Attributes"],
       "display": "ALL"
+    },
+
+    // other
+    {
+      "id": 10096,
+      "name": "Bowl of Orrian Truffle and Meat Stew",
+      "stats": ["100% Might on Dodge", "+40% to Endurance Regeneration"],
+      "display": "ENDU"
     }
   ],
 

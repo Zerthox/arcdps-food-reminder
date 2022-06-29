@@ -132,6 +132,11 @@ impl Plugin {
             );
         }
 
+        ui.checkbox(
+            "Remind for Reinforced Armor buff",
+            &mut self.reminder.settings.reinforced,
+        );
+
         // reminder duration
         let mut dura = self.reminder.settings.duration.as_millis() as i32;
         ui.set_next_item_width(input_width);

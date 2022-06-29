@@ -233,7 +233,7 @@ impl Plugin {
 
     fn check_self_reinforced(&mut self) {
         if let Some(entry) = self.tracker.get_self() {
-            if self.can_remind() {
+            if self.reminder.settings.reinforced && self.can_remind() {
                 let reinf = entry.reinforced.state;
 
                 #[cfg(feature = "log")]

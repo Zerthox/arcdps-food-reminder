@@ -1,12 +1,12 @@
 use super::Demo;
-use crate::tracking::entry::Entry;
+use crate::tracking::{buff::TrackedState, settings::SettingsEntry};
 use arc_util::{settings::HasSettings, ui::Hideable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DemoSettings {
-    players: Vec<Entry>,
+    players: Vec<SettingsEntry>,
     tracker: bool,
 }
 
@@ -32,7 +32,12 @@ impl HasSettings for Demo {
 
     fn current_settings(&self) -> Self::Settings {
         Self::Settings {
-            players: self.tracker.all_players().cloned().collect(),
+            players: self
+                .tracker
+                .all_players()
+                .cloned()
+                .map(Into::into)
+                .collect(),
             tracker: self.tracker.is_visible(),
         }
     }
@@ -42,8 +47,9 @@ impl HasSettings for Demo {
             let id = loaded.player.id;
             self.tracker.add_player(loaded.player);
             let entry = self.tracker.player_mut(id).unwrap();
-            entry.food = loaded.food;
-            entry.util = loaded.util;
+            entry.food = TrackedState::new(loaded.food);
+            entry.util = TrackedState::new(loaded.util);
+            entry.reinforced = TrackedState::new(loaded.reinforced);
         }
         self.tracker.set_visibility(loaded.tracker);
     }

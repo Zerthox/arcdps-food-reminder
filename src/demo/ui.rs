@@ -8,7 +8,7 @@ use crate::{
 };
 use arc_util::{
     game::Player,
-    ui::{align::LeftAlign, render, Component, Hideable, Windowable},
+    ui::{render, Component, Hideable, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 
@@ -37,21 +37,23 @@ impl Component<'_> for Demo {
             let _style = render::small_padding(ui);
 
             // reminder buttons
-            let mut align = LeftAlign::build();
-            align.item(ui, || {
-                ui.align_text_to_frame_padding();
-                ui.text("Reminders:");
-            });
-            align.item_with_spacing(ui, 10.0, || {
-                if ui.button("Trigger Food") {
-                    self.reminder.trigger_food();
-                }
-            });
-            align.item(ui, || {
-                if ui.button("Trigger Util") {
-                    self.reminder.trigger_util();
-                }
-            });
+            ui.align_text_to_frame_padding();
+            ui.text("Reminders:");
+
+            ui.same_line_with_spacing(0.0, 10.0);
+            if ui.button("Trigger Food") {
+                self.reminder.trigger_food();
+            }
+
+            ui.same_line_with_spacing(0.0, 5.0);
+            if ui.button("Trigger Util") {
+                self.reminder.trigger_util();
+            }
+
+            ui.same_line_with_spacing(0.0, 5.0);
+            if ui.button("Trigger Reinf") {
+                self.reminder.trigger_reinforced();
+            }
 
             ui.spacing();
             ui.separator();

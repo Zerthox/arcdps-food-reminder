@@ -172,7 +172,7 @@ impl Plugin {
         ui.same_line();
         match self.defs_state {
             Ok(()) => ui.text_colored(green, "Loaded"),
-            Err(LoadError::NotFound) => ui.text("Not found"),
+            Err(LoadError::NotFound) => ui.text_colored(yellow, "Not found"),
             Err(LoadError::FailedToRead) => ui.text_colored(red, "Failed to read file"),
             Err(LoadError::InvalidJSON) => ui.text_colored(red, "Failed to parse JSON"),
         }

@@ -2,10 +2,10 @@ use serde::{Deserialize, Serialize};
 use std::cmp::{Ordering, PartialOrd};
 
 /// Struct representing a buff.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Buff {
-    /// Current state of the buff.
-    pub state: BuffState,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TrackedState<T> {
+    /// Current state.
+    pub state: T,
 
     /// Timestamp of the last update.
     pub time: u64,
@@ -14,9 +14,9 @@ pub struct Buff {
     pub event_id: u64,
 }
 
-impl Buff {
+impl<T> TrackedState<T> {
     /// Creates a new buff.
-    pub const fn new(state: BuffState) -> Self {
+    pub const fn new(state: T) -> Self {
         Self {
             state,
             time: 0,
@@ -27,7 +27,7 @@ impl Buff {
     /// Updates the buff state.
     ///
     /// Returns `false` if this update was ignored due to out of order.
-    pub fn update(&mut self, state: BuffState, time: u64, event_id: u64) -> bool {
+    pub fn update(&mut self, state: T, time: u64, event_id: u64) -> bool {
         // check for later time or same time & later event id
         match (time.cmp(&self.time), event_id > self.event_id) {
             (Ordering::Greater, _) | (Ordering::Equal, true) => {

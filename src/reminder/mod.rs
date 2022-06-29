@@ -17,6 +17,7 @@ pub struct Reminder {
     pub settings: ReminderSettings,
     food_trigger: Option<Instant>,
     util_trigger: Option<Instant>,
+    reinf_trigger: Option<Instant>,
 }
 
 impl Reminder {
@@ -29,6 +30,7 @@ impl Reminder {
             settings: ReminderSettings::new(),
             food_trigger: None,
             util_trigger: None,
+            reinf_trigger: None,
         }
     }
 
@@ -40,6 +42,11 @@ impl Reminder {
     /// Triggers the utility reminder.
     pub fn trigger_util(&mut self) {
         self.util_trigger = Some(Instant::now());
+    }
+
+    /// Triggers the reinforced reminder.
+    pub fn trigger_reinforced(&mut self) {
+        self.reinf_trigger = Some(Instant::now());
     }
 
     /// Checks if a trigger is currently active and resets it if necessary.
@@ -81,9 +88,10 @@ impl Component<'_> for Reminder {
         // check for triggers
         let food = Self::check_trigger(&mut self.food_trigger, self.settings.duration);
         let util = Self::check_trigger(&mut self.util_trigger, self.settings.duration);
+        let reinf = Self::check_trigger(&mut self.reinf_trigger, self.settings.duration);
 
         // check if any is triggered
-        if food || util {
+        if food || util || reinf {
             // calculate window position
             let [screen_width, screen_height] = ui.io().display_size;
 
@@ -111,6 +119,9 @@ impl Component<'_> for Reminder {
                     }
                     if util {
                         Self::render_text(ui, "Utility reminder!");
+                    }
+                    if reinf {
+                        Self::render_text(ui, "Reinforced reminder!");
                     }
                 });
         }

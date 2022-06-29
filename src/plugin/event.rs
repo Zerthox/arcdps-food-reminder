@@ -1,5 +1,5 @@
 use super::{ExtrasState, Plugin};
-use crate::data::{DefKind, DIMINISHED, MALNOURISHED};
+use crate::data::{DefKind, DIMINISHED, MALNOURISHED, REINFORCED};
 use arc_util::{
     api::{BuffRemove, StateChange},
     game::Player,
@@ -92,6 +92,7 @@ impl Plugin {
                         if self.reminder.settings.encounter_end {
                             self.check_self_food();
                             self.check_self_util();
+                            self.check_self_reinforced();
                         }
 
                         // end encounter
@@ -113,7 +114,16 @@ impl Plugin {
                                         let buff_id = event.skill_id;
 
                                         // check type of buff
-                                        if let Some(buff_type) = self.defs.get_buff(buff_id) {
+                                        if buff_id == REINFORCED {
+                                            if entry.reinforced.update(true, event.time, event_id) {
+                                                #[cfg(feature = "log")]
+                                                self.debug.log(format!(
+                                                    "Reinforced applied on {:?} to {:?}",
+                                                    statechange, entry
+                                                ));
+                                            }
+                                        } else if let Some(buff_type) = self.defs.get_buff(buff_id)
+                                        {
                                             match buff_type {
                                                 DefKind::Food(food) => {
                                                     if entry
@@ -201,7 +211,22 @@ impl Plugin {
                                 let buff_id = event.skill_id;
 
                                 // check type of buff
-                                if let Some(buff_type) = self.defs.get_buff(buff_id) {
+                                if buff_id == REINFORCED {
+                                    if entry.reinforced.update(false, event.time, event_id) {
+                                        #[cfg(feature = "log")]
+                                        self.debug.log(format!(
+                                            "Reinforced removed on {:?} from {:?}",
+                                            statechange, entry
+                                        ));
+
+                                        // check for reinforced running out
+                                        if self.reminder.settings.during_encounter
+                                            && entry.player.is_self
+                                        {
+                                            self.check_self_reinforced();
+                                        }
+                                    }
+                                } else if let Some(buff_type) = self.defs.get_buff(buff_id) {
                                     match buff_type {
                                         DefKind::Food(food) => {
                                             if entry.remove_food(food.id, event.time, event_id) {
@@ -289,6 +314,7 @@ impl Plugin {
                                 if self.reminder.settings.encounter_start {
                                     self.check_self_food();
                                     self.check_self_util();
+                                    self.check_self_reinforced();
                                 }
                             }
                         }

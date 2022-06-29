@@ -1,5 +1,4 @@
-use super::buff::{Buff, BuffState};
-use serde::{Deserialize, Serialize};
+use super::buff::{BuffState, TrackedState};
 use std::cmp;
 
 pub use arc_util::game::{Player, Profession, Specialization};
@@ -7,37 +6,46 @@ pub use arc_util::game::{Player, Profession, Specialization};
 // TODO: track buff duration & reset to unset when duration runs out?
 
 /// Struct representing a tracker entry.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Entry {
     /// Player this entry corresponds to.
     pub player: Player,
 
     /// Current food buff applied to the player.
-    pub food: Buff,
+    pub food: TrackedState<BuffState>,
 
     /// Current utility buff applied to the player.
-    pub util: Buff,
+    pub util: TrackedState<BuffState>,
+
+    /// Whether the Reinforced Armor buff is applied to the player.
+    pub reinforced: TrackedState<bool>,
 }
 
 impl Entry {
     /// Creates a new entry.
     pub const fn new(player: Player) -> Self {
-        Self::with_states(player, BuffState::Unknown, BuffState::Unknown)
+        Self::with_states(player, BuffState::Unknown, BuffState::Unknown, false)
     }
 
     /// Creates a new entry with initial buff states.
-    pub const fn with_states(player: Player, food: BuffState, util: BuffState) -> Self {
+    pub const fn with_states(
+        player: Player,
+        food: BuffState,
+        util: BuffState,
+        reinforced: bool,
+    ) -> Self {
         Self {
             player,
-            food: Buff::new(food),
-            util: Buff::new(util),
+            food: TrackedState::new(food),
+            util: TrackedState::new(util),
+            reinforced: TrackedState::new(reinforced),
         }
     }
 
     /// Resets all buffs.
     pub fn reset_buffs(&mut self) {
-        self.food = Buff::new(BuffState::Unknown);
-        self.util = Buff::new(BuffState::Unknown);
+        self.food = TrackedState::new(BuffState::Unknown);
+        self.util = TrackedState::new(BuffState::Unknown);
     }
 
     /// Sets all buffs to none.

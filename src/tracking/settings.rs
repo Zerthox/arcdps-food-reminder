@@ -77,11 +77,34 @@ pub struct SettingsEntry {
     pub player: Player,
     pub food: BuffState,
     pub util: BuffState,
+    pub reinforced: bool,
 }
 
 impl SettingsEntry {
-    pub const fn new(player: Player, food: BuffState, util: BuffState) -> Self {
-        Self { player, food, util }
+    pub const fn new(player: Player, food: BuffState, util: BuffState, reinforced: bool) -> Self {
+        Self {
+            player,
+            food,
+            util,
+            reinforced,
+        }
+    }
+}
+
+impl From<Entry> for SettingsEntry {
+    fn from(entry: Entry) -> Self {
+        Self::new(
+            entry.player,
+            entry.food.state,
+            entry.util.state,
+            entry.reinforced.state,
+        )
+    }
+}
+
+impl From<SettingsEntry> for Entry {
+    fn from(entry: SettingsEntry) -> Self {
+        Self::with_states(entry.player, entry.food, entry.util, entry.reinforced)
     }
 }
 
@@ -98,9 +121,8 @@ impl HasSettings for Tracker {
                 self.get_self()
                     .into_iter()
                     .chain(&self.chars_cache)
-                    .map(|entry| {
-                        SettingsEntry::new(entry.player.clone(), entry.food.state, entry.util.state)
-                    })
+                    .cloned()
+                    .map(Into::into)
                     .collect()
             } else {
                 Vec::new()
@@ -112,11 +134,7 @@ impl HasSettings for Tracker {
     fn load_settings(&mut self, loaded: Self::Settings) {
         self.settings = loaded.settings;
         if self.settings.save_chars {
-            self.chars_cache = loaded
-                .own_chars
-                .into_iter()
-                .map(|entry| Entry::with_states(entry.player, entry.food, entry.util))
-                .collect();
+            self.chars_cache = loaded.own_chars.into_iter().map(Into::into).collect();
         }
 
         self.builds.load_settings(loaded.builds);

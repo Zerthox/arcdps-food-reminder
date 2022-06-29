@@ -6,6 +6,9 @@ pub const MALNOURISHED: u32 = 46587;
 /// Diminished buff id.
 pub const DIMINISHED: u32 = 46668;
 
+/// Reinforced Armor buff id.
+pub const REINFORCED: u32 = 9283;
+
 /// Professions sorted alphabetically.
 pub const PROFESSIONS: &[Profession] = &[
     Profession::Unknown,

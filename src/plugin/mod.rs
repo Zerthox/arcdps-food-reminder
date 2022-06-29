@@ -31,8 +31,8 @@ const DEFINITIONS_FILE: &str = "arcdps_food_reminder_definitions.json";
 /// Main plugin.
 #[derive(Debug)]
 pub struct Plugin {
-    /// Whether unofficial extras has been initialized.
-    extras: bool,
+    /// State of unofficial extras.
+    extras: ExtrasState,
 
     /// Definitions.
     defs: Definitions,
@@ -67,7 +67,7 @@ impl Plugin {
     /// Creates a new plugin.
     pub fn new() -> Self {
         Self {
-            extras: false,
+            extras: ExtrasState::Missing,
             defs: Definitions::with_defaults(),
             defs_state: Err(LoadError::NotFound),
             reminder: Reminder::new(),
@@ -244,4 +244,11 @@ impl Default for Plugin {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ExtrasState {
+    Missing,
+    Incompatible,
+    Found,
 }

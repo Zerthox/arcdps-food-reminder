@@ -1,7 +1,7 @@
 use super::Plugin;
 use crate::{
     data::{Definitions, LoadError},
-    plugin::DEFINITIONS_FILE,
+    plugin::{ExtrasState, DEFINITIONS_FILE},
 };
 use arc_util::{
     api::CoreColor,
@@ -80,10 +80,10 @@ impl Plugin {
         ui.group(|| {
             ui.text("Unofficial extras (for subgroup updates):");
             ui.same_line();
-            if self.extras {
-                ui.text_colored(green, "Found");
-            } else {
-                ui.text_colored(yellow, "Missing");
+            match self.extras {
+                ExtrasState::Missing => ui.text_colored(yellow, "Missing"),
+                ExtrasState::Incompatible => ui.text_colored(red, "Incompatible"),
+                ExtrasState::Found => ui.text_colored(green, "Found"),
             }
         });
         if ui.is_item_hovered() {

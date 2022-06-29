@@ -1,4 +1,4 @@
-use super::Plugin;
+use super::{ExtrasState, Plugin};
 use crate::data::{DefKind, DIMINISHED, MALNOURISHED};
 use arc_util::{
     api::{BuffRemove, StateChange},
@@ -8,6 +8,7 @@ use arcdps::{Agent, CombatEvent, UserInfo, UserInfoIter, UserRole};
 
 #[cfg(feature = "log")]
 use arc_util::api;
+use semver::Version;
 
 /// Minimum time (ms) since the last [`StateChange::BuffInitial`] event for the buff check to trigger.
 const CHECK_TIME_DIFF: u64 = 100;
@@ -346,8 +347,15 @@ impl Plugin {
     }
 
     /// Handles initialization from unofficial extras.
-    pub fn extras_init(&mut self, _account_name: Option<&str>, _version: Option<&'static str>) {
-        self.extras = true;
+    // TODO: update for new API
+    pub fn extras_init(&mut self, _account_name: Option<&str>, version: Option<&'static str>) {
+        /// Unofficial extras API change.
+        const EXTRAS_CHANGE: Version = Version::new(1, 2, 0);
+
+        self.extras = match version.and_then(|version| Version::parse(version).ok()) {
+            Some(version) if version <= EXTRAS_CHANGE => ExtrasState::Found,
+            _ => ExtrasState::Incompatible,
+        }
     }
 
     /// Handles a squad update from unofficial extras.

@@ -16,8 +16,8 @@ Report the copied buff ID & the Food/Utility that applied it.
 ![Reporting unknown buff](./screenshots/unknown.png)
 
 **Using custom definitions:**  
-Custom definitions can be set in `arcdps_food_reminder_definitions.json`.
-The file uses the same format as [src/data/definitions.json](./data/src/definitions.json).
+Custom definitions can be set by creating `arcdps_food_reminder_definitions.json` next to your `arcdps.ini` and other config/settings files.
+The file uses the same format as [src/data/definitions.json](./src/data/definitions.json).
 Entries using the same id will overwrite the default definition for a Food/Utility buff.
 
 ## Building from source

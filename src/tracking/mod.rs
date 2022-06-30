@@ -183,6 +183,9 @@ impl Tracker {
 
             (Sorting::Util, false) => self.players.sort_by_key(|entry| entry.util.state),
             (Sorting::Util, true) => self.players.sort_by_key(|entry| Reverse(entry.util.state)),
+
+            (Sorting::Reinf, false) => self.players.sort_by_key(|entry| entry.reinf.state),
+            (Sorting::Reinf, true) => self.players.sort_by_key(|entry| Reverse(entry.reinf.state)),
         }
     }
 }
@@ -194,4 +197,5 @@ pub enum Sorting {
     Name,
     Food,
     Util,
+    Reinf,
 }

@@ -188,6 +188,14 @@ impl Tracker {
                 }
             }
         }
+
+        // render reinforced cell
+        ui.table_next_column();
+        match entry.reinf.state {
+            BuffState::Unknown => ui.text("???"),
+            BuffState::None => ui.text_colored(red, "No"),
+            BuffState::Some(_) => ui.text_colored(green, "Yes"),
+        }
     }
 
     /// Renders the tracker tab for the squad.
@@ -223,6 +231,13 @@ impl Tracker {
                 init_width_or_weight: 0.0,
             };
 
+            let col_reinf = TableColumnSetup {
+                name: "Reinf",
+                user_id: 4.into(),
+                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
+                init_width_or_weight: 0.0,
+            };
+
             const TABLE_ID: &str = "##squad-table";
             let table_flags =
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE;
@@ -230,13 +245,13 @@ impl Tracker {
             if let Some(_table) = if self.settings.show_sub {
                 ui.begin_table_header_with_flags(
                     TABLE_ID,
-                    [col_sub, col_player, col_food, col_util],
+                    [col_sub, col_player, col_food, col_util, col_reinf],
                     table_flags,
                 )
             } else {
                 ui.begin_table_header_with_flags(
                     TABLE_ID,
-                    [col_player, col_food, col_util],
+                    [col_player, col_food, col_util, col_reinf],
                     table_flags,
                 )
             } {
@@ -253,6 +268,7 @@ impl Tracker {
                                 1 => self.sorting = Sorting::Name,
                                 2 => self.sorting = Sorting::Food,
                                 3 => self.sorting = Sorting::Util,
+                                4 => self.sorting = Sorting::Reinf,
                                 _ => {}
                             }
 
@@ -294,6 +310,7 @@ impl Tracker {
                 TableColumnSetup::new("Player"),
                 TableColumnSetup::new("Food"),
                 TableColumnSetup::new("Util"),
+                TableColumnSetup::new("Reinf"),
             ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
         ) {

@@ -169,6 +169,15 @@ impl Plugin {
             ui.tooltip_text("Vertical position of the reminder displayed on screen.");
         }
 
+        // test button
+        if ui.button("Test reminder") {
+            self.reminder.trigger_food();
+            self.reminder.trigger_util();
+            if self.reminder.settings.reinforced {
+                self.reminder.trigger_reinforced();
+            }
+        }
+
         ui.spacing();
         ui.spacing();
 

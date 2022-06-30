@@ -49,7 +49,7 @@ impl HasSettings for Demo {
             let entry = self.tracker.player_mut(id).unwrap();
             entry.food = TrackedState::new(loaded.food);
             entry.util = TrackedState::new(loaded.util);
-            entry.reinforced = TrackedState::new(loaded.reinforced);
+            entry.reinf = TrackedState::new(loaded.reinforced);
         }
         self.tracker.set_visibility(loaded.tracker);
     }

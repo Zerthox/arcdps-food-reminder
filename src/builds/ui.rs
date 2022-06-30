@@ -19,8 +19,8 @@ impl Builds {
         ui: &Ui,
         defs: &Definitions,
         current_prof: Option<Profession>,
-        current_food: BuffState,
-        current_util: BuffState,
+        current_food: BuffState<u32>,
+        current_util: BuffState<u32>,
     ) {
         // render builds table
         if let Some(_table) = if self.display_notes {
@@ -248,7 +248,12 @@ impl Builds {
 }
 
 impl<'p> Component<'p> for Builds {
-    type Props = (&'p Definitions, Option<Profession>, BuffState, BuffState);
+    type Props = (
+        &'p Definitions,
+        Option<Profession>,
+        BuffState<u32>,
+        BuffState<u32>,
+    );
 
     /// Renders the builds UI.
     fn render(&mut self, ui: &Ui, (defs, current_prof, current_food, current_util): &Self::Props) {

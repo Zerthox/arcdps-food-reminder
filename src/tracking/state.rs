@@ -41,9 +41,18 @@ impl<T> TrackedState<T> {
     }
 }
 
+impl<T> Default for TrackedState<T>
+where
+    T: Default,
+{
+    fn default() -> Self {
+        Self::new(T::default())
+    }
+}
+
 /// Possible buff states.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum BuffState {
+pub enum BuffState<T> {
     /// Buff state is not set (yet).
     ///
     /// This is the initial value.
@@ -53,10 +62,10 @@ pub enum BuffState {
     None,
 
     /// Some buff is applied.
-    Some(u32),
+    Some(T),
 }
 
-impl Default for BuffState {
+impl<T> Default for BuffState<T> {
     fn default() -> Self {
         Self::Unknown
     }

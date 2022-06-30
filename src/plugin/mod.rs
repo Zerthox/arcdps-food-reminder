@@ -234,13 +234,13 @@ impl Plugin {
     fn check_self_reinforced(&mut self) {
         if let Some(entry) = self.tracker.get_self() {
             if self.reminder.settings.reinforced && self.can_remind() {
-                let reinf = entry.reinforced.state;
+                let reinf = entry.reinf.state;
 
                 #[cfg(feature = "log")]
                 self.debug
                     .log(format!("Checking reinforced on self: {:?}", reinf));
 
-                if !reinf {
+                if let BuffState::None = reinf {
                     self.reminder.trigger_reinforced();
 
                     #[cfg(feature = "log")]

@@ -14,8 +14,8 @@ use std::borrow::Cow;
 /// Features demo.
 #[derive(Debug)]
 pub struct Demo {
-    all_foods: Vec<BuffState>,
-    all_utils: Vec<BuffState>,
+    all_foods: Vec<BuffState<u32>>,
+    all_utils: Vec<BuffState<u32>>,
     pub reminder: Reminder,
     pub tracker: Window<Tracker>,
 }
@@ -38,7 +38,7 @@ impl Demo {
     }
 
     /// Returns the display name for a given food buff.
-    fn food_name(defs: &Definitions, buff: BuffState) -> Cow<'static, str> {
+    fn food_name(defs: &Definitions, buff: BuffState<u32>) -> Cow<'static, str> {
         match buff {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
@@ -53,7 +53,7 @@ impl Demo {
     }
 
     /// Returns the display name for a given utility buff.
-    fn util_name(defs: &Definitions, buff: BuffState) -> Cow<'static, str> {
+    fn util_name(defs: &Definitions, buff: BuffState<u32>) -> Cow<'static, str> {
         match buff {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),

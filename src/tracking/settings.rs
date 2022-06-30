@@ -76,17 +76,22 @@ pub struct SettingsEntry {
     pub player: Player,
 
     #[serde(default)]
-    pub food: BuffState,
+    pub food: BuffState<u32>,
 
     #[serde(default)]
-    pub util: BuffState,
+    pub util: BuffState<u32>,
 
     #[serde(default)]
-    pub reinforced: bool,
+    pub reinforced: BuffState<()>,
 }
 
 impl SettingsEntry {
-    pub const fn new(player: Player, food: BuffState, util: BuffState, reinforced: bool) -> Self {
+    pub const fn new(
+        player: Player,
+        food: BuffState<u32>,
+        util: BuffState<u32>,
+        reinforced: BuffState<()>,
+    ) -> Self {
         Self {
             player,
             food,
@@ -102,7 +107,7 @@ impl From<Entry> for SettingsEntry {
             entry.player,
             entry.food.state,
             entry.util.state,
-            entry.reinforced.state,
+            entry.reinf.state,
         )
     }
 }

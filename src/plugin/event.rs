@@ -115,7 +115,7 @@ impl Plugin {
 
                                         // check type of buff
                                         if buff_id == REINFORCED {
-                                            if entry.reinforced.update(true, event.time, event_id) {
+                                            if entry.apply_reinf(event.time, event_id) {
                                                 #[cfg(feature = "log")]
                                                 self.debug.log(format!(
                                                     "Reinforced applied on {:?} to {:?}",
@@ -212,7 +212,7 @@ impl Plugin {
 
                                 // check type of buff
                                 if buff_id == REINFORCED {
-                                    if entry.reinforced.update(false, event.time, event_id) {
+                                    if entry.remove_reinf(event.time, event_id) {
                                         #[cfg(feature = "log")]
                                         self.debug.log(format!(
                                             "Reinforced removed on {:?} from {:?}",

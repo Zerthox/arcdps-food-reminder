@@ -55,3 +55,9 @@ pub enum BuffState {
     /// Some buff is applied.
     Some(u32),
 }
+
+impl Default for BuffState {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}

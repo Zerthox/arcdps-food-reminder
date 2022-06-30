@@ -74,8 +74,14 @@ impl Default for TrackerState {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SettingsEntry {
     pub player: Player,
+
+    #[serde(default)]
     pub food: BuffState,
+
+    #[serde(default)]
     pub util: BuffState,
+
+    #[serde(default)]
     pub reinforced: bool,
 }
 

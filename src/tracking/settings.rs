@@ -1,10 +1,9 @@
-use crate::builds::Builds;
-
 use super::{
-    buff::BuffState,
     entry::{Entry, Player},
+    state::BuffState,
     Tracker,
 };
+use crate::builds::Builds;
 use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};

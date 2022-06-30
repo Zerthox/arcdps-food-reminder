@@ -15,7 +15,7 @@ pub struct TrackedState<T> {
 }
 
 impl<T> TrackedState<T> {
-    /// Creates a new buff.
+    /// Creates a new tracked state.
     pub const fn new(state: T) -> Self {
         Self {
             state,
@@ -24,7 +24,7 @@ impl<T> TrackedState<T> {
         }
     }
 
-    /// Updates the buff state.
+    /// Updates the state.
     ///
     /// Returns `false` if this update was ignored due to out of order.
     pub fn update(&mut self, state: T, time: u64, event_id: u64) -> bool {

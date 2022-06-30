@@ -1,4 +1,4 @@
-use super::buff::{BuffState, TrackedState};
+use super::state::{BuffState, TrackedState};
 use std::cmp;
 
 pub use arc_util::game::{Player, Profession, Specialization};

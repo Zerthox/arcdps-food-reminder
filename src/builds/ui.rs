@@ -2,7 +2,7 @@ use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
     data::{DefKind, Definitions, PROFESSIONS},
-    tracking::buff::BuffState,
+    tracking::state::BuffState,
 };
 use arc_util::{
     api::CoreColor,

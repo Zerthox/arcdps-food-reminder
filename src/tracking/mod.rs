@@ -1,12 +1,12 @@
-pub mod buff;
 pub mod entry;
 pub mod settings;
+pub mod state;
 pub mod ui;
 
 use crate::builds::Builds;
-use buff::BuffState;
 use entry::{Entry, Player};
 use settings::TrackerSettings;
+use state::BuffState;
 use std::cmp::Reverse;
 use windows::System::VirtualKey;
 

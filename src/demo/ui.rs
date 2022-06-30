@@ -2,8 +2,8 @@ use super::Demo;
 use crate::{
     data::{Definitions, PROFESSIONS},
     tracking::{
-        buff::BuffState,
         entry::{Profession, Specialization},
+        state::BuffState,
     },
 };
 use arc_util::{

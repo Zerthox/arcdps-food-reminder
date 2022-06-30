@@ -1,5 +1,5 @@
 use super::Demo;
-use crate::tracking::{buff::TrackedState, settings::SettingsEntry};
+use crate::tracking::{settings::SettingsEntry, state::TrackedState};
 use arc_util::{settings::HasSettings, ui::Hideable};
 use serde::{Deserialize, Serialize};
 

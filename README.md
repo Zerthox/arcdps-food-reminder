@@ -6,7 +6,7 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
 
-## Buff definitions
+## Buff database
 The default definitions for Food & Utility buffs are collected in [src/data/definitions.json](./src/data/definitions.json).
 
 **Found an unknown Food/Utility buff that you would like to see added?**  
@@ -15,10 +15,33 @@ Report the copied buff ID & the Food/Utility that applied it.
 
 ![Reporting unknown buff](./screenshots/unknown.png)
 
-**Using custom definitions:**  
+## Custom definitions  
 Custom definitions can be set by creating `arcdps_food_reminder_definitions.json` next to your `arcdps.ini` and other config/settings files.
 The file uses the same format as [src/data/definitions.json](./src/data/definitions.json).
+The format is also showcased below.
 Entries using the same id will overwrite the default definition for a Food/Utility buff.
+
+```json
+{
+  "food": [
+    {
+      "id": 57244,
+      "name": "Cilantro Lime Sous-Vide Steak",
+      "stats": ["66% Life Steal Chance", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    }
+  ],
+  "utility": [
+    {
+      "id": 9963,
+      "name": "Superior Sharpening Stone",
+      "stats": ["3% Power from Precision", "6% Power from Ferocity"],
+      "display": "PWR"
+    }
+  ],
+  "ignore": [10110]
+}
+```
 
 ## Building from source
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.

@@ -70,10 +70,10 @@ impl Tracker {
                 .position(|entry| entry.player.character == added.player.character)
             {
                 // use cached buffs
-                let removed = self.chars_cache.remove(index);
-                added.food = removed.food;
-                added.util = removed.util;
-                added.reinf = removed.reinf;
+                let Entry {
+                    food, util, reinf, ..
+                } = self.chars_cache.remove(index);
+                added = Entry::with_states(added.player, food, util, reinf);
             }
         }
 

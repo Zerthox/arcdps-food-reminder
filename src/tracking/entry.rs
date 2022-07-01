@@ -22,9 +22,9 @@ pub struct Entry {
 }
 
 impl Entry {
-    /// Creates a new entry.
+    /// Creates a new entry with initial states.
     pub const fn new(player: Player) -> Self {
-        Self::with_states(
+        Self::with_buffs(
             player,
             BuffState::Unknown,
             BuffState::Unknown,
@@ -32,18 +32,33 @@ impl Entry {
         )
     }
 
-    /// Creates a new entry with initial buff states.
-    pub const fn with_states(
+    /// Creates a new entry with given buff states.
+    pub const fn with_buffs(
         player: Player,
         food: BuffState<u32>,
         util: BuffState<u32>,
         reinf: BuffState<()>,
     ) -> Self {
+        Self::with_states(
+            player,
+            TrackedState::new(food),
+            TrackedState::new(util),
+            TrackedState::new(reinf),
+        )
+    }
+
+    /// Creates a new entry with given tracking states.
+    pub const fn with_states(
+        player: Player,
+        food: TrackedState<BuffState<u32>>,
+        util: TrackedState<BuffState<u32>>,
+        reinf: TrackedState<BuffState<()>>,
+    ) -> Self {
         Self {
             player,
-            food: TrackedState::new(food),
-            util: TrackedState::new(util),
-            reinf: TrackedState::new(reinf),
+            food,
+            util,
+            reinf,
         }
     }
 

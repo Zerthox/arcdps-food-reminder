@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::{Ordering, PartialOrd};
 
-/// Struct representing a buff.
+/// Struct representing a tracked state.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TrackedState<T> {
     /// Current state.

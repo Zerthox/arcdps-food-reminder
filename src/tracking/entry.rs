@@ -37,13 +37,13 @@ impl Entry {
         player: Player,
         food: BuffState<u32>,
         util: BuffState<u32>,
-        reinforced: BuffState<()>,
+        reinf: BuffState<()>,
     ) -> Self {
         Self {
             player,
             food: TrackedState::new(food),
             util: TrackedState::new(util),
-            reinf: TrackedState::new(reinforced),
+            reinf: TrackedState::new(reinf),
         }
     }
 

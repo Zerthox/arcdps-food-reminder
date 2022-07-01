@@ -73,6 +73,7 @@ impl Tracker {
                 let removed = self.chars_cache.remove(index);
                 added.food = removed.food;
                 added.util = removed.util;
+                added.reinf = removed.reinf;
             }
         }
 

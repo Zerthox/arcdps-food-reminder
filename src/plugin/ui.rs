@@ -1,7 +1,7 @@
 use super::Plugin;
 use crate::{
     data::{Definitions, LoadError},
-    plugin::DEFINITIONS_FILE,
+    plugin::{ExtrasState, DEFINITIONS_FILE},
 };
 use arc_util::{
     settings::{HasSettings, Settings},
@@ -77,7 +77,20 @@ impl Plugin {
             &mut self.tracker.settings.hotkey,
         );
 
-        // TODO: display unofficial extras state again after updating for new API
+        ui.group(|| {
+            ui.text("Unofficial extras:");
+            ui.same_line();
+            match self.extras {
+                ExtrasState::Missing => ui.text_colored(yellow, "Missing"),
+                ExtrasState::Incompatible => ui.text_colored(red, "Incompatible"),
+                ExtrasState::Found => ui.text_colored(green, "Found"),
+            }
+        });
+        if ui.is_item_hovered() {
+            ui.tooltip_text(
+                "Unofficial extras allows for more frequent updates on player subgroups.",
+            );
+        }
 
         // reset buttons
         self.tracker.render_reset_buttons(ui, true);

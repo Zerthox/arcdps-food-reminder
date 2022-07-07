@@ -4,13 +4,12 @@ use crate::{
     data::{DefKind, Definitions, PROFESSIONS},
     tracking::state::BuffState,
 };
-use arc_util::{
-    api::CoreColor,
-    exports,
-    game::Profession,
-    ui::{render, Component, Ui},
+use arc_util::ui::{render, Component, Ui};
+use arcdps::{
+    exports::{self, CoreColor},
+    imgui::{StyleVar, TableColumnSetup, TableFlags},
+    Profession,
 };
-use arcdps::imgui::{StyleVar, TableColumnSetup, TableFlags};
 
 impl Builds {
     /// Renders viewing mode contents.

@@ -9,7 +9,12 @@ mod util;
 #[cfg(feature = "demo")]
 mod demo;
 
-use arcdps::{arcdps_export, imgui::Ui, Agent, CombatEvent, UserInfoIter};
+use arcdps::{
+    arcdps_export,
+    extras::{ExtrasAddonInfo, UserInfoIter},
+    imgui::Ui,
+    Agent, CombatEvent,
+};
 use once_cell::sync::Lazy;
 use plugin::Plugin;
 use std::{error::Error, sync::Mutex};
@@ -82,8 +87,8 @@ fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {
         .key_event(key, key_down, prev_key_down)
 }
 
-fn unofficial_extras_init(account_name: Option<&str>, version: Option<&'static str>) {
-    PLUGIN.lock().unwrap().extras_init(account_name, version)
+fn unofficial_extras_init(addon_info: ExtrasAddonInfo, account_name: Option<&str>) {
+    PLUGIN.lock().unwrap().extras_init(addon_info, account_name)
 }
 
 fn unofficial_extras_squad_update(users: UserInfoIter) {

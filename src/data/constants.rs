@@ -1,4 +1,4 @@
-use arc_util::game::Profession;
+use arcdps::Profession;
 
 /// Malnourished buff id.
 pub const MALNOURISHED: u32 = 46587;

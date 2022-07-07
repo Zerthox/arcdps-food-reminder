@@ -7,7 +7,7 @@ use crate::{
     },
 };
 use arc_util::{
-    game::Player,
+    player::Player,
     ui::{render, Component, Hideable, Windowable},
 };
 use arcdps::imgui::{TableColumnSetup, Ui};

@@ -4,28 +4,39 @@ version = 3
 
 [[package]]
 name = "arc_util"
-version = "0.7.0"
-source = "git+https://github.com/zerthox/arcdps-utils?branch=0.7.x#bea60092d888a05460ac600578bbd903aed50e5b"
+version = "0.8.0"
+source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#339addd4911266876003688b75f1aee5e2089121"
 dependencies = [
  "arcdps",
  "chrono",
- "num_enum",
  "serde",
  "serde_json",
- "strum",
  "windows",
 ]
 
 [[package]]
 name = "arcdps"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a07e7c1acfc350f88b865a64464a369dd9bfa668bfbffd5ce77f0dae3cf0f5e"
+version = "0.8.0"
+source = "git+https://github.com/zerthox/arcdps-bindings?branch=master#75a85939c3081a36e3b647be342657ccfd1986d4"
 dependencies = [
+ "arcdps-codegen",
  "arcdps-imgui",
- "arcdps_codegen",
- "log",
+ "num_enum",
  "once_cell",
+ "serde",
+ "strum",
+ "windows",
+]
+
+[[package]]
+name = "arcdps-codegen"
+version = "0.8.0"
+source = "git+https://github.com/zerthox/arcdps-bindings?branch=master#75a85939c3081a36e3b647be342657ccfd1986d4"
+dependencies = [
+ "paste",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -50,20 +61,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "arcdps_codegen"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "33bc01a0700f4f94a615d37e1c58880acd9e7904bbdf7db6c53a452d1cd50a56"
-dependencies = [
- "paste",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "arcdps_food_reminder"
-version = "0.5.1"
+version = "0.6.0"
 dependencies = [
  "arc_util",
  "arcdps",
@@ -168,15 +167,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "log"
-version = "0.4.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abb12e687cfb44aa40f41fc3978ef76448f9b6038cad6aef4259d3c095a2382e"
-dependencies = [
- "cfg-if",
-]
-
-[[package]]
 name = "num-integer"
 version = "0.1.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -218,9 +208,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.12.0"
+version = "1.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7709cef83f0c1f58f666e746a08b21e0085f7440fa6a29cc194d68aac97a4225"
+checksum = "18a6dbe30758c9f83eb00cbea4ac95966305f5a7772f3f42ebfc7fc7eddbd8e1"
 
 [[package]]
 name = "open"
@@ -335,18 +325,18 @@ dependencies = [
 
 [[package]]
 name = "serde"
-version = "1.0.137"
+version = "1.0.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61ea8d54c77f8315140a05f4c7237403bf38b72704d031543aa1d16abbf517d1"
+checksum = "1578c6245786b9d168c5447eeacfb96856573ca56c9d68fdcf394be134882a47"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.137"
+version = "1.0.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f26faba0c3959972377d3b2d306ee9f71faee9714294e41bb777f83f88578be"
+checksum = "023e9b1467aef8a10fb88f25611870ada9800ef7e22afce356bb0d2387b6f27c"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -4,15 +4,16 @@ use crate::{
     plugin::DEFINITIONS_FILE,
 };
 use arc_util::{
-    api::CoreColor,
-    exports,
     settings::{HasSettings, Settings},
     ui::{
         render::{self, input_float_with_format},
         Component, Hideable,
     },
 };
-use arcdps::imgui::{InputTextFlags, Ui};
+use arcdps::{
+    exports::{self, CoreColor},
+    imgui::{InputTextFlags, Ui},
+};
 use std::time::Duration;
 
 impl Plugin {

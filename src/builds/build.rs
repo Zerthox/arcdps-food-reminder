@@ -1,7 +1,6 @@
-use arc_util::game::Profession;
-use serde::{Deserialize, Serialize};
-
 use crate::data::{DIMINISHED, MALNOURISHED};
+use arcdps::Profession;
+use serde::{Deserialize, Serialize};
 
 /// Build data.
 #[derive(Debug, Clone, Serialize, Deserialize)]

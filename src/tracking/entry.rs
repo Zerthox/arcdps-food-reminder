@@ -1,7 +1,8 @@
 use super::state::{BuffState, TrackedState};
 use std::cmp;
 
-pub use arc_util::game::{Player, Profession, Specialization};
+pub use arc_util::player::Player;
+pub use arcdps::{Profession, Specialization};
 
 // TODO: track buff duration & reset to unset when duration runs out?
 

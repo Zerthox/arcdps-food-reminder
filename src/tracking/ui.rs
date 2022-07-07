@@ -3,13 +3,12 @@ use crate::{
     buff_ui,
     data::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
 };
-use arc_util::{
-    api::CoreColor,
-    exports,
-    ui::{render, Component, Windowable},
-};
-use arcdps::imgui::{
-    TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
+use arc_util::ui::{render, Component, Windowable};
+use arcdps::{
+    exports::{self, CoreColor},
+    imgui::{
+        TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
+    },
 };
 
 impl Tracker {

@@ -1,7 +1,10 @@
 pub mod settings;
 
-use arc_util::{api::CoreColor, exports, ui::Component};
-use arcdps::imgui::{self, Ui};
+use arc_util::ui::Component;
+use arcdps::{
+    exports::{self, CoreColor},
+    imgui::{self, Ui},
+};
 use imgui::Condition;
 use settings::ReminderSettings;
 use std::time::{Duration, Instant};

@@ -1,10 +1,9 @@
 use crate::data::BuffData;
-use arc_util::{
-    api::CoreColor,
-    exports,
-    ui::{render, Ui},
+use arc_util::ui::{render, Ui};
+use arcdps::{
+    exports::{self, CoreColor},
+    imgui::Selectable,
 };
-use arcdps::imgui::Selectable;
 
 /// Renders a tooltip for a buff.
 pub fn render_buff_tooltip(ui: &Ui, buff: &BuffData) {

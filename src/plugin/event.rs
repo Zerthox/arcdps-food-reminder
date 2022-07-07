@@ -1,14 +1,10 @@
 use super::{ExtrasState, Plugin};
 use crate::data::{DefKind, DIMINISHED, MALNOURISHED, REINFORCED};
-use arc_util::{
-    api::{BuffRemove, StateChange},
-    game::Player,
+use arc_util::player::Player;
+use arcdps::{
+    extras::{ExtrasAddonInfo, UserInfo, UserInfoIter, UserRole},
+    Agent, BuffRemove, CombatEvent, StateChange,
 };
-use arcdps::{Agent, CombatEvent, UserInfo, UserInfoIter, UserRole};
-
-#[cfg(feature = "log")]
-use arc_util::api;
-use semver::Version;
 
 /// Minimum time (ms) since the last [`StateChange::BuffInitial`] event for the buff check to trigger.
 const CHECK_TIME_DIFF: u64 = 100;
@@ -28,7 +24,7 @@ impl Plugin {
         if let Some(src) = src {
             // check for combat event
             if let Some(event) = event {
-                match event.is_statechange.into() {
+                match event.is_statechange {
                     StateChange::EnterCombat => {
                         // combat enter
 
@@ -57,7 +53,8 @@ impl Plugin {
                         // log start
 
                         #[cfg(feature = "log")]
-                        let delta = api::calc_delta(event);
+                        // let delta = api::calc_delta(event);
+                        let delta = 0; // TODO
 
                         // change buffs to none
                         // initial buffs should be reported right after
@@ -333,7 +330,7 @@ impl Plugin {
                                 prof,
                                 elite,
                                 team: sub,
-                                self_: is_self,
+                                is_self,
                                 ..
                             }),
                         ) = (src.name, dest)
@@ -374,13 +371,11 @@ impl Plugin {
 
     /// Handles initialization from unofficial extras.
     // TODO: update for new API
-    pub fn extras_init(&mut self, _account_name: Option<&str>, version: Option<&'static str>) {
-        /// Unofficial extras API change.
-        const EXTRAS_CHANGE: Version = Version::new(1, 2, 0);
-
-        self.extras = match version.and_then(|version| Version::parse(version).ok()) {
-            Some(version) if version <= EXTRAS_CHANGE => ExtrasState::Found,
-            _ => ExtrasState::Incompatible,
+    pub fn extras_init(&mut self, extras_info: ExtrasAddonInfo, _account_name: Option<&str>) {
+        self.extras = if extras_info.check_compat() {
+            ExtrasState::Found
+        } else {
+            ExtrasState::Incompatible
         }
     }
 

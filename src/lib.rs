@@ -49,7 +49,7 @@ fn release() {
 }
 
 fn combat(
-    event: Option<&CombatEvent>,
+    event: Option<CombatEvent>,
     src: Option<Agent>,
     dest: Option<Agent>,
     skill_name: Option<&str>,

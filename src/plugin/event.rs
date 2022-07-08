@@ -13,7 +13,7 @@ impl Plugin {
     /// Handles a combat event from area stats.
     pub fn area_event(
         &mut self,
-        event: Option<&CombatEvent>,
+        event: Option<CombatEvent>,
         src: Option<Agent>,
         dest: Option<Agent>,
         skill_name: Option<&str>,

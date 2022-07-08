@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "arc_util"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#339addd4911266876003688b75f1aee5e2089121"
+source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#ea848e735aeaf057e8a49b8a123977d1235f46f2"
 dependencies = [
  "arcdps",
  "chrono",
@@ -17,7 +17,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-bindings?branch=master#75a85939c3081a36e3b647be342657ccfd1986d4"
+source = "git+https://github.com/zerthox/arcdps-bindings#fc9710c8db451f2a91bb8d5fce4b189e0a8978d8"
 dependencies = [
  "arcdps-codegen",
  "arcdps-imgui",
@@ -31,7 +31,7 @@ dependencies = [
 [[package]]
 name = "arcdps-codegen"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-bindings?branch=master#75a85939c3081a36e3b647be342657ccfd1986d4"
+source = "git+https://github.com/zerthox/arcdps-bindings#fc9710c8db451f2a91bb8d5fce4b189e0a8978d8"
 dependencies = [
  "paste",
  "proc-macro2",

@@ -10,7 +10,6 @@ mod util;
 mod demo;
 
 use arcdps::{
-    arcdps_export,
     extras::{ExtrasAddonInfo, UserInfoIter},
     imgui::Ui,
     Agent, CombatEvent,
@@ -24,7 +23,7 @@ use std::{error::Error, sync::Mutex};
 static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 
 // create exports for arcdps
-arcdps_export! {
+arcdps::export! {
     name: "Food Reminder",
     sig: 0x642baaae, // random id
     init,
@@ -34,8 +33,8 @@ arcdps_export! {
     options_end,
     options_windows,
     wnd_filter,
-    unofficial_extras_init,
-    unofficial_extras_squad_update,
+    extras_init,
+    extras_squad_update,
 }
 
 fn init() -> Result<(), Box<dyn Error>> {
@@ -87,10 +86,10 @@ fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {
         .key_event(key, key_down, prev_key_down)
 }
 
-fn unofficial_extras_init(addon_info: ExtrasAddonInfo, account_name: Option<&str>) {
+fn extras_init(addon_info: ExtrasAddonInfo, account_name: Option<&str>) {
     PLUGIN.lock().unwrap().extras_init(addon_info, account_name)
 }
 
-fn unofficial_extras_squad_update(users: UserInfoIter) {
+fn extras_squad_update(users: UserInfoIter) {
     PLUGIN.lock().unwrap().extras_squad_update(users)
 }

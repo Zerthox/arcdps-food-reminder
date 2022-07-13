@@ -9,7 +9,7 @@ use imgui::Condition;
 use settings::ReminderSettings;
 use std::time::{Duration, Instant};
 
-// TODO: alert component with custom text instead of this?
+// TODO: split component with custom text and add to arc_util
 
 /// Font size used by the reminder.
 const FONT_SIZE: f32 = 2.0;

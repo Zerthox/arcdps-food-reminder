@@ -11,6 +11,7 @@ use std::cmp::Reverse;
 use windows::System::VirtualKey;
 
 /// Player tracker.
+// TODO: split generic utility to track players and add to arc_util
 #[derive(Debug)]
 pub struct Tracker {
     /// Current tracker settings.

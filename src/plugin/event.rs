@@ -260,7 +260,7 @@ impl Plugin {
                                         DefKind::Ignore => {
                                             #[cfg(feature = "log")]
                                             self.debug.log(format!(
-                                                "Ignored application of {} to {:?}",
+                                                "Ignored removal of {} from {:?}",
                                                 buff_id, entry
                                             ));
                                         }

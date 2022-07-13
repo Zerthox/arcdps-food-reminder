@@ -101,7 +101,7 @@ impl Plugin {
                         // TODO: should we restrict this to specific state change kinds?
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
-                        if let BuffRemove::None = event.is_buff_remove.into() {
+                        if let BuffRemove::None = event.is_buff_remove {
                             if event.buff != 0 && event.buff_dmg == 0 {
                                 // buff applied
 

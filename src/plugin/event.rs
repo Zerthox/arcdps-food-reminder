@@ -99,8 +99,9 @@ impl Plugin {
                     }
 
                     #[cfg_attr(not(feature = "log"), allow(unused))]
-                    statechange => {
-                        // TODO: should we restrict this to specific state change kinds?
+                    statechange @ (StateChange::None
+                    | StateChange::ApiDelayed
+                    | StateChange::BuffInitial) => {
                         // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
 
                         if let BuffRemove::None = event.is_buff_remove {
@@ -300,22 +301,23 @@ impl Plugin {
                                 }
                             }
                         }
+                    }
+                    _ => {}
+                }
 
-                        // handle pending check
-                        if let Some(last_time) = self.pending_check {
-                            if statechange == StateChange::BuffInitial {
-                                // initial buffs are still being reported, refresh time
-                                self.pending_check = Some(event.time);
-                            } else if event.time >= last_time + CHECK_TIME_DIFF {
-                                self.pending_check = None;
+                // handle pending check
+                if let Some(last_time) = self.pending_check {
+                    if event.is_statechange == StateChange::BuffInitial {
+                        // initial buffs are still being reported, refresh time
+                        self.pending_check = Some(event.time);
+                    } else if event.time >= last_time + CHECK_TIME_DIFF {
+                        self.pending_check = None;
 
-                                // check self buffs
-                                if self.reminder.settings.encounter_start {
-                                    self.check_self_food();
-                                    self.check_self_util();
-                                    self.check_self_reinforced();
-                                }
-                            }
+                        // check self buffs
+                        if self.reminder.settings.encounter_start {
+                            self.check_self_food();
+                            self.check_self_util();
+                            self.check_self_reinforced();
                         }
                     }
                 }

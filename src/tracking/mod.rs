@@ -79,7 +79,7 @@ impl Tracker {
                 } = self.chars_cache.remove(index);
 
                 debug!(
-                    "Cached for {}: {:?} {:?} {:?}",
+                    "Cached for {}: Food {:?}, Util {:?}, Reinf {:?}",
                     added.player.character, food.state, util.state, reinf.state
                 );
 

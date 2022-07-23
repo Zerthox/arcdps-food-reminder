@@ -1,4 +1,4 @@
-use super::state::{BuffState, TrackedState};
+use super::state::{BuffState, TrackedBuff};
 use std::cmp;
 
 pub use arc_util::player::Player;
@@ -13,19 +13,19 @@ pub struct Entry {
     pub player: Player,
 
     /// Current food buff applied to the player.
-    pub food: TrackedState<BuffState<u32>>,
+    pub food: TrackedBuff<u32>,
 
     /// Current utility buff applied to the player.
-    pub util: TrackedState<BuffState<u32>>,
+    pub util: TrackedBuff<u32>,
 
     /// Whether the Reinforced Armor buff is applied to the player.
-    pub reinf: TrackedState<BuffState<()>>,
+    pub reinf: TrackedBuff<()>,
 }
 
 impl Entry {
     /// Creates a new entry with initial states.
     pub const fn new(player: Player) -> Self {
-        Self::with_buffs(
+        Self::with_states(
             player,
             BuffState::Unknown,
             BuffState::Unknown,
@@ -34,26 +34,26 @@ impl Entry {
     }
 
     /// Creates a new entry with given buff states.
-    pub const fn with_buffs(
+    pub const fn with_states(
         player: Player,
         food: BuffState<u32>,
         util: BuffState<u32>,
         reinf: BuffState<()>,
     ) -> Self {
-        Self::with_states(
+        Self::with_buffs(
             player,
-            TrackedState::new(food),
-            TrackedState::new(util),
-            TrackedState::new(reinf),
+            TrackedBuff::new(food),
+            TrackedBuff::new(util),
+            TrackedBuff::new(reinf),
         )
     }
 
-    /// Creates a new entry with given tracking states.
-    pub const fn with_states(
+    /// Creates a new entry with given tracked buffs.
+    pub const fn with_buffs(
         player: Player,
-        food: TrackedState<BuffState<u32>>,
-        util: TrackedState<BuffState<u32>>,
-        reinf: TrackedState<BuffState<()>>,
+        food: TrackedBuff<u32>,
+        util: TrackedBuff<u32>,
+        reinf: TrackedBuff<()>,
     ) -> Self {
         Self {
             player,
@@ -65,23 +65,23 @@ impl Entry {
 
     /// Resets all buffs.
     pub fn reset_buffs(&mut self) {
-        self.food = TrackedState::default();
-        self.util = TrackedState::default();
-        self.reinf = TrackedState::default();
+        self.food = TrackedBuff::default();
+        self.util = TrackedBuff::default();
+        self.reinf = TrackedBuff::default();
     }
 
     /// Sets all buffs to none.
-    pub fn buffs_to_none(&mut self, time: u64, event_id: u64) {
-        self.food.update(BuffState::None, time, event_id);
-        self.util.update(BuffState::None, time, event_id);
-        self.reinf.update(BuffState::None, time, event_id);
+    pub fn buffs_to_none(&mut self, time: u64) {
+        self.food.update(BuffState::None, time, false);
+        self.util.update(BuffState::None, time, false);
+        self.reinf.update(BuffState::None, time, false);
     }
 
     /// Applies a food buff to the player.
     ///
     /// Returns `true` if this update changed the buff state.
-    pub fn apply_food(&mut self, food: u32, time: u64, event_id: u64) -> bool {
-        self.food.update(BuffState::Some(food), time, event_id)
+    pub fn apply_food(&mut self, food: u32, time: u64) -> bool {
+        self.food.update(BuffState::Some(food), time, true)
     }
 
     /// Removes the current food buff from the player.
@@ -91,13 +91,13 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_food(&mut self, food: u32, time: u64, event_id: u64) -> bool {
+    pub fn remove_food(&mut self, food: u32, time: u64) -> bool {
         let changed = match self.food.state {
             BuffState::Some(applied) => food == applied,
             _ => true,
         };
         if changed {
-            self.food.update(BuffState::None, time, event_id)
+            self.food.update(BuffState::None, time, false)
         } else {
             false
         }
@@ -106,8 +106,8 @@ impl Entry {
     /// Applies an utility buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_util(&mut self, util: u32, time: u64, event_id: u64) -> bool {
-        self.util.update(BuffState::Some(util), time, event_id)
+    pub fn apply_util(&mut self, util: u32, time: u64) -> bool {
+        self.util.update(BuffState::Some(util), time, true)
     }
 
     /// Removes the current utility buff from the player.
@@ -117,13 +117,13 @@ impl Entry {
     /// [`BuffState::Unset`] is always removed.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_util(&mut self, util: u32, time: u64, event_id: u64) -> bool {
+    pub fn remove_util(&mut self, util: u32, time: u64) -> bool {
         let changed = match self.util.state {
             BuffState::Some(applied) => util == applied,
             _ => true,
         };
         if changed {
-            self.util.update(BuffState::None, time, event_id)
+            self.util.update(BuffState::None, time, false)
         } else {
             false
         }
@@ -132,15 +132,15 @@ impl Entry {
     /// Applies the Reinforced Armor buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_reinf(&mut self, time: u64, event_id: u64) -> bool {
-        self.reinf.update(BuffState::Some(()), time, event_id)
+    pub fn apply_reinf(&mut self, time: u64) -> bool {
+        self.reinf.update(BuffState::Some(()), time, true)
     }
 
     /// Removes the Reinforced Armor buff from the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_reinf(&mut self, time: u64, event_id: u64) -> bool {
-        self.reinf.update(BuffState::None, time, event_id)
+    pub fn remove_reinf(&mut self, time: u64) -> bool {
+        self.reinf.update(BuffState::None, time, false)
     }
 }
 

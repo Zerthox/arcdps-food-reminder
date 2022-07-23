@@ -74,7 +74,7 @@ impl Tracker {
                 let Entry {
                     food, util, reinf, ..
                 } = self.chars_cache.remove(index);
-                added = Entry::with_states(added.player, food, util, reinf);
+                added = Entry::with_buffs(added.player, food, util, reinf);
             }
         }
 

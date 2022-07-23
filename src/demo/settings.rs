@@ -1,5 +1,5 @@
 use super::Demo;
-use crate::tracking::{settings::SettingsEntry, state::TrackedState};
+use crate::tracking::{settings::SettingsEntry, state::TrackedBuff};
 use arc_util::{settings::HasSettings, ui::Hideable};
 use serde::{Deserialize, Serialize};
 
@@ -47,9 +47,9 @@ impl HasSettings for Demo {
             let id = loaded.player.id;
             self.tracker.add_player(loaded.player);
             let entry = self.tracker.player_mut(id).unwrap();
-            entry.food = TrackedState::new(loaded.food);
-            entry.util = TrackedState::new(loaded.util);
-            entry.reinf = TrackedState::new(loaded.reinforced);
+            entry.food = TrackedBuff::new(loaded.food);
+            entry.util = TrackedBuff::new(loaded.util);
+            entry.reinf = TrackedBuff::new(loaded.reinforced);
         }
         self.tracker.set_visibility(loaded.tracker);
     }

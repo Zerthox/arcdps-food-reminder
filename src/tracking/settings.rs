@@ -114,7 +114,7 @@ impl From<Entry> for SettingsEntry {
 
 impl From<SettingsEntry> for Entry {
     fn from(entry: SettingsEntry) -> Self {
-        Self::with_buffs(entry.player, entry.food, entry.util, entry.reinforced)
+        Self::with_states(entry.player, entry.food, entry.util, entry.reinforced)
     }
 }
 

@@ -1,52 +1,45 @@
 use serde::{Deserialize, Serialize};
-use std::cmp::{Ordering, PartialOrd};
 
-/// Struct representing a tracked state.
+/// Struct representing a tracked buff.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct TrackedState<T> {
-    /// Current state.
-    pub state: T,
+pub struct TrackedBuff<T> {
+    /// Current buff state.
+    pub state: BuffState<T>,
 
     /// Timestamp of the last update.
     pub time: u64,
-
-    /// Event id of the last update.
-    pub event_id: u64,
 }
 
-impl<T> TrackedState<T> {
-    /// Creates a new tracked state.
-    pub const fn new(state: T) -> Self {
-        Self {
-            state,
-            time: 0,
-            event_id: 0,
-        }
+impl<T> TrackedBuff<T> {
+    /// Creates a new tracked buff.
+    pub const fn new(state: BuffState<T>) -> Self {
+        Self { state, time: 0 }
     }
 
-    /// Updates the state.
+    /// Updates the tracked buff.
+    ///
+    /// `time` is the timestamp of the event.
+    /// `overwrite` determines whether the same time replaces the current state.
     ///
     /// Returns `false` if this update was ignored due to out of order.
-    pub fn update(&mut self, state: T, time: u64, event_id: u64) -> bool {
-        // check for later time or same time & later event id
-        match (time.cmp(&self.time), event_id > self.event_id) {
-            (Ordering::Greater, _) | (Ordering::Equal, true) => {
-                self.state = state;
-                self.time = time;
-                self.event_id = event_id;
-                true
-            }
-            _ => false,
+    pub fn update(&mut self, state: BuffState<T>, time: u64, overwrite: bool) -> bool {
+        // check for later time or same time & overwrite
+        if time > self.time || (overwrite && time == self.time) {
+            self.state = state;
+            self.time = time;
+            true
+        } else {
+            false
         }
     }
 }
 
-impl<T> Default for TrackedState<T>
+impl<T> Default for TrackedBuff<T>
 where
     T: Default,
 {
     fn default() -> Self {
-        Self::new(T::default())
+        Self::new(BuffState::default())
     }
 }
 

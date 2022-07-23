@@ -1,6 +1,6 @@
 use super::{
+    buff::BuffState,
     entry::{Entry, Player},
-    state::BuffState,
     Tracker,
 };
 use crate::builds::Builds;

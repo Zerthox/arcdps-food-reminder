@@ -2,7 +2,7 @@ use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
     data::{DefKind, Definitions, PROFESSIONS},
-    tracking::state::BuffState,
+    tracking::buff::BuffState,
 };
 use arc_util::ui::{render, Component, Ui};
 use arcdps::{

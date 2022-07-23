@@ -1,4 +1,4 @@
-use super::state::{BuffState, TrackedBuff};
+use super::buff::{BuffState, TrackedBuff};
 use std::cmp;
 
 pub use arc_util::player::Player;

@@ -6,7 +6,7 @@ pub mod ui;
 use crate::{
     data::{DefKind, Definitions},
     reminder::Reminder,
-    tracking::{state::BuffState, Tracker},
+    tracking::{buff::BuffState, Tracker},
 };
 use arc_util::ui::{Window, WindowOptions};
 use std::borrow::Cow;

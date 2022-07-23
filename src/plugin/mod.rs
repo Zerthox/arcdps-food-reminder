@@ -4,7 +4,7 @@ pub mod ui;
 use crate::{
     data::{Definitions, LoadError, DIMINISHED, MALNOURISHED},
     reminder::Reminder,
-    tracking::{state::BuffState, Tracker},
+    tracking::{buff::BuffState, Tracker},
 };
 use arc_util::{
     settings::Settings,

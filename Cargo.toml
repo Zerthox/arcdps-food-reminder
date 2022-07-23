@@ -6,7 +6,7 @@ authors = ["Zerthox"]
 repository = "https://github.com/zerthox/arcdps-food-reminder"
 
 [dependencies]
-arcdps = { version = "0.8", git = "https://github.com/zerthox/arcdps-bindings", features = ["extras", "log", "serde", "strum"] }
+arcdps = { version = "0.8", tag = "0.8.0", git = "https://github.com/zerthox/arcdps-bindings", features = ["extras", "log", "serde", "strum"] }
 arcdps-imgui = { version = "0.8", features = ["tables-api"] }
 arc_util = { version = "0.8", git = "https://github.com/zerthox/arcdps-utils", branch = "0.8.x", features = ["serde", "settings"] }
 jsonc-parser = { version = "0.19", features = ["serde"] }

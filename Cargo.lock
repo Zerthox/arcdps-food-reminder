@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "arc_util"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#20c263568207b15b14dea9ce983e802b73323c76"
+source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#258377a096cb9e820093e631fc81474d54adb9b2"
 dependencies = [
  "arcdps",
  "serde",
@@ -16,7 +16,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#344adf8a7b99ccfad408b3bc2b54349496d92b7c"
+source = "git+https://github.com/zerthox/arcdps-bindings?tag=0.8.0#344adf8a7b99ccfad408b3bc2b54349496d92b7c"
 dependencies = [
  "arcdps-codegen",
  "arcdps-imgui",
@@ -30,7 +30,7 @@ dependencies = [
 [[package]]
 name = "arcdps-codegen"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#344adf8a7b99ccfad408b3bc2b54349496d92b7c"
+source = "git+https://github.com/zerthox/arcdps-bindings?tag=0.8.0#344adf8a7b99ccfad408b3bc2b54349496d92b7c"
 dependencies = [
  "cfg-if",
  "paste",

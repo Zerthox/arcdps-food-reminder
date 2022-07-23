@@ -47,7 +47,7 @@ Entries using the same id will overwrite the default definition for a Food/Utili
 You need to have [Rust](https://www.rust-lang.org/learn/get-started) installed.
 
 For the standard release version run `cargo build --release`.
-For development you can include a debug log using the `--features log` flag.
+The debug build will include additional log messages.
 
 There is also a makefile provided for use with [cargo-make](https://github.com/sagiegurari/cargo-make).
 To build & install the plugin run `cargo make install`.

@@ -112,8 +112,8 @@ impl Plugin {
                                             );
                                             if entry.apply_reinf(event.time) {
                                                 info!(
-                                                    "Reinforced applied to {}",
-                                                    entry.player.character
+                                                    "Reinforced ({}) applied to {}",
+                                                    REINFORCED, entry.player.character
                                                 );
                                             }
                                         } else if let Some(buff_type) = self.defs.get_buff(buff_id)
@@ -126,8 +126,10 @@ impl Plugin {
                                                     );
                                                     if entry.apply_food(food.id, event.time) {
                                                         info!(
-                                                            "Food {} applied to {}",
-                                                            food.name, entry.player.character
+                                                            "Food {} ({}) applied to {}",
+                                                            food.name,
+                                                            food.id,
+                                                            entry.player.character
                                                         );
                                                         // trigger reminder on malnourished
                                                         if self.reminder.settings.always_mal_dim
@@ -135,11 +137,6 @@ impl Plugin {
                                                             && food.id == MALNOURISHED
                                                         {
                                                             self.reminder.trigger_food();
-
-                                                            info!(
-                                                                "Food Malnourished reminder triggered on {}",
-                                                                statechange
-                                                            );
                                                         }
                                                     }
                                                 }
@@ -150,8 +147,10 @@ impl Plugin {
                                                     );
                                                     if entry.apply_util(util.id, event.time) {
                                                         info!(
-                                                            "Utility {} applied to {}",
-                                                            util.name, entry.player.character
+                                                            "Utility {} ({}) applied to {}",
+                                                            util.name,
+                                                            util.id,
+                                                            entry.player.character
                                                         );
 
                                                         // trigger reminder on diminished
@@ -160,8 +159,6 @@ impl Plugin {
                                                             && util.id == DIMINISHED
                                                         {
                                                             self.reminder.trigger_util();
-
-                                                            info!("Utility Diminished reminder triggered on {}", statechange);
                                                         }
                                                     }
                                                 }
@@ -204,7 +201,10 @@ impl Plugin {
                                         event_id, event.time, statechange
                                     );
                                     if entry.remove_reinf(event.time) {
-                                        info!("Reinforced removed from {}", entry.player.character);
+                                        info!(
+                                            "Reinforced ({}) removed from {}",
+                                            REINFORCED, entry.player.character
+                                        );
 
                                         // check for reinforced running out
                                         if self.reminder.settings.during_encounter
@@ -222,8 +222,8 @@ impl Plugin {
                                             );
                                             if entry.remove_food(food.id, event.time) {
                                                 info!(
-                                                    "Food {} removed from {}",
-                                                    food.name, entry.player.character
+                                                    "Food {} ({}) removed from {}",
+                                                    food.name, food.id, entry.player.character
                                                 );
 
                                                 // check for food running out
@@ -241,8 +241,8 @@ impl Plugin {
                                             );
                                             if entry.remove_util(util.id, event.time) {
                                                 info!(
-                                                    "Utility {} removed from {}",
-                                                    util.name, entry.player.character
+                                                    "Utility {} ({}) removed from {}",
+                                                    util.name, util.id, entry.player.character
                                                 );
 
                                                 // check for utility running out
@@ -340,17 +340,12 @@ impl Plugin {
                                 sub as usize,
                             );
 
-                            debug!("Added {}:{}", player.character, player.id);
-
                             self.tracker.add_player(player);
                         }
                     } else {
                         // player removed
 
-                        let id = src.id;
-                        if let Some(removed) = self.tracker.remove_player(id) {
-                            debug!("Removed {}:{}", removed.player.character, removed.player.id);
-                        }
+                        self.tracker.remove_player(src.id);
                     }
                 }
             }

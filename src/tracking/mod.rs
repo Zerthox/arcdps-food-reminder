@@ -6,6 +6,7 @@ pub mod ui;
 use crate::builds::Builds;
 use buff::BuffState;
 use entry::{Entry, Player};
+use log::debug;
 use settings::TrackerSettings;
 use std::cmp::Reverse;
 use windows::System::VirtualKey;
@@ -60,6 +61,8 @@ impl Tracker {
 
     /// Adds a new tracked player.
     pub fn add_player(&mut self, player: Player) {
+        debug!("Added {} ({})", player.character, player.id);
+
         let mut added = Entry::new(player);
 
         // check for self
@@ -74,6 +77,12 @@ impl Tracker {
                 let Entry {
                     food, util, reinf, ..
                 } = self.chars_cache.remove(index);
+
+                debug!(
+                    "Cached for {}: {:?} {:?} {:?}",
+                    added.player.character, food.state, util.state, reinf.state
+                );
+
                 added = Entry::with_buffs(added.player, food, util, reinf);
             }
         }
@@ -93,6 +102,11 @@ impl Tracker {
             .map(|index| {
                 // remove entry, sorting will be preserved
                 let removed = self.players.remove(index);
+
+                debug!(
+                    "Removed {} ({})",
+                    removed.player.character, removed.player.id
+                );
 
                 // check for self
                 if removed.player.is_self {

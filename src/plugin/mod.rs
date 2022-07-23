@@ -178,8 +178,6 @@ impl Plugin {
 
                 if let BuffState::None | BuffState::Some(MALNOURISHED) = food {
                     self.reminder.trigger_food();
-
-                    info!("Food reminder triggered");
                 }
             }
         }
@@ -195,8 +193,6 @@ impl Plugin {
 
                 if let BuffState::None | BuffState::Some(DIMINISHED) = util {
                     self.reminder.trigger_util();
-
-                    info!("Utility reminder triggered");
                 }
             }
         }
@@ -211,8 +207,6 @@ impl Plugin {
 
                 if let BuffState::None = reinf {
                     self.reminder.trigger_reinforced();
-
-                    info!("Reinforced reminder triggered");
                 }
             }
         }

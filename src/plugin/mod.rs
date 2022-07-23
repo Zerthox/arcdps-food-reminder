@@ -10,14 +10,12 @@ use arc_util::{
     settings::Settings,
     ui::{Window, WindowOptions},
 };
+use log::{debug, info, warn};
 use semver::Version;
 use std::fs;
 
 #[cfg(feature = "demo")]
 use crate::demo::Demo;
-
-#[cfg(feature = "log")]
-use arc_util::ui::log::Log;
 
 /// Plugin version.
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -55,10 +53,6 @@ pub struct Plugin {
     #[cfg(feature = "demo")]
     demo: Window<Demo>,
 
-    /// Debug log window.
-    #[cfg(feature = "log")]
-    debug: Window<Log>,
-
     /// Confirmation for reset.
     reset_confirm: bool,
 }
@@ -90,37 +84,25 @@ impl Plugin {
                 Demo::new(),
             ),
 
-            #[cfg(feature = "log")]
-            debug: Window::new(
-                WindowOptions {
-                    width: 600.0,
-                    height: 300.0,
-                    ..WindowOptions::new("Food Debug Log")
-                },
-                Log::new(),
-            ),
-
             reset_confirm: false,
         }
     }
 
     /// Loads the plugin.
     pub fn load(&mut self) {
-        #[cfg(feature = "log")]
-        self.debug.log(format!("Food Reminder v{} load", VERSION));
+        info!("v{} load", VERSION);
 
         // load settings
         let mut settings = Settings::from_file(SETTINGS_FILE);
         let settings_version: Option<Version> = settings.load_data("version");
 
-        #[cfg(feature = "log")]
-        self.debug.log(format!(
+        info!(
             "Loaded settings from version {}",
             match &settings_version {
                 Some(version) => version.to_string(),
                 None => "unknown".into(),
             }
-        ));
+        );
 
         // load component settings
         settings.load_component(&mut self.tracker);
@@ -143,25 +125,19 @@ impl Plugin {
                     self.defs_state = self.defs.try_load(&defs_path);
 
                     if self.defs_state.is_ok() {
-                        #[cfg(feature = "log")]
-                        self.debug.log(format!(
-                            "Loaded custom definitions from \"{}\"",
-                            defs_path.display()
-                        ));
+                        info!("Loaded custom definitions from \"{}\"", defs_path.display());
                     } else {
-                        #[cfg(feature = "log")]
-                        self.debug.log(format!(
+                        warn!(
                             "Failed to load custom definitions from \"{}\"",
                             defs_path.display()
-                        ));
+                        );
                     }
                 }
             } else {
                 // settings are from old version, remove old defs file
                 let _ = fs::remove_file(defs_path);
 
-                #[cfg(feature = "log")]
-                self.debug.log("Removed definitions from old version");
+                info!("Removed definitions from old version");
             }
         }
     }
@@ -198,14 +174,12 @@ impl Plugin {
             if self.can_remind() {
                 let food = entry.food.state;
 
-                #[cfg(feature = "log")]
-                self.debug.log(format!("Checking food on self: {:?}", food));
+                debug!("Checking food on self: {:?}", food);
 
                 if let BuffState::None | BuffState::Some(MALNOURISHED) = food {
                     self.reminder.trigger_food();
 
-                    #[cfg(feature = "log")]
-                    self.debug.log("Food reminder triggered");
+                    info!("Food reminder triggered");
                 }
             }
         }
@@ -217,15 +191,12 @@ impl Plugin {
             if self.can_remind() {
                 let util = entry.util.state;
 
-                #[cfg(feature = "log")]
-                self.debug
-                    .log(format!("Checking utility on self: {:?}", util));
+                debug!("Checking utility on self: {:?}", util);
 
                 if let BuffState::None | BuffState::Some(DIMINISHED) = util {
                     self.reminder.trigger_util();
 
-                    #[cfg(feature = "log")]
-                    self.debug.log("Utility reminder triggered");
+                    info!("Utility reminder triggered");
                 }
             }
         }
@@ -236,15 +207,12 @@ impl Plugin {
             if self.reminder.settings.reinforced && self.can_remind() {
                 let reinf = entry.reinf.state;
 
-                #[cfg(feature = "log")]
-                self.debug
-                    .log(format!("Checking reinforced on self: {:?}", reinf));
+                debug!("Checking reinforced on self: {:?}", reinf);
 
                 if let BuffState::None = reinf {
                     self.reminder.trigger_reinforced();
 
-                    #[cfg(feature = "log")]
-                    self.debug.log("Reinforced reminder triggered");
+                    info!("Reinforced reminder triggered");
                 }
             }
         }

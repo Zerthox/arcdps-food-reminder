@@ -16,10 +16,14 @@ clear = true
 script = "cargo build --release --features demo"
 
 [tasks.build-dev]
-script = "cargo build --release --features log"
+script = "cargo build"
 
 [tasks.copy]
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${ARCDPS_PATH}\""
+script_runner = "@shell"
+
+[tasks.copy-debug]
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${ARCDPS_PATH}\""
 script_runner = "@shell"
 
 [tasks.remove]
@@ -36,5 +40,5 @@ alias = "remove"
 run_task = { name = ["build-demo", "copy"] }
 
 [tasks.dev]
-run_task = { name = ["build-dev", "copy"] }
+run_task = { name = ["build-dev", "copy-debug"] }
 watch = true

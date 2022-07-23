@@ -14,6 +14,7 @@ use arcdps::{
     exports::{self, CoreColor},
     imgui::{InputTextFlags, Ui},
 };
+use log::{info, warn};
 use std::time::Duration;
 
 impl Plugin {
@@ -24,9 +25,6 @@ impl Plugin {
 
         #[cfg(feature = "demo")]
         self.demo.render(ui, &self.defs);
-
-        #[cfg(feature = "log")]
-        self.debug.render(ui, &());
 
         // other ui renders conditionally
         let ui_settings = exports::ui_settings();
@@ -197,17 +195,15 @@ impl Plugin {
                 self.defs_state = self.defs.try_load(&defs_path);
 
                 if self.defs_state.is_ok() {
-                    #[cfg(feature = "log")]
-                    self.debug.log(format!(
+                    info!(
                         "Reloaded custom definitions from \"{}\"",
                         defs_path.display()
-                    ));
+                    );
                 } else {
-                    #[cfg(feature = "log")]
-                    self.debug.log(format!(
+                    warn!(
                         "Failed to reload custom definitions from \"{}\"",
                         defs_path.display()
-                    ));
+                    );
                 }
             }
         }
@@ -255,9 +251,6 @@ impl Plugin {
 
             #[cfg(feature = "demo")]
             ui.checkbox("Food Demo", self.demo.visible_mut());
-
-            #[cfg(feature = "log")]
-            ui.checkbox("Food Debug Log", self.debug.visible_mut());
         }
         false
     }

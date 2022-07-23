@@ -1,13 +1,11 @@
 use super::{ExtrasState, Plugin};
 use crate::data::{DefKind, DIMINISHED, MALNOURISHED, REINFORCED};
-use arc_util::player::Player;
+use arc_util::{api::calc_delta, player::Player};
 use arcdps::{
     extras::{ExtrasAddonInfo, UserInfo, UserInfoIter, UserRole},
     Agent, BuffRemove, CombatEvent, StateChange,
 };
-
-#[cfg(feature = "log")]
-use arc_util::api::calc_delta;
+use log::{debug, info, log_enabled, Level};
 
 /// Minimum time (ms) since the last [`StateChange::BuffInitial`] event for the buff check to trigger.
 const CHECK_TIME_DIFF: u64 = 100;
@@ -36,8 +34,7 @@ impl Plugin {
                             player.elite = src.elite.into();
                             player.enter_combat(Some(event.dst_agent));
 
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Combat enter for {:?}", entry));
+                            debug!("Combat enter for {}", entry.player.character);
                         }
                     }
 
@@ -47,16 +44,19 @@ impl Plugin {
                         if let Some(entry) = self.tracker.player_mut(src.id) {
                             entry.player.exit_combat();
 
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Combat exit for {:?}", entry));
+                            debug!("Combat exit for {}", entry.player.character);
                         }
                     }
 
                     StateChange::LogStart => {
                         // log start
 
-                        #[cfg(feature = "log")]
-                        let delta = calc_delta(&event);
+                        let target_id = event.src_agent;
+
+                        if log_enabled!(Level::Debug) {
+                            let delta = calc_delta(&event);
+                            debug!("Log for id {} started with {:?} delta", target_id, delta);
+                        }
 
                         // change buffs to none
                         // initial buffs should be reported right after
@@ -65,26 +65,18 @@ impl Plugin {
                         }
 
                         // start encounter
-                        let target_id = event.src_agent;
                         self.tracker.start_encounter(target_id);
 
                         // set check as pending
                         self.pending_check = Some(event.time);
-
-                        #[cfg(feature = "log")]
-                        self.debug.log(format!(
-                            "Log for id {} started with {:?} delta",
-                            target_id, delta
-                        ));
                     }
 
                     StateChange::LogEnd => {
                         // log end
 
-                        #[cfg(feature = "log")]
-                        {
+                        if log_enabled!(Level::Debug) {
                             let target_id = event.src_agent;
-                            self.debug.log(format!("Log for id {} ended", target_id));
+                            debug!("Log for id {} ended", target_id);
                         }
 
                         // check self buffs
@@ -98,7 +90,6 @@ impl Plugin {
                         self.tracker.end_encounter();
                     }
 
-                    #[cfg_attr(not(feature = "log"), allow(unused))]
                     statechange @ (StateChange::None
                     | StateChange::ApiDelayed
                     | StateChange::BuffInitial) => {
@@ -116,11 +107,10 @@ impl Plugin {
                                         // check type of buff
                                         if buff_id == REINFORCED {
                                             if entry.apply_reinf(event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Reinforced applied on {:?} to {:?}",
-                                                    statechange, entry
-                                                ));
+                                                info!(
+                                                    "Reinforced applied on {:?} to {}",
+                                                    statechange, entry.player.character
+                                                );
                                             }
                                         } else if let Some(buff_type) = self.defs.get_buff(buff_id)
                                         {
@@ -129,11 +119,12 @@ impl Plugin {
                                                     if entry
                                                         .apply_food(food.id, event.time, event_id)
                                                     {
-                                                        #[cfg(feature = "log")]
-                                                        self.debug.log(format!(
-                                                            "Food {:?} applied on {:?} to {:?}",
-                                                            food, statechange, entry
-                                                        ));
+                                                        info!(
+                                                            "Food {} applied on {:?} to {}",
+                                                            food.name,
+                                                            statechange,
+                                                            entry.player.character
+                                                        );
 
                                                         // trigger reminder on malnourished
                                                         if self.reminder.settings.always_mal_dim
@@ -142,11 +133,10 @@ impl Plugin {
                                                         {
                                                             self.reminder.trigger_food();
 
-                                                            #[cfg(feature = "log")]
-                                                            self.debug.log(format!(
+                                                            info!(
                                                                 "Food Malnourished reminder triggered on {:?}",
                                                                 statechange
-                                                            ));
+                                                            );
                                                         }
                                                     }
                                                 }
@@ -154,11 +144,10 @@ impl Plugin {
                                                     if entry
                                                         .apply_util(util.id, event.time, event_id)
                                                     {
-                                                        #[cfg(feature = "log")]
-                                                        self.debug.log(format!(
-                                                            "Utility {:?} applied on {:?} to {:?}",
-                                                            util, statechange, entry
-                                                        ));
+                                                        info!(
+                                                            "Utility {} applied on {:?} to {:?}",
+                                                            util.name, statechange, entry
+                                                        );
 
                                                         // trigger reminder on diminished
                                                         if self.reminder.settings.always_mal_dim
@@ -167,37 +156,30 @@ impl Plugin {
                                                         {
                                                             self.reminder.trigger_util();
 
-                                                            #[cfg(feature = "log")]
-                                                            self.debug.log(format!(
-                                                                "Utility Diminished reminder triggered on {:?}",
-                                                                statechange,
-                                                            ));
+                                                            info!("Utility Diminished reminder triggered on {:?}", statechange);
                                                         }
                                                     }
                                                 }
                                                 DefKind::Ignore => {
-                                                    #[cfg(feature = "log")]
-                                                    self.debug.log(format!(
-                                                        "Ignored application of {} to {:?}",
-                                                        buff_id, entry
-                                                    ));
+                                                    info!(
+                                                        "Ignored application of {} to {}",
+                                                        buff_id, entry.player.character
+                                                    );
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
                                             if entry.apply_food(buff_id, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Unknown Food with id {} applied on {:?} to {:?}",
-                                                    buff_id, statechange, entry
-                                                ));
+                                                info!(
+                                                    "Unknown Food{} applied on {:?} to {}",
+                                                    buff_id, statechange, entry.player.character
+                                                );
                                             }
                                         } else if let Some("Enhancement") = skill_name {
                                             if entry.apply_util(buff_id, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Unknown Utility with id {} applied on {:?} to {:?}",
-                                                    buff_id, statechange, entry
-                                                ));
+                                                info!(
+                                                    "Unknown Utility {} applied on {:?} to {}",
+                                                    buff_id, statechange, entry.player.character
+                                                );
                                             }
                                         }
                                     }
@@ -213,11 +195,10 @@ impl Plugin {
                                 // check type of buff
                                 if buff_id == REINFORCED {
                                     if entry.remove_reinf(event.time, event_id) {
-                                        #[cfg(feature = "log")]
-                                        self.debug.log(format!(
-                                            "Reinforced removed on {:?} from {:?}",
-                                            statechange, entry
-                                        ));
+                                        info!(
+                                            "Reinforced removed on {:?} from {}",
+                                            statechange, entry.player.character
+                                        );
 
                                         // check for reinforced running out
                                         if self.reminder.settings.during_encounter
@@ -230,11 +211,10 @@ impl Plugin {
                                     match buff_type {
                                         DefKind::Food(food) => {
                                             if entry.remove_food(food.id, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Food {:?} removed on {:?} from {:?}",
-                                                    food, statechange, entry
-                                                ));
+                                                info!(
+                                                    "Food {} removed on {:?} from {}",
+                                                    food.name, statechange, entry.player.character
+                                                );
 
                                                 // check for food running out
                                                 if self.reminder.settings.during_encounter
@@ -246,11 +226,10 @@ impl Plugin {
                                         }
                                         DefKind::Util(util) => {
                                             if entry.remove_util(util.id, event.time, event_id) {
-                                                #[cfg(feature = "log")]
-                                                self.debug.log(format!(
-                                                    "Utility {:?} removed on {:?} from {:?}",
-                                                    util, statechange, entry
-                                                ));
+                                                info!(
+                                                    "Utility {} removed on {:?} from {}",
+                                                    util.name, statechange, entry.player.character
+                                                );
 
                                                 // check for utility running out
                                                 if self.reminder.settings.during_encounter
@@ -261,20 +240,18 @@ impl Plugin {
                                             }
                                         }
                                         DefKind::Ignore => {
-                                            #[cfg(feature = "log")]
-                                            self.debug.log(format!(
-                                                "Ignored removal of {} from {:?}",
-                                                buff_id, entry
-                                            ));
+                                            info!(
+                                                "Ignored removal of {} from {}",
+                                                buff_id, entry.player.character
+                                            );
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
                                     if entry.remove_food(buff_id, event.time, event_id) {
-                                        #[cfg(feature = "log")]
-                                        self.debug.log(format!(
-                                            "Unknown Food with id {} removed on {:?} from {:?}",
-                                            buff_id, statechange, entry
-                                        ));
+                                        info!(
+                                            "Unknown Food with id {} removed on {:?} from {}",
+                                            buff_id, statechange, entry.player.character
+                                        );
 
                                         // check for food running out
                                         if self.reminder.settings.during_encounter
@@ -285,11 +262,10 @@ impl Plugin {
                                     }
                                 } else if let Some("Enhancement") = skill_name {
                                     if entry.remove_util(buff_id, event.time, event_id) {
-                                        #[cfg(feature = "log")]
-                                        self.debug.log(format!(
-                                            "Unknown Utility with id {} removed on {:?} from {:?}",
-                                            buff_id, statechange, entry
-                                        ));
+                                        info!(
+                                            "Unknown Utility with id {} removed on {:?} from {}",
+                                            buff_id, statechange, entry.player.character
+                                        );
 
                                         // check for utility running out
                                         if self.reminder.settings.during_encounter
@@ -350,8 +326,7 @@ impl Plugin {
                                 sub as usize,
                             );
 
-                            #[cfg(feature = "log")]
-                            self.debug.log(format!("Added {:?}", player));
+                            debug!("Added {}:{}", player.character, player.id);
 
                             self.tracker.add_player(player);
                         }
@@ -359,13 +334,8 @@ impl Plugin {
                         // player removed
 
                         let id = src.id;
-
-                        #[cfg_attr(not(feature = "log"), allow(unused))]
-                        let removed = self.tracker.remove_player(id);
-
-                        #[cfg(feature = "log")]
-                        if let Some(entry) = removed {
-                            self.debug.log(format!("Removed {:?}", entry));
+                        if let Some(removed) = self.tracker.remove_player(id) {
+                            debug!("Removed {}:{}", removed.player.character, removed.player.id);
                         }
                     }
                 }
@@ -385,9 +355,6 @@ impl Plugin {
     /// Handles a squad update from unofficial extras.
     pub fn extras_squad_update(&mut self, users: UserInfoIter) {
         for user in users {
-            #[cfg(feature = "log")]
-            self.debug.log(format!("Squad update: {:?}", user));
-
             if let UserInfo {
                 account_name: Some(name),
                 role: UserRole::SquadLeader | UserRole::Lieutenant | UserRole::Member,
@@ -403,11 +370,10 @@ impl Plugin {
                 {
                     entry.player.subgroup = subgroup as usize + 1;
 
-                    #[cfg(feature = "log")]
-                    self.debug.log(format!(
+                    debug!(
                         "Updated subgroup {} for {}",
                         entry.player.subgroup, entry.player.character
-                    ));
+                    );
                 }
             }
         }

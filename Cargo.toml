@@ -8,7 +8,7 @@ repository = "https://github.com/zerthox/arcdps-food-reminder"
 [dependencies]
 arcdps = { version = "0.8", tag = "0.8.0", git = "https://github.com/zerthox/arcdps-bindings", features = ["extras", "log", "serde", "strum"] }
 arcdps-imgui = { version = "0.8", features = ["tables-api"] }
-arc_util = { version = "0.8", branch = "0.8.x", git = "https://github.com/zerthox/arcdps-utils", features = ["serde", "settings"] }
+arc_util = { version = "0.9", branch = "0.9.x", git = "https://github.com/zerthox/arcdps-utils", features = ["serde", "settings"] }
 jsonc-parser = { version = "0.20", features = ["serde"] }
 log = { version = "0.4", features = ["release_max_level_info"] }
 once_cell = "1.9"

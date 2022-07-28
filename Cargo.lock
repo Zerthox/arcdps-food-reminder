@@ -4,8 +4,8 @@ version = 3
 
 [[package]]
 name = "arc_util"
-version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-utils?branch=0.8.x#258377a096cb9e820093e631fc81474d54adb9b2"
+version = "0.9.0"
+source = "git+https://github.com/zerthox/arcdps-utils?branch=0.9.x#e9398c33cfa11f8d002dc999e3bf54d516d8afb4"
 dependencies = [
  "arcdps",
  "serde",

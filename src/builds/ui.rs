@@ -246,16 +246,16 @@ impl Builds {
     }
 }
 
-impl<'p> Component<'p> for Builds {
-    type Props = (
-        &'p Definitions,
-        Option<Profession>,
-        BuffState<u32>,
-        BuffState<u32>,
-    );
+type Props<'p> = (
+    &'p Definitions,
+    Option<Profession>,
+    BuffState<u32>,
+    BuffState<u32>,
+);
 
+impl<'p> Component<Props<'p>> for Builds {
     /// Renders the builds UI.
-    fn render(&mut self, ui: &Ui, (defs, current_prof, current_food, current_util): &Self::Props) {
+    fn render(&mut self, ui: &Ui, (defs, current_prof, current_food, current_util): Props<'p>) {
         let _style = render::small_padding(ui);
 
         // profession filter
@@ -281,7 +281,7 @@ impl<'p> Component<'p> for Builds {
         if self.edit {
             self.render_edit(ui, defs);
         } else {
-            self.render_view(ui, defs, *current_prof, *current_food, *current_util);
+            self.render_view(ui, defs, current_prof, current_food, current_util);
         }
     }
 }

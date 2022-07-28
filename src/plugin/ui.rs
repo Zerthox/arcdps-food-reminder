@@ -21,7 +21,7 @@ impl Plugin {
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // reminder, log & demo render always
-        self.reminder.render(ui, &());
+        self.reminder.render(ui, ());
 
         #[cfg(feature = "demo")]
         self.demo.render(ui, &self.defs);

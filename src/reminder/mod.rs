@@ -88,10 +88,8 @@ impl Reminder {
     }
 }
 
-impl Component<'_> for Reminder {
-    type Props = ();
-
-    fn render(&mut self, ui: &Ui, _props: &Self::Props) {
+impl Component<()> for Reminder {
+    fn render(&mut self, ui: &Ui, _props: ()) {
         // check for triggers
         let food = Self::check_trigger(&mut self.food_trigger, self.settings.duration);
         let util = Self::check_trigger(&mut self.util_trigger, self.settings.duration);

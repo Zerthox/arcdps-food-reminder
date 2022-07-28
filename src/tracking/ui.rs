@@ -335,14 +335,12 @@ impl Tracker {
             .map(|entry| entry.util.state)
             .unwrap_or(BuffState::Unknown);
 
-        self.builds.render(ui, &(defs, prof, food, util));
+        self.builds.render(ui, (defs, prof, food, util));
     }
 }
 
-impl Component<'_> for Tracker {
-    type Props = Definitions;
-
-    fn render(&mut self, ui: &Ui, defs: &Self::Props) {
+impl Component<&Definitions> for Tracker {
+    fn render(&mut self, ui: &Ui, defs: &Definitions) {
         TabBar::new("##tabs").build(ui, || {
             TabItem::new("Squad").build(ui, || {
                 self.render_squad_tab(ui, defs);
@@ -359,10 +357,10 @@ impl Component<'_> for Tracker {
     }
 }
 
-impl Windowable<'_> for Tracker {
+impl Windowable<&Definitions> for Tracker {
     const CONTEXT_MENU: bool = true;
 
-    fn render_menu(&mut self, ui: &Ui, _defs: &Self::Props) {
+    fn render_menu(&mut self, ui: &Ui, _defs: &&Definitions) {
         let colors = exports::colors();
         let grey = colors
             .core(CoreColor::MediumGrey)

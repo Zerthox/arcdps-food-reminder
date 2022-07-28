@@ -12,10 +12,8 @@ use arc_util::{
 };
 use arcdps::imgui::{TableColumnSetup, Ui};
 
-impl Component<'_> for Demo {
-    type Props = Definitions;
-
-    fn render(&mut self, ui: &Ui, defs: &Self::Props) {
+impl Component<&Definitions> for Demo {
+    fn render(&mut self, ui: &Ui, defs: &Definitions) {
         // initialize data
         if self.all_foods.is_empty() {
             self.all_foods = [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
@@ -180,11 +178,11 @@ impl Component<'_> for Demo {
         }
 
         // render children
-        self.reminder.render(ui, &());
+        self.reminder.render(ui, ());
         self.tracker.render(ui, defs);
     }
 }
 
-impl Windowable<'_> for Demo {
+impl Windowable<&Definitions> for Demo {
     const CONTEXT_MENU: bool = true;
 }

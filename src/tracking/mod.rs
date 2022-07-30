@@ -3,9 +3,9 @@ pub mod settings;
 pub mod ui;
 
 use crate::builds::Builds;
-use arc_util::tracking::{CachedTracker, Player};
+use arc_util::tracking::{CachedTracker, Entry, Player};
 use buff::{BuffState, Buffs};
-use log::debug;
+use log::{debug, log_enabled, Level};
 use settings::TrackerSettings;
 use std::cmp::Reverse;
 use windows::System::VirtualKey;
@@ -55,8 +55,17 @@ impl Tracker {
 
     /// Adds a new tracked player.
     pub fn add_player(&mut self, player: Player) {
-        debug!("Added {} ({})", player.character, player.id);
-        self.players.add_player_default(player);
+        let id = player.id;
+        debug!("Added {} ({})", player.character, id);
+        let cached = self.players.add_player_default(player);
+
+        if log_enabled!(Level::Debug) && cached {
+            let Entry { player, data } = self.players.player(id).unwrap();
+            debug!(
+                "Cached for {}: Food {:?}, Util {:?}, Reinf {:?}",
+                player.character, data.food.state, data.util.state, data.reinf.state
+            );
+        }
 
         // refresh sorting
         self.refresh_sort();

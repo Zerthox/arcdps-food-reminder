@@ -30,3 +30,6 @@ crate-type = ["cdylib"]
 [features]
 default = []
 demo = []
+
+[profile.release]
+lto = "thin"

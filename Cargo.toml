@@ -33,3 +33,8 @@ demo = []
 
 [profile.release]
 lto = "thin"
+
+[profile.release-log]
+inherits = "release"
+debug-assertions = true
+incremental = true

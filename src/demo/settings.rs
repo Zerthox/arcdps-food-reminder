@@ -1,6 +1,6 @@
 use super::Demo;
 use crate::tracking::{buff::TrackedBuff, settings::SettingsEntry};
-use arc_util::{settings::HasSettings, ui::Hideable};
+use arc_util::{settings::HasSettings, tracking::Entry, ui::Hideable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -34,7 +34,8 @@ impl HasSettings for Demo {
         Self::Settings {
             players: self
                 .tracker
-                .all_players()
+                .players
+                .iter()
                 .cloned()
                 .map(Into::into)
                 .collect(),
@@ -46,10 +47,10 @@ impl HasSettings for Demo {
         for loaded in loaded.players {
             let id = loaded.player.id;
             self.tracker.add_player(loaded.player);
-            let entry = self.tracker.player_mut(id).unwrap();
-            entry.food = TrackedBuff::new(loaded.food);
-            entry.util = TrackedBuff::new(loaded.util);
-            entry.reinf = TrackedBuff::new(loaded.reinforced);
+            let Entry { data, .. } = self.tracker.players.player_mut(id).unwrap();
+            data.food = TrackedBuff::new(loaded.food);
+            data.util = TrackedBuff::new(loaded.util);
+            data.reinf = TrackedBuff::new(loaded.reinforced);
         }
         self.tracker.set_visibility(loaded.tracker);
     }

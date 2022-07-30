@@ -1,16 +1,16 @@
 use super::Demo;
 use crate::{
     data::{Definitions, PROFESSIONS},
-    tracking::{
-        buff::BuffState,
-        entry::{Profession, Specialization},
-    },
+    tracking::buff::BuffState,
 };
 use arc_util::{
-    player::Player,
+    tracking::{Entry, Player},
     ui::{render, Component, Hideable, Windowable},
 };
-use arcdps::imgui::{TableColumnSetup, Ui};
+use arcdps::{
+    imgui::{TableColumnSetup, Ui},
+    Profession, Specialization,
+};
 
 impl Component<&Definitions> for Demo {
     fn render(&mut self, ui: &Ui, defs: &Definitions) {
@@ -74,12 +74,12 @@ impl Component<&Definitions> for Demo {
                 const INPUT_SIZE: f32 = 100.0;
 
                 // entries
-                for id in 0..self.tracker.len() {
+                for id in 0..self.tracker.players.len() {
                     ui.table_next_row();
-                    let entry = self.tracker.player_mut(id).unwrap();
+                    let Entry { player, data } = self.tracker.players.player_mut(id).unwrap();
 
                     // subgroup
-                    let mut sub = entry.player.subgroup as i32;
+                    let mut sub = player.subgroup as i32;
                     ui.table_next_column();
                     ui.set_next_item_width(render::ch_width(ui, 3));
                     if ui
@@ -87,7 +87,7 @@ impl Component<&Definitions> for Demo {
                         .step(0)
                         .build()
                     {
-                        entry.player.subgroup = match sub {
+                        player.subgroup = match sub {
                             1..=15 => sub as usize,
                             _ => 0,
                         };
@@ -96,26 +96,26 @@ impl Component<&Definitions> for Demo {
                     // character name
                     ui.table_next_column();
                     ui.set_next_item_width(INPUT_SIZE);
-                    ui.input_text(format!("##char-{}", id), &mut entry.player.character)
+                    ui.input_text(format!("##char-{}", id), &mut player.character)
                         .build();
 
                     // account name
                     ui.table_next_column();
                     ui.set_next_item_width(INPUT_SIZE);
-                    ui.input_text(format!("##acc-{}", id), &mut entry.player.account)
+                    ui.input_text(format!("##acc-{}", id), &mut player.account)
                         .build();
 
                     // profession select
                     ui.table_next_column();
                     let mut index = PROFESSIONS
                         .iter()
-                        .position(|prof| *prof == entry.player.profession)
+                        .position(|prof| *prof == player.profession)
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
                     if ui.combo(format!("##prof-{}", id), &mut index, PROFESSIONS, |prof| {
                         <&str>::from(prof).into()
                     }) {
-                        entry.player.profession = PROFESSIONS[index];
+                        player.profession = PROFESSIONS[index];
                     }
 
                     // food select
@@ -123,7 +123,7 @@ impl Component<&Definitions> for Demo {
                     let mut food_id = self
                         .all_foods
                         .iter()
-                        .position(|buff| *buff == entry.food.state)
+                        .position(|buff| *buff == data.food.state)
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
                     if ui.combo(
@@ -132,7 +132,7 @@ impl Component<&Definitions> for Demo {
                         &self.all_foods,
                         |buff| Self::food_name(defs, *buff),
                     ) {
-                        entry.food.state = self.all_foods[food_id];
+                        data.food.state = self.all_foods[food_id];
                     }
 
                     // utility
@@ -140,7 +140,7 @@ impl Component<&Definitions> for Demo {
                     let mut util_id = self
                         .all_utils
                         .iter()
-                        .position(|buff| *buff == entry.util.state)
+                        .position(|buff| *buff == data.util.state)
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
                     if ui.combo(
@@ -149,14 +149,14 @@ impl Component<&Definitions> for Demo {
                         &self.all_utils,
                         |buff| Self::util_name(defs, *buff),
                     ) {
-                        entry.util.state = self.all_utils[util_id];
+                        data.util.state = self.all_utils[util_id];
                     }
                 }
             }
 
             // add button
             if ui.button("Add") {
-                let next_id = self.tracker.len();
+                let next_id = self.tracker.players.len();
                 self.tracker.add_player(Player::new(
                     next_id,
                     "char",
@@ -172,7 +172,7 @@ impl Component<&Definitions> for Demo {
             // remove button
             ui.same_line_with_pos(button_width + 10.0);
             if ui.button("Remove") {
-                let last_id = self.tracker.len() - 1;
+                let last_id = self.tracker.players.len() - 1;
                 self.tracker.remove_player(last_id);
             }
         }

@@ -1,6 +1,9 @@
 use super::{ExtrasState, Plugin};
 use crate::data::{DefKind, DIMINISHED, MALNOURISHED, REINFORCED};
-use arc_util::{api::calc_delta, player::Player};
+use arc_util::{
+    api::calc_delta,
+    tracking::{Entry, Player},
+};
 use arcdps::{
     extras::{ExtrasAddonInfo, UserInfo, UserInfoIter, UserRole},
     Agent, BuffRemove, CombatEvent, StateChange,
@@ -29,7 +32,7 @@ impl Plugin {
                     StateChange::EnterCombat => {
                         // combat enter
 
-                        if let Some(entry) = self.tracker.player_mut(src.id) {
+                        if let Some(entry) = self.tracker.players.player_mut(src.id) {
                             let player = &mut entry.player;
                             player.elite = src.elite.into();
                             player.enter_combat(Some(event.dst_agent));
@@ -41,7 +44,7 @@ impl Plugin {
                     StateChange::ExitCombat => {
                         // combat exit
 
-                        if let Some(entry) = self.tracker.player_mut(src.id) {
+                        if let Some(entry) = self.tracker.players.player_mut(src.id) {
                             entry.player.exit_combat();
 
                             debug!("Combat exit for {}", entry.player.character);
@@ -60,12 +63,12 @@ impl Plugin {
 
                         // change buffs to none
                         // initial buffs should be reported right after
-                        for entry in self.tracker.all_players_mut() {
-                            entry.buffs_to_none(event.time);
+                        for entry in self.tracker.players.iter_mut() {
+                            entry.data.buffs_to_none(event.time);
                         }
 
                         // start encounter
-                        self.tracker.start_encounter(target_id);
+                        self.tracker.encounter = Some(target_id);
 
                         // set check as pending
                         self.pending_check = Some(event.time);
@@ -87,7 +90,7 @@ impl Plugin {
                         }
 
                         // end encounter
-                        self.tracker.end_encounter();
+                        self.tracker.encounter = None;
                     }
 
                     statechange @ (StateChange::None
@@ -101,7 +104,9 @@ impl Plugin {
 
                                 // check for tracked player
                                 if let Some(dest) = dest {
-                                    if let Some(entry) = self.tracker.player_mut(dest.id) {
+                                    if let Some(Entry { player, data }) =
+                                        self.tracker.players.player_mut(dest.id)
+                                    {
                                         let buff_id = event.skill_id;
 
                                         // check type of buff
@@ -110,10 +115,10 @@ impl Plugin {
                                                 "Reinf apply id {} time {} statechange {}",
                                                 event_id, event.time, statechange
                                             );
-                                            if entry.apply_reinf(event.time) {
+                                            if data.apply_reinf(event.time) {
                                                 info!(
                                                     "Reinforced ({}) applied to {}",
-                                                    REINFORCED, entry.player.character
+                                                    REINFORCED, player.character
                                                 );
                                             }
                                         } else if let Some(buff_type) = self.defs.get_buff(buff_id)
@@ -124,16 +129,14 @@ impl Plugin {
                                                         "Food apply id {} time {} statechange {}",
                                                         event_id, event.time, statechange
                                                     );
-                                                    if entry.apply_food(food.id, event.time) {
+                                                    if data.apply_food(food.id, event.time) {
                                                         info!(
                                                             "Food {} ({}) applied to {}",
-                                                            food.name,
-                                                            food.id,
-                                                            entry.player.character
+                                                            food.name, food.id, player.character
                                                         );
                                                         // trigger reminder on malnourished
                                                         if self.reminder.settings.always_mal_dim
-                                                            && entry.player.is_self
+                                                            && player.is_self
                                                             && food.id == MALNOURISHED
                                                         {
                                                             self.reminder.trigger_food();
@@ -145,17 +148,15 @@ impl Plugin {
                                                         "Util apply id {} time {} statechange {}",
                                                         event_id, event.time, statechange
                                                     );
-                                                    if entry.apply_util(util.id, event.time) {
+                                                    if data.apply_util(util.id, event.time) {
                                                         info!(
                                                             "Utility {} ({}) applied to {}",
-                                                            util.name,
-                                                            util.id,
-                                                            entry.player.character
+                                                            util.name, util.id, player.character
                                                         );
 
                                                         // trigger reminder on diminished
                                                         if self.reminder.settings.always_mal_dim
-                                                            && entry.player.is_self
+                                                            && player.is_self
                                                             && util.id == DIMINISHED
                                                         {
                                                             self.reminder.trigger_util();
@@ -165,22 +166,22 @@ impl Plugin {
                                                 DefKind::Ignore => {
                                                     info!(
                                                         "Ignored buff {} applied to {}",
-                                                        buff_id, entry.player.character
+                                                        buff_id, player.character
                                                     );
                                                 }
                                             }
                                         } else if let Some("Nourishment") = skill_name {
-                                            if entry.apply_food(buff_id, event.time) {
+                                            if data.apply_food(buff_id, event.time) {
                                                 info!(
                                                     "Unknown Food {} applied to {}",
-                                                    buff_id, entry.player.character
+                                                    buff_id, player.character
                                                 );
                                             }
                                         } else if let Some("Enhancement") = skill_name {
-                                            if entry.apply_util(buff_id, event.time) {
+                                            if data.apply_util(buff_id, event.time) {
                                                 info!(
                                                     "Unknown Utility {} applied to {}",
-                                                    buff_id, entry.player.character
+                                                    buff_id, player.character
                                                 );
                                             }
                                         }
@@ -191,7 +192,9 @@ impl Plugin {
                             // buff removed
 
                             // check for tracked player
-                            if let Some(entry) = self.tracker.player_mut(src.id) {
+                            if let Some(Entry { player, data }) =
+                                self.tracker.players.player_mut(src.id)
+                            {
                                 let buff_id = event.skill_id;
 
                                 // check type of buff
@@ -200,15 +203,14 @@ impl Plugin {
                                         "Reinf remove id {} time {} statechange {}",
                                         event_id, event.time, statechange
                                     );
-                                    if entry.remove_reinf(event.time) {
+                                    if data.remove_reinf(event.time) {
                                         info!(
                                             "Reinforced ({}) removed from {}",
-                                            REINFORCED, entry.player.character
+                                            REINFORCED, player.character
                                         );
 
                                         // check for reinforced running out
-                                        if self.reminder.settings.during_encounter
-                                            && entry.player.is_self
+                                        if self.reminder.settings.during_encounter && player.is_self
                                         {
                                             self.check_self_reinforced();
                                         }
@@ -220,15 +222,15 @@ impl Plugin {
                                                 "Food remove id {} time {} statechange {}",
                                                 event_id, event.time, statechange
                                             );
-                                            if entry.remove_food(food.id, event.time) {
+                                            if data.remove_food(food.id, event.time) {
                                                 info!(
                                                     "Food {} ({}) removed from {}",
-                                                    food.name, food.id, entry.player.character
+                                                    food.name, food.id, player.character
                                                 );
 
                                                 // check for food running out
                                                 if self.reminder.settings.during_encounter
-                                                    && entry.player.is_self
+                                                    && player.is_self
                                                 {
                                                     self.check_self_food();
                                                 }
@@ -239,15 +241,15 @@ impl Plugin {
                                                 "Util remove id {} time {} statechange {}",
                                                 event_id, event.time, statechange
                                             );
-                                            if entry.remove_util(util.id, event.time) {
+                                            if data.remove_util(util.id, event.time) {
                                                 info!(
                                                     "Utility {} ({}) removed from {}",
-                                                    util.name, util.id, entry.player.character
+                                                    util.name, util.id, player.character
                                                 );
 
                                                 // check for utility running out
                                                 if self.reminder.settings.during_encounter
-                                                    && entry.player.is_self
+                                                    && player.is_self
                                                 {
                                                     self.check_self_util();
                                                 }
@@ -256,34 +258,32 @@ impl Plugin {
                                         DefKind::Ignore => {
                                             info!(
                                                 "Ignored buff {} removed from {}",
-                                                buff_id, entry.player.character
+                                                buff_id, player.character
                                             );
                                         }
                                     }
                                 } else if let Some("Nourishment") = skill_name {
-                                    if entry.remove_food(buff_id, event.time) {
+                                    if data.remove_food(buff_id, event.time) {
                                         info!(
                                             "Unknown Food {} removed from {}",
-                                            buff_id, entry.player.character
+                                            buff_id, player.character
                                         );
 
                                         // check for food running out
-                                        if self.reminder.settings.during_encounter
-                                            && entry.player.is_self
+                                        if self.reminder.settings.during_encounter && player.is_self
                                         {
                                             self.check_self_food();
                                         }
                                     }
                                 } else if let Some("Enhancement") = skill_name {
-                                    if entry.remove_util(buff_id, event.time) {
+                                    if data.remove_util(buff_id, event.time) {
                                         info!(
                                             "Unknown Utility {} removed from {}",
-                                            buff_id, entry.player.character
+                                            buff_id, player.character
                                         );
 
                                         // check for utility running out
-                                        if self.reminder.settings.during_encounter
-                                            && entry.player.is_self
+                                        if self.reminder.settings.during_encounter && player.is_self
                                         {
                                             self.check_self_util();
                                         }
@@ -374,7 +374,8 @@ impl Plugin {
                 let acc_name = name.strip_prefix(':').unwrap_or(name);
                 if let Some(entry) = self
                     .tracker
-                    .all_players_mut()
+                    .players
+                    .iter_mut()
                     .find(|entry| entry.player.account == acc_name)
                 {
                     entry.player.subgroup = subgroup as usize + 1;

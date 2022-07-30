@@ -161,7 +161,7 @@ impl Plugin {
 
     /// Whether the local player can be reminded.
     fn can_remind(&self) -> bool {
-        match self.tracker.encounter() {
+        match self.tracker.encounter {
             Some(boss_id) if self.reminder.settings.only_bosses => boss_id > 1,
             Some(_) => true,
             None => false,
@@ -170,9 +170,9 @@ impl Plugin {
 
     /// Checks for missing food on the local player.
     fn check_self_food(&mut self) {
-        if let Some(entry) = self.tracker.get_self() {
+        if let Some(entry) = self.tracker.players.get_self() {
             if self.can_remind() {
-                let food = entry.food.state;
+                let food = entry.data.food.state;
 
                 debug!("Checking food on self: {:?}", food);
 
@@ -185,9 +185,9 @@ impl Plugin {
 
     /// Checks for missing utility on the local player.
     fn check_self_util(&mut self) {
-        if let Some(entry) = self.tracker.get_self() {
+        if let Some(entry) = self.tracker.players.get_self() {
             if self.can_remind() {
-                let util = entry.util.state;
+                let util = entry.data.util.state;
 
                 debug!("Checking utility on self: {:?}", util);
 
@@ -199,9 +199,9 @@ impl Plugin {
     }
 
     fn check_self_reinforced(&mut self) {
-        if let Some(entry) = self.tracker.get_self() {
+        if let Some(entry) = self.tracker.players.get_self() {
             if self.reminder.settings.reinforced && self.can_remind() {
-                let reinf = entry.reinf.state;
+                let reinf = entry.data.reinf.state;
 
                 debug!("Checking reinforced on self: {:?}", reinf);
 

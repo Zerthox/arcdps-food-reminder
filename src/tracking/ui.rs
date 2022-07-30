@@ -1,9 +1,12 @@
-use super::{settings::Color, BuffState, Entry, Sorting, Tracker};
+use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
 use crate::{
     buff_ui,
     data::{DefKind, Definitions, DIMINISHED, MALNOURISHED},
 };
-use arc_util::ui::{render, Component, Windowable};
+use arc_util::{
+    tracking::Entry,
+    ui::{render, Component, Windowable},
+};
 use arcdps::{
     exports::{self, CoreColor},
     imgui::{
@@ -18,8 +21,8 @@ impl Tracker {
 
         // reset squad
         if ui.button("Reset squad") {
-            for entry in &mut self.players {
-                entry.reset_buffs();
+            for entry in self.players.iter_mut() {
+                entry.data.reset_buffs();
             }
         }
         if ui.is_item_hovered() {
@@ -45,7 +48,7 @@ impl Tracker {
 
             ui.same_line();
             if ui.button("Confirm") {
-                self.chars_cache.clear();
+                self.players.clear_cache();
                 self.chars_reset = false;
             }
 
@@ -62,11 +65,11 @@ impl Tracker {
         ui: &Ui,
         defs: &Definitions,
         entry_id: usize,
-        entry: &Entry,
+        entry: &Entry<Buffs>,
         colors: &exports::Colors,
         sub: bool,
     ) {
-        let player = &entry.player;
+        let Entry { player, data } = entry;
         let sub_color = colors
             .sub_base(player.subgroup)
             .map(|color| render::with_alpha(color, 1.0));
@@ -110,7 +113,7 @@ impl Tracker {
 
         // render food cell
         ui.table_next_column();
-        match entry.food.state {
+        match data.food.state {
             BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
@@ -150,7 +153,7 @@ impl Tracker {
 
         // render util cell
         ui.table_next_column();
-        match entry.util.state {
+        match data.util.state {
             BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
@@ -190,7 +193,7 @@ impl Tracker {
 
         // render reinforced cell
         ui.table_next_column();
-        match entry.reinf.state {
+        match data.reinf.state {
             BuffState::Unknown => ui.text("???"),
             BuffState::None => ui.text_colored(red, "No"),
             BuffState::Some(_) => ui.text_colored(green, "Yes"),
@@ -283,7 +286,7 @@ impl Tracker {
 
                 // render table content
                 let colors = exports::colors();
-                for entry in &self.players {
+                for entry in self.players.iter() {
                     self.render_table_entry(
                         ui,
                         defs,
@@ -299,9 +302,9 @@ impl Tracker {
 
     /// Renders the tracker tab for own characters.
     fn render_characters_tab(&mut self, ui: &Ui, defs: &Definitions) {
-        let current = self.get_self();
+        let current = self.players.get_self();
 
-        if current.is_none() && self.chars_cache.is_empty() {
+        if current.is_none() && !self.players.cached() {
             ui.text("No characters found");
         } else if let Some(_table) = ui.begin_table_header_with_flags(
             "##self-table",
@@ -318,7 +321,7 @@ impl Tracker {
             if let Some(entry) = current {
                 self.render_table_entry(ui, defs, usize::MAX, entry, &colors, false);
             }
-            for (i, entry) in self.chars_cache.iter().enumerate() {
+            for (i, entry) in self.players.cache_iter().enumerate() {
                 self.render_table_entry(ui, defs, i, entry, &colors, false);
             }
         }
@@ -326,13 +329,13 @@ impl Tracker {
 
     /// Renders the builds tab for user-defined builds.
     fn render_builds_tab(&mut self, ui: &Ui, defs: &Definitions) {
-        let current = self.get_self();
+        let current = self.players.get_self();
         let prof = current.map(|entry| entry.player.profession);
         let food = current
-            .map(|entry| entry.food.state)
+            .map(|entry| entry.data.food.state)
             .unwrap_or(BuffState::Unknown);
         let util = current
-            .map(|entry| entry.util.state)
+            .map(|entry| entry.data.util.state)
             .unwrap_or(BuffState::Unknown);
 
         self.builds.render(ui, (defs, prof, food, util));

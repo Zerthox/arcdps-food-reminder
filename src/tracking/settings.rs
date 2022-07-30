@@ -1,10 +1,12 @@
 use super::{
-    buff::BuffState,
-    entry::{Entry, Player},
+    buff::{BuffState, Buffs},
     Tracker,
 };
 use crate::builds::Builds;
-use arc_util::settings::HasSettings;
+use arc_util::{
+    settings::HasSettings,
+    tracking::{Entry, Player},
+};
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 
@@ -101,20 +103,23 @@ impl SettingsEntry {
     }
 }
 
-impl From<Entry> for SettingsEntry {
-    fn from(entry: Entry) -> Self {
+impl From<Entry<Buffs>> for SettingsEntry {
+    fn from(entry: Entry<Buffs>) -> Self {
         Self::new(
             entry.player,
-            entry.food.state,
-            entry.util.state,
-            entry.reinf.state,
+            entry.data.food.state,
+            entry.data.util.state,
+            entry.data.reinf.state,
         )
     }
 }
 
-impl From<SettingsEntry> for Entry {
+impl From<SettingsEntry> for Entry<Buffs> {
     fn from(entry: SettingsEntry) -> Self {
-        Self::with_states(entry.player, entry.food, entry.util, entry.reinforced)
+        Self::new(
+            entry.player,
+            Buffs::with_states(entry.food, entry.util, entry.reinforced),
+        )
     }
 }
 
@@ -128,9 +133,10 @@ impl HasSettings for Tracker {
         Self::Settings {
             settings: self.settings.clone(),
             own_chars: if self.settings.save_chars {
-                self.get_self()
+                self.players
+                    .get_self()
                     .into_iter()
-                    .chain(&self.chars_cache)
+                    .chain(self.players.cache_iter())
                     .cloned()
                     .map(Into::into)
                     .collect()
@@ -144,7 +150,8 @@ impl HasSettings for Tracker {
     fn load_settings(&mut self, loaded: Self::Settings) {
         self.settings = loaded.settings;
         if self.settings.save_chars {
-            self.chars_cache = loaded.own_chars.into_iter().map(Into::into).collect();
+            self.players
+                .cache_multiple(loaded.own_chars.into_iter().map(Into::into));
         }
 
         self.builds.load_settings(loaded.builds);

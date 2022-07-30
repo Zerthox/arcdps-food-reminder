@@ -19,7 +19,7 @@ impl Plugin {
         &mut self,
         event: Option<CombatEvent>,
         src: Option<Agent>,
-        dest: Option<Agent>,
+        dst: Option<Agent>,
         skill_name: Option<&str>,
         event_id: u64,
         _revision: u64,
@@ -103,9 +103,9 @@ impl Plugin {
                                 // buff applied
 
                                 // check for tracked player
-                                if let Some(dest) = dest {
+                                if let Some(dst) = dst {
                                     if let Some(Entry { player, data }) =
-                                        self.tracker.players.player_mut(dest.id)
+                                        self.tracker.players.player_mut(dst.id)
                                     {
                                         let buff_id = event.skill_id;
 
@@ -317,29 +317,9 @@ impl Plugin {
                     if src.prof != 0 {
                         // player added
 
-                        if let (
-                            Some(char_name),
-                            Some(Agent {
-                                name: Some(dest_name),
-                                prof,
-                                elite,
-                                team: sub,
-                                is_self,
-                                ..
-                            }),
-                        ) = (src.name, dest)
+                        if let Some(player) =
+                            dst.and_then(|dst| Player::from_tracking_change(src, dst))
                         {
-                            let acc_name = dest_name.strip_prefix(':').unwrap_or(dest_name);
-                            let player = Player::new(
-                                src.id,
-                                char_name,
-                                acc_name,
-                                is_self != 0,
-                                prof.into(),
-                                elite.into(),
-                                sub as usize,
-                            );
-
                             self.tracker.add_player(player);
                         }
                     } else {

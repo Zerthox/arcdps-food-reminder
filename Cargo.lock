@@ -16,7 +16,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.8.1"
-source = "git+https://github.com/zerthox/arcdps-bindings#cfdb157d4fa76bbbe1d826b9bbe9e7665a75728c"
+source = "git+https://github.com/zerthox/arcdps-bindings#194d61464a2318aa4ef044a05dff949c4959cda7"
 dependencies = [
  "arcdps-codegen",
  "arcdps-imgui",
@@ -31,7 +31,7 @@ dependencies = [
 [[package]]
 name = "arcdps-codegen"
 version = "0.8.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#cfdb157d4fa76bbbe1d826b9bbe9e7665a75728c"
+source = "git+https://github.com/zerthox/arcdps-bindings#194d61464a2318aa4ef044a05dff949c4959cda7"
 dependencies = [
  "cfg-if",
  "paste",

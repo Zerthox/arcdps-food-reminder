@@ -334,7 +334,7 @@ impl Plugin {
 
     /// Handles initialization from unofficial extras.
     pub fn extras_init(&mut self, extras_info: ExtrasAddonInfo, _account_name: Option<&str>) {
-        self.extras = if extras_info.check_compat() {
+        self.extras = if extras_info.is_compatible() {
             ExtrasState::Found
         } else {
             ExtrasState::Incompatible
@@ -351,12 +351,11 @@ impl Plugin {
                 ..
             } = user
             {
-                let acc_name = name.strip_prefix(':').unwrap_or(name);
                 if let Some(entry) = self
                     .tracker
                     .players
                     .iter_mut()
-                    .find(|entry| entry.player.account == acc_name)
+                    .find(|entry| entry.player.account == name)
                 {
                     entry.player.subgroup = subgroup as usize + 1;
 

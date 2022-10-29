@@ -313,6 +313,12 @@
       "name": "Bowl of Orrian Truffle and Meat Stew",
       "stats": ["100% Might on Dodge", "+40% to Endurance Regeneration"],
       "display": "ENDU"
+    },
+    {
+      "id": 34570,
+      "name": "Bowl of Bloodstone Bisque",
+      "stats": ["Side effects may be unpredictable or fatal.", "Consult a healer if conditions deteriorate."],
+      "display": "MATT"
     }
   ],
 

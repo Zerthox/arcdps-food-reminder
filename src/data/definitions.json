@@ -552,6 +552,14 @@
       "name": "Sharpening Skull",
       "stats": ["+75 All Attributes after reviving"],
       "display": "RES"
+    },
+
+    // all stats
+    {
+      "id": 68235,
+      "name": "Decade Enhancement",
+      "stats": ["+3% All Attributes"],
+      "display": "ALL"
     }
   ],
 

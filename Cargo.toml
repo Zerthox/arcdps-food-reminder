@@ -39,9 +39,3 @@ panic = "abort" # rust currently aborts across ffi boundaries anyway
 inherits = "release"
 debug-assertions = true
 incremental = true
-
-# [patch."https://github.com/zerthox/arcdps-utils"]
-# arc_util = { path = "../arcdps-utils"}
-
-# [patch."https://github.com/zerthox/arcdps-bindings"]
-# arcdps = { path = "../arcdps-bindings/core"}

@@ -10,7 +10,7 @@ pub use build::Build;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Builds {
-    /// User-defined builds
+    /// User-defined builds.
     pub entries: Vec<Build>,
 
     /// Whether to display notes as table column.
@@ -20,7 +20,8 @@ pub struct Builds {
     pub filter_prof: bool,
 
     /// Current search contents.
-    pub search: String,
+    #[serde(skip)]
+    search: String,
 
     /// Edit mode.
     #[serde(skip)]
@@ -73,6 +74,7 @@ impl HasSettings for Builds {
 
     fn load_settings(&mut self, loaded: Self::Settings) {
         self.entries = loaded.entries;
+        self.display_notes = loaded.display_notes;
         self.filter_prof = loaded.filter_prof;
     }
 }

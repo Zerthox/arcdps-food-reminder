@@ -168,10 +168,17 @@ impl Plugin {
         }
     }
 
+    /// Performs a check for all reminders.
+    fn check_self_all(&mut self) {
+        self.check_self_food();
+        self.check_self_util();
+        self.check_self_reinforced();
+    }
+
     /// Checks for missing food on the local player.
     fn check_self_food(&mut self) {
-        if let Some(entry) = self.tracker.players.get_self() {
-            if self.can_remind() {
+        if self.can_remind() {
+            if let Some(entry) = self.tracker.players.get_self() {
                 let food = entry.data.food.state;
 
                 debug!("Checking food on self: {:?}", food);
@@ -185,8 +192,8 @@ impl Plugin {
 
     /// Checks for missing utility on the local player.
     fn check_self_util(&mut self) {
-        if let Some(entry) = self.tracker.players.get_self() {
-            if self.can_remind() {
+        if self.can_remind() {
+            if let Some(entry) = self.tracker.players.get_self() {
                 let util = entry.data.util.state;
 
                 debug!("Checking utility on self: {:?}", util);
@@ -199,8 +206,8 @@ impl Plugin {
     }
 
     fn check_self_reinforced(&mut self) {
-        if let Some(entry) = self.tracker.players.get_self() {
-            if self.reminder.settings.reinforced && self.can_remind() {
+        if self.can_remind() {
+            if let Some(entry) = self.tracker.players.get_self() {
                 let reinf = entry.data.reinf.state;
 
                 debug!("Checking reinforced on self: {:?}", reinf);

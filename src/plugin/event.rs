@@ -30,8 +30,6 @@ impl Plugin {
             if let Some(event) = event {
                 match event.is_statechange {
                     StateChange::EnterCombat => {
-                        // combat enter
-
                         if let Some(entry) = self.tracker.players.player_mut(src.id) {
                             let player = &mut entry.player;
                             player.elite = src.elite.into();
@@ -42,8 +40,6 @@ impl Plugin {
                     }
 
                     StateChange::ExitCombat => {
-                        // combat exit
-
                         if let Some(entry) = self.tracker.players.player_mut(src.id) {
                             entry.player.exit_combat();
 
@@ -52,8 +48,6 @@ impl Plugin {
                     }
 
                     StateChange::LogStart => {
-                        // log start
-
                         let target_id = event.src_agent;
 
                         if log_enabled!(Level::Debug) {
@@ -67,16 +61,27 @@ impl Plugin {
                             entry.data.buffs_to_none(event.time);
                         }
 
-                        // start encounter
+                        // start encounter, set check as pending
                         self.tracker.encounter = Some(target_id);
-
-                        // set check as pending
                         self.pending_check = Some(event.time);
                     }
 
-                    StateChange::LogEnd => {
-                        // log end
+                    StateChange::LogNPCUpdate => {
+                        let target_id = event.src_agent;
 
+                        if log_enabled!(Level::Debug) {
+                            debug!(
+                                "Log changed from id {:?} to id {}",
+                                self.tracker.encounter, target_id
+                            );
+                        }
+
+                        // update encounter, perform check immediately
+                        self.tracker.encounter = Some(target_id);
+                        self.check_self_all();
+                    }
+
+                    StateChange::LogEnd => {
                         if log_enabled!(Level::Debug) {
                             let target_id = event.src_agent;
                             debug!("Log for id {} ended", target_id);
@@ -84,9 +89,7 @@ impl Plugin {
 
                         // check self buffs
                         if self.reminder.settings.encounter_end {
-                            self.check_self_food();
-                            self.check_self_util();
-                            self.check_self_reinforced();
+                            self.check_self_all();
                         }
 
                         // end encounter
@@ -100,9 +103,7 @@ impl Plugin {
 
                         if let BuffRemove::None = event.is_buff_remove {
                             if event.buff != 0 && event.buff_dmg == 0 {
-                                // buff applied
-
-                                // check for tracked player
+                                // buff applied, check for tracked player
                                 if let Some(dst) = dst {
                                     if let Some(Entry { player, data }) =
                                         self.tracker.players.player_mut(dst.id)
@@ -134,6 +135,7 @@ impl Plugin {
                                                             "Food {} ({}) applied to {}",
                                                             food.name, food.id, player.character
                                                         );
+
                                                         // trigger reminder on malnourished
                                                         if self.reminder.settings.always_mal_dim
                                                             && player.is_self
@@ -189,9 +191,7 @@ impl Plugin {
                                 }
                             }
                         } else {
-                            // buff removed
-
-                            // check for tracked player
+                            // buff removed, check for tracked player
                             if let Some(Entry { player, data }) =
                                 self.tracker.players.player_mut(src.id)
                             {
@@ -305,9 +305,7 @@ impl Plugin {
 
                         // check self buffs
                         if self.reminder.settings.encounter_start {
-                            self.check_self_food();
-                            self.check_self_util();
-                            self.check_self_reinforced();
+                            self.check_self_all();
                         }
                     }
                 }

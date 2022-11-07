@@ -52,8 +52,10 @@ impl Reminder {
 
     /// Triggers the reinforced reminder.
     pub fn trigger_reinforced(&mut self) {
-        info!("Reinforced reminder triggered");
-        self.reinf_trigger = Some(Instant::now());
+        if self.settings.reinforced {
+            info!("Reinforced reminder triggered");
+            self.reinf_trigger = Some(Instant::now());
+        }
     }
 
     /// Checks if a trigger is currently active and resets it if necessary.

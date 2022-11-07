@@ -1,6 +1,6 @@
 [package]
 name = "arcdps_food_reminder"
-version = "0.5.3"
+version = "0.5.4"
 edition = "2021"
 authors = ["Zerthox"]
 repository = "https://github.com/zerthox/arcdps-food-reminder"
@@ -36,6 +36,6 @@ lto = "thin"
 panic = "abort" # rust currently aborts across ffi boundaries anyway
 
 [profile.release-log]
-inherits = "release"
 debug-assertions = true
 incremental = true
+inherits = "release"

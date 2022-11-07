@@ -11,6 +11,9 @@ pub struct Build {
     pub notes: String,
     pub food: u32,
     pub util: u32,
+
+    #[serde(skip)]
+    pub visible: bool,
 }
 
 impl Build {
@@ -28,6 +31,7 @@ impl Build {
             notes: notes.into(),
             food,
             util,
+            visible: true,
         }
     }
 

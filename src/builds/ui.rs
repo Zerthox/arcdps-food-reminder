@@ -22,39 +22,39 @@ impl Builds {
         current_util: BuffState<u32>,
     ) {
         // render builds table
-        if let Some(_table) = if self.display_notes {
+        let name = "##builds-table";
+        let flags = TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X;
+        let table = if self.display_notes {
             ui.begin_table_header_with_flags(
-                "##builds-table",
+                name,
                 [
                     TableColumnSetup::new("Build"),
                     TableColumnSetup::new("Notes"),
                     TableColumnSetup::new("Food"),
                     TableColumnSetup::new("Util"),
                 ],
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+                flags,
             )
         } else {
             ui.begin_table_header_with_flags(
-                "##builds-table",
+                name,
                 [
                     TableColumnSetup::new("Build"),
                     TableColumnSetup::new("Food"),
                     TableColumnSetup::new("Util"),
                 ],
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+                flags,
             )
-        } {
+        };
+        if let Some(_table) = table {
             let colors = exports::colors();
 
             for (i, build) in self.entries.iter_mut().enumerate() {
                 // check if filters match
-                let prof_matches = !self.filter_prof
-                    || current_prof.map(|prof| prof == build.prof).unwrap_or(true);
-                let search_matches = self.search.is_empty()
-                    || build.name.to_lowercase().contains(&self.search)
-                    || build.notes.to_lowercase().contains(&self.search);
+                let prof_matches =
+                    !self.filter_prof || current_prof.map_or(true, |prof| prof == build.prof);
 
-                if prof_matches && search_matches {
+                if build.visible && prof_matches {
                     ui.table_next_row();
 
                     let red = colors
@@ -269,13 +269,16 @@ impl<'p> Component<Props<'p>> for Builds {
         if self.edit {
             if ui.button("Done") {
                 self.edit = false;
+                self.refresh_search();
             }
         } else if ui.button("Edit") {
             self.edit = true;
         }
 
         // search field
-        ui.input_text("##search", &mut self.search).build();
+        if ui.input_text("##search", &mut self.search).build() {
+            self.refresh_search();
+        }
 
         // contents
         if self.edit {

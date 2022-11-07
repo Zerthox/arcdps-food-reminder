@@ -37,6 +37,15 @@ impl Builds {
             edit: false,
         }
     }
+
+    /// Refreshes build visibility according to search.
+    fn refresh_search(&mut self) {
+        for build in &mut self.entries {
+            build.visible = self.search.is_empty()
+                || build.name.to_lowercase().contains(&self.search)
+                || build.notes.to_lowercase().contains(&self.search);
+        }
+    }
 }
 
 impl Default for Builds {

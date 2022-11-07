@@ -99,6 +99,13 @@ impl Plugin {
 
         ui.text_colored(grey, "Reminder");
 
+        ui.checkbox("Remind for Food buff", &mut self.reminder.settings.food);
+        ui.checkbox("Remind for Utility buff", &mut self.reminder.settings.util);
+        ui.checkbox(
+            "Remind for Reinforced Armor buff",
+            &mut self.reminder.settings.reinforced,
+        );
+
         ui.checkbox(
             "Remind on encounter start",
             &mut self.reminder.settings.encounter_start,
@@ -129,11 +136,6 @@ impl Plugin {
                 "Makes the reminder always trigger when Malnourished or Diminished is detected.",
             );
         }
-
-        ui.checkbox(
-            "Remind for Reinforced Armor buff",
-            &mut self.reminder.settings.reinforced,
-        );
 
         // reminder duration
         let mut dura = self.reminder.settings.duration.as_millis() as i32;

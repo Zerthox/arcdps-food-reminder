@@ -6,20 +6,44 @@ use std::time::Duration;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReminderSettings {
-    pub duration: Duration,
-    pub position: f32,
-    pub only_bosses: bool,
-    pub encounter_start: bool,
-    pub encounter_end: bool,
-    pub during_encounter: bool,
-    pub always_mal_dim: bool,
+    /// Whether to remind for food.
+    pub food: bool,
+
+    /// Whether to remind for utility.
+    pub util: bool,
+
+    /// Whether to remind for reinforced.
     pub reinforced: bool,
+
+    /// Duration of the reminder display.
+    pub duration: Duration,
+
+    /// Position of the reminder display.
+    pub position: f32,
+
+    /// Whether to remind only for boss encounters.
+    pub only_bosses: bool,
+
+    /// Whether to remind on encounter start.
+    pub encounter_start: bool,
+
+    /// Whether to remind on encounter end.
+    pub encounter_end: bool,
+
+    /// Whether to remind during an encounter.
+    pub during_encounter: bool,
+
+    /// Whether to always remind when becoming malnourished/diminished.
+    pub always_mal_dim: bool,
 }
 
 impl ReminderSettings {
     /// Creates new reminder settings with the defaults.
     pub const fn new() -> Self {
         Self {
+            food: true,
+            util: true,
+            reinforced: true,
             duration: Reminder::DEFAULT_DURATION,
             position: 0.2,
             only_bosses: true,
@@ -27,7 +51,6 @@ impl ReminderSettings {
             encounter_end: true,
             during_encounter: true,
             always_mal_dim: true,
-            reinforced: true,
         }
     }
 }

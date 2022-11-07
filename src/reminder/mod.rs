@@ -40,14 +40,18 @@ impl Reminder {
 
     /// Triggers the food reminder.
     pub fn trigger_food(&mut self) {
-        info!("Food reminder triggered");
-        self.food_trigger = Some(Instant::now());
+        if self.settings.food {
+            info!("Food reminder triggered");
+            self.food_trigger = Some(Instant::now());
+        }
     }
 
     /// Triggers the utility reminder.
     pub fn trigger_util(&mut self) {
-        info!("Utility reminder triggered");
-        self.util_trigger = Some(Instant::now());
+        if self.settings.util {
+            info!("Utility reminder triggered");
+            self.util_trigger = Some(Instant::now());
+        }
     }
 
     /// Triggers the reinforced reminder.

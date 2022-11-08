@@ -10,20 +10,17 @@ jobs:
     name: Release
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          target: x86_64-pc-windows-msvc
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-      - uses: actions/upload-artifact@v2
+          targets: x86_64-pc-windows-msvc
+      - run: cargo build --release
+      - uses: actions/upload-artifact@v3
         with:
           name: arcdps_food_reminder
           path: target/release/arcdps_food_reminder.dll
-      - uses: softprops/action-gh-release@v1
+      - uses: shogo82148/actions-upload-release-asset@v1
         with:
-          files: target/release/arcdps_food_reminder.dll
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: target/release/arcdps_food_reminder.dll
+          overwrite: true

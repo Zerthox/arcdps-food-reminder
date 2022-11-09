@@ -29,24 +29,6 @@ impl Plugin {
             // check for combat event
             if let Some(event) = event {
                 match event.is_statechange {
-                    StateChange::EnterCombat => {
-                        if let Some(entry) = self.tracker.players.player_mut(src.id) {
-                            let player = &mut entry.player;
-                            player.elite = src.elite.into();
-                            player.enter_combat(Some(event.dst_agent));
-
-                            debug!("Combat enter for {}", entry.player.character);
-                        }
-                    }
-
-                    StateChange::ExitCombat => {
-                        if let Some(entry) = self.tracker.players.player_mut(src.id) {
-                            entry.player.exit_combat();
-
-                            debug!("Combat exit for {}", entry.player.character);
-                        }
-                    }
-
                     StateChange::LogStart => {
                         let target_id = event.src_agent;
 
@@ -55,37 +37,36 @@ impl Plugin {
                             debug!("Log for id {} started with {:?} delta", target_id, delta);
                         }
 
-                        // change buffs to none
-                        // initial buffs should be reported right after
+                        // change buffs to none, initial buffs should be reported right after
                         for entry in self.tracker.players.iter_mut() {
                             entry.data.buffs_to_none(event.time);
                         }
 
                         // start encounter, set check as pending
                         self.tracker.encounter = Some(target_id);
-                        self.pending_check = Some(event.time);
+                        if self.reminder.settings.encounter_start {
+                            self.pending_check = Some(event.time);
+                        }
                     }
 
                     StateChange::LogNPCUpdate => {
                         let target_id = event.src_agent;
 
-                        if log_enabled!(Level::Debug) {
-                            debug!(
-                                "Log changed from id {:?} to id {}",
-                                self.tracker.encounter, target_id
-                            );
-                        }
+                        debug!(
+                            "Log changed from id {:?} to id {}",
+                            self.tracker.encounter, target_id
+                        );
 
-                        // update encounter, perform check immediately
+                        // update encounter, set check as pending
                         self.tracker.encounter = Some(target_id);
-                        self.check_self_all();
+                        if self.reminder.settings.encounter_start {
+                            self.pending_check = Some(event.time);
+                        }
                     }
 
                     StateChange::LogEnd => {
-                        if log_enabled!(Level::Debug) {
-                            let target_id = event.src_agent;
-                            debug!("Log for id {} ended", target_id);
-                        }
+                        let target_id = event.src_agent;
+                        debug!("Log for id {} ended", target_id);
 
                         // check self buffs
                         if self.reminder.settings.encounter_end {
@@ -301,12 +282,9 @@ impl Plugin {
                         // initial buffs are still being reported, refresh time
                         self.pending_check = Some(event.time);
                     } else if event.time >= last_time + CHECK_TIME_DIFF {
-                        self.pending_check = None;
-
                         // check self buffs
-                        if self.reminder.settings.encounter_start {
-                            self.check_self_all();
-                        }
+                        self.pending_check = None;
+                        self.check_self_all();
                     }
                 }
             } else {

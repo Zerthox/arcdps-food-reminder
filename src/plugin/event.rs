@@ -84,193 +84,26 @@ impl Plugin {
 
                         if let BuffRemove::None = event.is_buff_remove {
                             if event.buff != 0 && event.buff_dmg == 0 {
-                                // buff applied, check for tracked player
                                 if let Some(dst) = dst {
-                                    if let Some(Entry { player, data }) =
-                                        self.tracker.players.player_mut(dst.id)
-                                    {
-                                        let buff_id = event.skill_id;
-
-                                        // check type of buff
-                                        if buff_id == REINFORCED {
-                                            debug!(
-                                                "Reinf apply id {} time {} statechange {}",
-                                                event_id, event.time, statechange
-                                            );
-                                            if data.apply_reinf(event.time) {
-                                                info!(
-                                                    "Reinforced ({}) applied to {}",
-                                                    REINFORCED, player.character
-                                                );
-                                            }
-                                        } else if let Some(buff_type) = self.defs.get_buff(buff_id)
-                                        {
-                                            match buff_type {
-                                                DefKind::Food(food) => {
-                                                    debug!(
-                                                        "Food apply id {} time {} statechange {}",
-                                                        event_id, event.time, statechange
-                                                    );
-                                                    if data.apply_food(food.id, event.time) {
-                                                        info!(
-                                                            "Food {} ({}) applied to {}",
-                                                            food.name, food.id, player.character
-                                                        );
-
-                                                        // trigger reminder on malnourished
-                                                        if self.reminder.settings.always_mal_dim
-                                                            && player.is_self
-                                                            && food.id == MALNOURISHED
-                                                        {
-                                                            self.reminder.trigger_food();
-                                                        }
-                                                    }
-                                                }
-                                                DefKind::Util(util) => {
-                                                    debug!(
-                                                        "Util apply id {} time {} statechange {}",
-                                                        event_id, event.time, statechange
-                                                    );
-                                                    if data.apply_util(util.id, event.time) {
-                                                        info!(
-                                                            "Utility {} ({}) applied to {}",
-                                                            util.name, util.id, player.character
-                                                        );
-
-                                                        // trigger reminder on diminished
-                                                        if self.reminder.settings.always_mal_dim
-                                                            && player.is_self
-                                                            && util.id == DIMINISHED
-                                                        {
-                                                            self.reminder.trigger_util();
-                                                        }
-                                                    }
-                                                }
-                                                DefKind::Ignore => {
-                                                    info!(
-                                                        "Ignored buff {} applied to {}",
-                                                        buff_id, player.character
-                                                    );
-                                                }
-                                            }
-                                        } else if let Some("Nourishment") = skill_name {
-                                            if data.apply_food(buff_id, event.time) {
-                                                info!(
-                                                    "Unknown Food {} applied to {}",
-                                                    buff_id, player.character
-                                                );
-                                            }
-                                        } else if let Some("Enhancement") = skill_name {
-                                            if data.apply_util(buff_id, event.time) {
-                                                info!(
-                                                    "Unknown Utility {} applied to {}",
-                                                    buff_id, player.character
-                                                );
-                                            }
-                                        }
-                                    }
+                                    self.buff_apply(
+                                        dst.id,
+                                        event.skill_id,
+                                        skill_name,
+                                        statechange,
+                                        event_id,
+                                        event.time,
+                                    );
                                 }
                             }
                         } else {
-                            // buff removed, check for tracked player
-                            if let Some(Entry { player, data }) =
-                                self.tracker.players.player_mut(src.id)
-                            {
-                                let buff_id = event.skill_id;
-
-                                // check type of buff
-                                if buff_id == REINFORCED {
-                                    debug!(
-                                        "Reinf remove id {} time {} statechange {}",
-                                        event_id, event.time, statechange
-                                    );
-                                    if data.remove_reinf(event.time) {
-                                        info!(
-                                            "Reinforced ({}) removed from {}",
-                                            REINFORCED, player.character
-                                        );
-
-                                        // check for reinforced running out
-                                        if self.reminder.settings.during_encounter && player.is_self
-                                        {
-                                            self.check_self_reinforced();
-                                        }
-                                    }
-                                } else if let Some(buff_type) = self.defs.get_buff(buff_id) {
-                                    match buff_type {
-                                        DefKind::Food(food) => {
-                                            debug!(
-                                                "Food remove id {} time {} statechange {}",
-                                                event_id, event.time, statechange
-                                            );
-                                            if data.remove_food(food.id, event.time) {
-                                                info!(
-                                                    "Food {} ({}) removed from {}",
-                                                    food.name, food.id, player.character
-                                                );
-
-                                                // check for food running out
-                                                if self.reminder.settings.during_encounter
-                                                    && player.is_self
-                                                {
-                                                    self.check_self_food();
-                                                }
-                                            }
-                                        }
-                                        DefKind::Util(util) => {
-                                            debug!(
-                                                "Util remove id {} time {} statechange {}",
-                                                event_id, event.time, statechange
-                                            );
-                                            if data.remove_util(util.id, event.time) {
-                                                info!(
-                                                    "Utility {} ({}) removed from {}",
-                                                    util.name, util.id, player.character
-                                                );
-
-                                                // check for utility running out
-                                                if self.reminder.settings.during_encounter
-                                                    && player.is_self
-                                                {
-                                                    self.check_self_util();
-                                                }
-                                            }
-                                        }
-                                        DefKind::Ignore => {
-                                            info!(
-                                                "Ignored buff {} removed from {}",
-                                                buff_id, player.character
-                                            );
-                                        }
-                                    }
-                                } else if let Some("Nourishment") = skill_name {
-                                    if data.remove_food(buff_id, event.time) {
-                                        info!(
-                                            "Unknown Food {} removed from {}",
-                                            buff_id, player.character
-                                        );
-
-                                        // check for food running out
-                                        if self.reminder.settings.during_encounter && player.is_self
-                                        {
-                                            self.check_self_food();
-                                        }
-                                    }
-                                } else if let Some("Enhancement") = skill_name {
-                                    if data.remove_util(buff_id, event.time) {
-                                        info!(
-                                            "Unknown Utility {} removed from {}",
-                                            buff_id, player.character
-                                        );
-
-                                        // check for utility running out
-                                        if self.reminder.settings.during_encounter && player.is_self
-                                        {
-                                            self.check_self_util();
-                                        }
-                                    }
-                                }
-                            }
+                            self.buff_remove(
+                                src.id,
+                                event.skill_id,
+                                skill_name,
+                                statechange,
+                                event_id,
+                                event.time,
+                            );
                         }
                     }
                     _ => {}
@@ -302,6 +135,183 @@ impl Plugin {
                         // player removed
 
                         self.tracker.remove_player(src.id);
+                    }
+                }
+            }
+        }
+    }
+
+    /// Handles a buff apply event.
+    fn buff_apply(
+        &mut self,
+        player_id: usize,
+        buff_id: u32,
+        buff_name: Option<&str>,
+        statechange: StateChange,
+        event_id: u64,
+        time: u64,
+    ) {
+        if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
+            // check type of buff
+            if buff_id == REINFORCED {
+                debug!(
+                    "Reinf apply id {} time {} statechange {}",
+                    event_id, time, statechange
+                );
+                if data.apply_reinf(time) {
+                    info!(
+                        "Reinforced ({}) applied to {}",
+                        REINFORCED, player.character
+                    );
+                }
+            } else if let Some(buff_type) = self.defs.get_buff(buff_id) {
+                match buff_type {
+                    DefKind::Food(food) => {
+                        debug!(
+                            "Food apply id {} time {} statechange {}",
+                            event_id, time, statechange
+                        );
+                        if data.apply_food(food.id, time) {
+                            info!(
+                                "Food {} ({}) applied to {}",
+                                food.name, food.id, player.character
+                            );
+
+                            // trigger reminder on malnourished
+                            if self.reminder.settings.always_mal_dim
+                                && player.is_self
+                                && food.id == MALNOURISHED
+                            {
+                                self.reminder.trigger_food();
+                            }
+                        }
+                    }
+                    DefKind::Util(util) => {
+                        debug!(
+                            "Util apply id {} time {} statechange {}",
+                            event_id, time, statechange
+                        );
+                        if data.apply_util(util.id, time) {
+                            info!(
+                                "Utility {} ({}) applied to {}",
+                                util.name, util.id, player.character
+                            );
+
+                            // trigger reminder on diminished
+                            if self.reminder.settings.always_mal_dim
+                                && player.is_self
+                                && util.id == DIMINISHED
+                            {
+                                self.reminder.trigger_util();
+                            }
+                        }
+                    }
+                    DefKind::Ignore => {
+                        info!("Ignored buff {} applied to {}", buff_id, player.character);
+                    }
+                }
+            } else if let Some("Nourishment") = buff_name {
+                if data.apply_food(buff_id, time) {
+                    info!("Unknown Food {} applied to {}", buff_id, player.character);
+                }
+            } else if let Some("Enhancement") = buff_name {
+                if data.apply_util(buff_id, time) {
+                    info!(
+                        "Unknown Utility {} applied to {}",
+                        buff_id, player.character
+                    );
+                }
+            }
+        }
+    }
+
+    /// Handles a buff remove event.
+    fn buff_remove(
+        &mut self,
+        player_id: usize,
+        buff_id: u32,
+        buff_name: Option<&str>,
+        statechange: StateChange,
+        event_id: u64,
+        time: u64,
+    ) {
+        if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
+            // check type of buff
+            if buff_id == REINFORCED {
+                debug!(
+                    "Reinf remove id {} time {} statechange {}",
+                    event_id, time, statechange
+                );
+                if data.remove_reinf(time) {
+                    info!(
+                        "Reinforced ({}) removed from {}",
+                        REINFORCED, player.character
+                    );
+
+                    // check for reinforced running out
+                    if self.reminder.settings.during_encounter && player.is_self {
+                        self.check_self_reinforced();
+                    }
+                }
+            } else if let Some(buff_type) = self.defs.get_buff(buff_id) {
+                match buff_type {
+                    DefKind::Food(food) => {
+                        debug!(
+                            "Food remove id {} time {} statechange {}",
+                            event_id, time, statechange
+                        );
+                        if data.remove_food(food.id, time) {
+                            info!(
+                                "Food {} ({}) removed from {}",
+                                food.name, food.id, player.character
+                            );
+
+                            // check for food running out
+                            if self.reminder.settings.during_encounter && player.is_self {
+                                self.check_self_food();
+                            }
+                        }
+                    }
+                    DefKind::Util(util) => {
+                        debug!(
+                            "Util remove id {} time {} statechange {}",
+                            event_id, time, statechange
+                        );
+                        if data.remove_util(util.id, time) {
+                            info!(
+                                "Utility {} ({}) removed from {}",
+                                util.name, util.id, player.character
+                            );
+
+                            // check for utility running out
+                            if self.reminder.settings.during_encounter && player.is_self {
+                                self.check_self_util();
+                            }
+                        }
+                    }
+                    DefKind::Ignore => {
+                        info!("Ignored buff {} removed from {}", buff_id, player.character);
+                    }
+                }
+            } else if let Some("Nourishment") = buff_name {
+                if data.remove_food(buff_id, time) {
+                    info!("Unknown Food {} removed from {}", buff_id, player.character);
+
+                    // check for food running out
+                    if self.reminder.settings.during_encounter && player.is_self {
+                        self.check_self_food();
+                    }
+                }
+            } else if let Some("Enhancement") = buff_name {
+                if data.remove_util(buff_id, time) {
+                    info!(
+                        "Unknown Utility {} removed from {}",
+                        buff_id, player.character
+                    );
+
+                    // check for utility running out
+                    if self.reminder.settings.during_encounter && player.is_self {
+                        self.check_self_util();
                     }
                 }
             }

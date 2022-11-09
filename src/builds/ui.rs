@@ -1,7 +1,7 @@
 use super::{build::Build, Action, Builds};
 use crate::{
     buff_ui,
-    data::{DefKind, Definitions, PROFESSIONS},
+    data::{DefinitionKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
 };
 use arc_util::ui::{render, Component, Ui};
@@ -81,7 +81,7 @@ impl Builds {
 
                     // food
                     ui.table_next_column();
-                    if let Some(DefKind::Food(food)) = defs.get_buff(build.food) {
+                    if let Some(DefinitionKind::Food(food)) = defs.get_definition(build.food) {
                         match current_food {
                             BuffState::Unknown => ui.text(&food.display),
                             BuffState::Some(id) if id == food.id => {
@@ -102,7 +102,7 @@ impl Builds {
 
                     // util
                     ui.table_next_column();
-                    if let Some(DefKind::Util(util)) = defs.get_buff(build.util) {
+                    if let Some(DefinitionKind::Util(util)) = defs.get_definition(build.util) {
                         match current_util {
                             BuffState::Unknown => ui.text(&util.display),
                             BuffState::Some(id) if id == util.id => {

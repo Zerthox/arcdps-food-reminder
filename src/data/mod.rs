@@ -18,10 +18,9 @@ pub struct Definitions {
     /// Buff definitions data.
     ///
     /// Sorted alphabetically for UI usage.
-    data: Vec<DefEntry>,
+    data: Vec<DefinitionEntry>,
 }
 
-#[allow(dead_code)]
 impl Definitions {
     /// Creates a new empty set of definitions.
     pub const fn empty() -> Self {
@@ -39,7 +38,7 @@ impl Definitions {
     }
 
     /// Updates an old buff entry or inserts iut as a new entry.
-    fn update_or_insert(&mut self, new: DefEntry) {
+    fn update_or_insert(&mut self, new: DefinitionEntry) {
         if let Some(old) = self.data.iter_mut().find(|entry| entry.id == new.id) {
             *old = new;
         } else {
@@ -56,13 +55,13 @@ impl Definitions {
     ) {
         // insert
         for entry in food.into_iter() {
-            self.update_or_insert(DefEntry::new_food(entry));
+            self.update_or_insert(DefinitionEntry::new_food(entry));
         }
         for entry in util.into_iter() {
-            self.update_or_insert(DefEntry::new_util(entry));
+            self.update_or_insert(DefinitionEntry::new_util(entry));
         }
         for id in ignored.into_iter() {
-            self.update_or_insert(DefEntry::new(id, DefKind::Ignore));
+            self.update_or_insert(DefinitionEntry::new(id, DefinitionKind::Ignore));
         }
 
         // sort
@@ -89,8 +88,27 @@ impl Definitions {
         Ok(())
     }
 
-    /// Returns the buff definition with the given id.
-    pub fn get_buff(&self, buff_id: u32) -> Option<&DefKind> {
+    /// Returns the kind for the given buff id & name.
+    pub fn get_buff(&self, id: u32, name: Option<&str>) -> BuffKind {
+        if id == REINFORCED {
+            BuffKind::Reinforced
+        } else if let Some(def) = self.get_definition(id) {
+            match def {
+                DefinitionKind::Food(data) => BuffKind::Food(Some(data)),
+                DefinitionKind::Util(data) => BuffKind::Util(Some(data)),
+                DefinitionKind::Ignore => BuffKind::Ignore,
+            }
+        } else {
+            match name {
+                Some("Nourishment") => BuffKind::Food(None),
+                Some("Enhancement") => BuffKind::Util(None),
+                _ => BuffKind::Unknown,
+            }
+        }
+    }
+
+    /// Returns the definition for the buff with the given id.
+    pub fn get_definition(&self, buff_id: u32) -> Option<&DefinitionKind> {
         self.data.iter().find_map(|entry| {
             if entry.id == buff_id {
                 Some(&entry.def)
@@ -103,7 +121,7 @@ impl Definitions {
     /// Returns all food definitions.
     pub fn all_food(&self) -> impl Iterator<Item = &BuffData> + Clone {
         self.data.iter().filter_map(|entry| match &entry.def {
-            DefKind::Food(data) => Some(data),
+            DefinitionKind::Food(data) => Some(data),
             _ => None,
         })
     }
@@ -111,7 +129,7 @@ impl Definitions {
     /// Returns all utility definitions.
     pub fn all_util(&self) -> impl Iterator<Item = &BuffData> + Clone {
         self.data.iter().filter_map(|entry| match &entry.def {
-            DefKind::Util(data) => Some(data),
+            DefinitionKind::Util(data) => Some(data),
             _ => None,
         })
     }
@@ -119,49 +137,54 @@ impl Definitions {
 
 /// Buff definitions entry.
 #[derive(Debug, Clone)]
-pub struct DefEntry {
+pub struct DefinitionEntry {
     pub id: u32,
-    pub def: DefKind,
+    pub def: DefinitionKind,
 }
 
-impl DefEntry {
+impl DefinitionEntry {
     /// Creates a new definitions entry.
-    pub const fn new(id: u32, def: DefKind) -> Self {
+    pub const fn new(id: u32, def: DefinitionKind) -> Self {
         Self { id, def }
     }
 
     /// Creates a new definitions entry for a food buff.
     pub const fn new_food(data: BuffData) -> Self {
-        Self::new(data.id, DefKind::Food(data))
+        Self::new(data.id, DefinitionKind::Food(data))
     }
 
     /// Creates a new definitions entry for an utility buff.
     pub const fn new_util(data: BuffData) -> Self {
-        Self::new(data.id, DefKind::Util(data))
+        Self::new(data.id, DefinitionKind::Util(data))
     }
 }
 
-/// Buff definitions kind.
+/// Buff definition kind.
 #[derive(Debug, Clone)]
-pub enum DefKind {
-    /// Food buff.
+pub enum DefinitionKind {
     Food(BuffData),
-
-    /// Utility buff.
     Util(BuffData),
-
-    /// Ignored buff.
     Ignore,
 }
 
-impl DefKind {
+impl DefinitionKind {
     pub fn name(&self) -> &str {
         match self {
-            DefKind::Food(data) => data.name.as_str(),
-            DefKind::Util(data) => data.name.as_str(),
-            DefKind::Ignore => "",
+            DefinitionKind::Food(data) => data.name.as_str(),
+            DefinitionKind::Util(data) => data.name.as_str(),
+            DefinitionKind::Ignore => "",
         }
     }
+}
+
+/// Buff kind.
+#[derive(Debug, Clone)]
+pub enum BuffKind<'a> {
+    Unknown,
+    Reinforced,
+    Food(Option<&'a BuffData>),
+    Util(Option<&'a BuffData>),
+    Ignore,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

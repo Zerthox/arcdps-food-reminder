@@ -4,7 +4,7 @@ pub mod settings;
 pub mod ui;
 
 use crate::{
-    data::{DefKind, Definitions},
+    data::{DefinitionKind, Definitions},
     reminder::Reminder,
     tracking::{buff::BuffState, Tracker},
 };
@@ -43,7 +43,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(DefKind::Food(food)) = defs.get_buff(buff) {
+                if let Some(DefinitionKind::Food(food)) = defs.get_definition(buff) {
                     food.name.clone().into()
                 } else {
                     "Unknown".into()
@@ -58,7 +58,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(DefKind::Util(util)) = defs.get_buff(buff) {
+                if let Some(DefinitionKind::Util(util)) = defs.get_definition(buff) {
                     util.name.clone().into()
                 } else {
                     "Unknown".into()

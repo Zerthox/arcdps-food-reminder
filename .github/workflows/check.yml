@@ -19,12 +19,14 @@ jobs:
     name: Check
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo check --all-features
   test:
     name: Test
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --all-features
   clippy:

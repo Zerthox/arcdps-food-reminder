@@ -574,6 +574,9 @@
     10110, // dragons breath bun proc
     10104, // saffron stuffed mushroom proc
     64528, // block of tofu proc
+    32289, // cheesy cassava roll proc?
+    32293, // jerk poultry flatbread sandwich proc?
+    33046, // piece of undersea wurm sushi proc?
     65475 // enhancement vs void in dragons end
   ]
 }

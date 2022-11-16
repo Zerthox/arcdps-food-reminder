@@ -14,7 +14,7 @@ dependencies = [
 [[package]]
 name = "arc_util"
 version = "0.9.0"
-source = "git+https://github.com/zerthox/arcdps-utils#f6f0289dd6650e2b868abb4a962a9053fe510b2d"
+source = "git+https://github.com/zerthox/arcdps-utils#9ecce5ece38c027fbd0b4b7a46bd95a98a611870"
 dependencies = [
  "arcdps",
  "serde",
@@ -25,7 +25,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.9.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#fac9ddaec4785e339e9f603f365865eacd3f2c25"
+source = "git+https://github.com/zerthox/arcdps-bindings#910973d32b7ff0fbd0ca7b4516865787f6d49e19"
 dependencies = [
  "arcdps-codegen",
  "arcdps-imgui",
@@ -40,7 +40,7 @@ dependencies = [
 [[package]]
 name = "arcdps-codegen"
 version = "0.9.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#fac9ddaec4785e339e9f603f365865eacd3f2c25"
+source = "git+https://github.com/zerthox/arcdps-bindings#910973d32b7ff0fbd0ca7b4516865787f6d49e19"
 dependencies = [
  "cfg-if",
  "paste",
@@ -108,9 +108,9 @@ checksum = "572f695136211188308f16ad2ca5c851a712c464060ae6974944458eb83880ba"
 
 [[package]]
 name = "cc"
-version = "1.0.74"
+version = "1.0.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "581f5dba903aac52ea3feb5ec4810848460ee833876f1f9b0fdeab1f19091574"
+checksum = "76a284da2e6fe2092f2353e51713435363112dfd60030e22add80be333fb928f"
 
 [[package]]
 name = "cfg-if"
@@ -126,9 +126,9 @@ checksum = "75476fe966a8af7c0ceae2a3e514afa87d4451741fcdfab8bfaa07ad301842ec"
 
 [[package]]
 name = "chrono"
-version = "0.4.22"
+version = "0.4.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfd4d1b31faaa3a89d7934dbded3111da0d2ef28e3ebccdb4f0179f5929d1ef1"
+checksum = "16b0a3d9ed01224b22057780a37bb8c5dbfe1be8ba48678e7bf57ec4b385411f"
 dependencies = [
  "iana-time-zone",
  "js-sys",
@@ -158,9 +158,9 @@ checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
 name = "cxx"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b7d4e43b25d3c994662706a1d4fcfc32aaa6afd287502c111b237093bb23f3a"
+checksum = "97abf9f0eca9e52b7f81b945524e76710e6cb2366aead23b7d4fbf72e281f888"
 dependencies = [
  "cc",
  "cxxbridge-flags",
@@ -170,9 +170,9 @@ dependencies = [
 
 [[package]]
 name = "cxx-build"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84f8829ddc213e2c1368e51a2564c552b65a8cb6a28f31e576270ac81d5e5827"
+checksum = "7cc32cc5fea1d894b77d269ddb9f192110069a8a9c1f1d441195fba90553dea3"
 dependencies = [
  "cc",
  "codespan-reporting",
@@ -185,15 +185,15 @@ dependencies = [
 
 [[package]]
 name = "cxxbridge-flags"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e72537424b474af1460806647c41d4b6d35d09ef7fe031c5c2fa5766047cc56a"
+checksum = "8ca220e4794c934dc6b1207c3b42856ad4c302f2df1712e9f8d2eec5afaacf1f"
 
 [[package]]
 name = "cxxbridge-macro"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "309e4fb93eed90e1e14bea0da16b209f81813ba9fc7830c20ed151dd7bc0a4d7"
+checksum = "b846f081361125bfc8dc9d3940c84e1fd83ba54bbca7b17cd29483c828be0704"
 dependencies = [
  "proc-macro2",
  "quote",

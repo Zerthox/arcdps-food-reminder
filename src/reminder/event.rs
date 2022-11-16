@@ -7,7 +7,7 @@ use arc_util::tracking::CachedTracker;
 use log::debug;
 
 /// Minimum time (ms) since the encounter start for the buff check to trigger.
-const CHECK_TIME_DIFF: u64 = 100;
+const CHECK_TIME_DIFF: u64 = 250;
 
 impl Reminder {
     /// Returns the current encounter id.

@@ -171,11 +171,7 @@ impl Plugin {
 
         // test button
         if ui.button("Test reminder") {
-            self.reminder.trigger_food();
-            self.reminder.trigger_util();
-            if self.reminder.settings.reinforced {
-                self.reminder.trigger_reinforced();
-            }
+            self.reminder.trigger_all();
         }
 
         ui.spacing();

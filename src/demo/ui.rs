@@ -12,18 +12,21 @@ use arcdps::{
     Profession, Specialization,
 };
 
+const SPECIAL_BUFFS: [BuffState<u32>; 3] =
+    [BuffState::Unknown, BuffState::None, BuffState::Some(0)];
+
 impl Component<&Definitions> for Demo {
     fn render(&mut self, ui: &Ui, defs: &Definitions) {
         // initialize data
         if self.all_foods.is_empty() {
-            self.all_foods = [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
+            self.all_foods = SPECIAL_BUFFS
                 .iter()
                 .copied()
                 .chain(defs.all_food().map(|food| BuffState::Some(food.id)))
                 .collect();
         }
         if self.all_utils.is_empty() {
-            self.all_utils = [BuffState::Unknown, BuffState::None, BuffState::Some(0)]
+            self.all_utils = SPECIAL_BUFFS
                 .iter()
                 .copied()
                 .chain(defs.all_util().map(|util| BuffState::Some(util.id)))

@@ -2,15 +2,15 @@ pub mod event;
 pub mod ui;
 
 use crate::{
-    data::{Definitions, LoadError, DIMINISHED, MALNOURISHED},
+    data::{Definitions, LoadError},
     reminder::Reminder,
-    tracking::{buff::BuffState, Tracker},
+    tracking::Tracker,
 };
 use arc_util::{
     settings::Settings,
     ui::{Window, WindowOptions},
 };
-use log::{debug, info, warn};
+use log::{info, warn};
 use semver::Version;
 use std::fs;
 
@@ -41,11 +41,6 @@ pub struct Plugin {
     /// Food reminder.
     reminder: Reminder,
 
-    /// Whether there is a pending food check for the current encounter.
-    ///
-    /// Stores the timestamp of last relevant event.
-    pending_check: Option<u64>,
-
     /// Food tracker window.
     tracker: Window<Tracker>,
 
@@ -65,7 +60,6 @@ impl Plugin {
             defs: Definitions::with_defaults(),
             defs_state: Err(LoadError::NotFound),
             reminder: Reminder::new(),
-            pending_check: None,
 
             tracker: Window::new(
                 WindowOptions {
@@ -157,66 +151,6 @@ impl Plugin {
 
         // save settings
         settings.save_file();
-    }
-
-    /// Whether the local player can be reminded.
-    fn can_remind(&self) -> bool {
-        match self.tracker.encounter {
-            Some(boss_id) if self.reminder.settings.only_bosses => boss_id > 1,
-            Some(_) => true,
-            None => false,
-        }
-    }
-
-    /// Performs a check for all reminders.
-    fn check_self_all(&mut self) {
-        self.check_self_food();
-        self.check_self_util();
-        self.check_self_reinforced();
-    }
-
-    /// Checks for missing food on the local player.
-    fn check_self_food(&mut self) {
-        if self.can_remind() {
-            if let Some(entry) = self.tracker.players.get_self() {
-                let food = entry.data.food.state;
-
-                debug!("Checking food on self: {:?}", food);
-
-                if let BuffState::None | BuffState::Some(MALNOURISHED) = food {
-                    self.reminder.trigger_food();
-                }
-            }
-        }
-    }
-
-    /// Checks for missing utility on the local player.
-    fn check_self_util(&mut self) {
-        if self.can_remind() {
-            if let Some(entry) = self.tracker.players.get_self() {
-                let util = entry.data.util.state;
-
-                debug!("Checking utility on self: {:?}", util);
-
-                if let BuffState::None | BuffState::Some(DIMINISHED) = util {
-                    self.reminder.trigger_util();
-                }
-            }
-        }
-    }
-
-    fn check_self_reinforced(&mut self) {
-        if self.can_remind() {
-            if let Some(entry) = self.tracker.players.get_self() {
-                let reinf = entry.data.reinf.state;
-
-                debug!("Checking reinforced on self: {:?}", reinf);
-
-                if let BuffState::None = reinf {
-                    self.reminder.trigger_reinforced();
-                }
-            }
-        }
     }
 
     /// Propagates settings from reminder & tracker to demo versions.

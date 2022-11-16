@@ -1,5 +1,5 @@
 use super::{ExtrasState, Plugin};
-use crate::data::{BuffKind, DIMINISHED, MALNOURISHED, REINFORCED};
+use crate::data::{BuffKind, REINFORCED};
 use arc_util::{
     api::calc_delta,
     tracking::{Entry, Player},
@@ -9,9 +9,6 @@ use arcdps::{
     Agent, BuffRemove, CombatEvent, StateChange,
 };
 use log::{debug, info, log_enabled, Level};
-
-/// Minimum time (ms) since the last [`StateChange::BuffInitial`] event for the buff check to trigger.
-const CHECK_TIME_DIFF: u64 = 100;
 
 impl Plugin {
     /// Handles a combat event from area stats.
@@ -31,7 +28,6 @@ impl Plugin {
                 match event.is_statechange {
                     StateChange::LogStart => {
                         let target_id = event.src_agent;
-
                         if log_enabled!(Level::Debug) {
                             let delta = calc_delta(&event);
                             debug!("Log for id {} started with {:?} delta", target_id, delta);
@@ -42,39 +38,23 @@ impl Plugin {
                             entry.data.buffs_to_none(event.time);
                         }
 
-                        // start encounter, set check as pending
-                        self.tracker.encounter = Some(target_id);
-                        if self.reminder.settings.encounter_start {
-                            self.pending_check = Some(event.time);
-                        }
+                        self.reminder.start_encounter(target_id, event.time);
                     }
 
                     StateChange::LogNPCUpdate => {
                         let target_id = event.src_agent;
-
                         debug!(
-                            "Log changed from id {:?} to id {}",
-                            self.tracker.encounter, target_id
+                            "Log changed from {:?} to id {}",
+                            self.reminder.current_encounter(),
+                            target_id
                         );
-
-                        // update encounter, set check as pending
-                        self.tracker.encounter = Some(target_id);
-                        if self.reminder.settings.encounter_start {
-                            self.pending_check = Some(event.time);
-                        }
+                        self.reminder.change_encounter(target_id, event.time);
                     }
 
                     StateChange::LogEnd => {
                         let target_id = event.src_agent;
                         debug!("Log for id {} ended", target_id);
-
-                        // check self buffs
-                        if self.reminder.settings.encounter_end {
-                            self.check_self_all();
-                        }
-
-                        // end encounter
-                        self.tracker.encounter = None;
+                        self.reminder.end_encounter(&self.tracker.players);
                     }
 
                     statechange @ (StateChange::None
@@ -109,16 +89,10 @@ impl Plugin {
                     _ => {}
                 }
 
-                // handle pending check
-                if let Some(last_time) = self.pending_check {
-                    if event.is_statechange == StateChange::BuffInitial {
-                        // initial buffs are still being reported, refresh time
-                        self.pending_check = Some(event.time);
-                    } else if event.time >= last_time + CHECK_TIME_DIFF {
-                        // check self buffs
-                        self.pending_check = None;
-                        self.check_self_all();
-                    }
+                // buff initial events will happen at the start
+                if event.is_statechange != StateChange::BuffInitial {
+                    self.reminder
+                        .update_pending_check(&self.tracker.players, event.time);
                 }
             } else {
                 // check for player tracking change
@@ -178,12 +152,8 @@ impl Plugin {
                             info!("Unknown Food {} applied to {}", buff_id, player.character);
                         }
 
-                        // trigger reminder on malnourished
-                        if self.reminder.settings.always_mal_dim
-                            && player.is_self
-                            && buff_id == MALNOURISHED
-                        {
-                            self.reminder.trigger_food();
+                        if player.is_self {
+                            self.reminder.self_buff_apply(buff_id);
                         }
                     }
                 }
@@ -205,12 +175,8 @@ impl Plugin {
                             );
                         }
 
-                        // trigger reminder on diminished
-                        if self.reminder.settings.always_mal_dim
-                            && player.is_self
-                            && buff_id == DIMINISHED
-                        {
-                            self.reminder.trigger_util();
+                        if player.is_self {
+                            self.reminder.self_buff_apply(buff_id);
                         }
                     }
                 }
@@ -246,8 +212,8 @@ impl Plugin {
                         );
 
                         // check for reinforced running out
-                        if self.reminder.settings.during_encounter && player.is_self {
-                            self.check_self_reinforced();
+                        if player.is_self {
+                            self.reminder.self_reinf_remove(data);
                         }
                     }
                 }
@@ -267,8 +233,8 @@ impl Plugin {
                         }
 
                         // check for food running out
-                        if self.reminder.settings.during_encounter && player.is_self {
-                            self.check_self_food();
+                        if player.is_self {
+                            self.reminder.self_food_remove(data);
                         }
                     }
                 }
@@ -291,8 +257,8 @@ impl Plugin {
                         }
 
                         // check for utility running out
-                        if self.reminder.settings.during_encounter && player.is_self {
-                            self.check_self_util();
+                        if player.is_self {
+                            self.reminder.self_util_remove(data);
                         }
                     }
                 }

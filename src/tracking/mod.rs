@@ -19,9 +19,6 @@ pub struct Tracker {
     /// Currently tracked players.
     pub players: CachedTracker<Buffs>,
 
-    /// Current ongoing encounter.
-    pub encounter: Option<usize>,
-
     /// Current sorting.
     sorting: Sorting,
 
@@ -45,7 +42,6 @@ impl Tracker {
         Self {
             settings: TrackerSettings::new(),
             players: CachedTracker::for_self(),
-            encounter: None,
             sorting: Sorting::Sub,
             reverse: false,
             chars_reset: false,

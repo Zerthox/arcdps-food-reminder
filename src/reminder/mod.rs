@@ -83,7 +83,7 @@ struct Encounter {
     /// Id of the encounter target.
     pub target_id: usize,
 
-    /// Time the encounter started.
+    /// Time the encounter started (or target changed).
     pub start_time: u64,
 
     /// Whether there is a pending check for the encounter.

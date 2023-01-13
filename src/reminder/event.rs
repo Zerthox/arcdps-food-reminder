@@ -26,12 +26,10 @@ impl Reminder {
 
     /// Handles encounter target change.
     pub fn change_encounter(&mut self, target_id: usize, time: u64) {
-        // only change id, otherwise start as new encounter
-        // pending check will be handled later
-        if let Some(encounter) = &mut self.encounter {
-            encounter.target_id = target_id;
-        } else {
-            self.start_encounter(target_id, time);
+        // only change id if pending, otherwise start as new encounter
+        match &mut self.encounter {
+            Some(encounter) if encounter.pending_check => encounter.target_id = target_id,
+            _ => self.start_encounter(target_id, time),
         }
     }
 

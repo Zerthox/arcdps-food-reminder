@@ -86,7 +86,7 @@ impl Component<&Definitions> for Demo {
                     ui.table_next_column();
                     ui.set_next_item_width(render::ch_width(ui, 3));
                     if ui
-                        .input_int(format!("##sub-{}", id), &mut sub)
+                        .input_int(format!("##sub-{id}"), &mut sub)
                         .step(0)
                         .build()
                     {
@@ -99,13 +99,13 @@ impl Component<&Definitions> for Demo {
                     // character name
                     ui.table_next_column();
                     ui.set_next_item_width(INPUT_SIZE);
-                    ui.input_text(format!("##char-{}", id), &mut player.character)
+                    ui.input_text(format!("##char-{id}"), &mut player.character)
                         .build();
 
                     // account name
                     ui.table_next_column();
                     ui.set_next_item_width(INPUT_SIZE);
-                    ui.input_text(format!("##acc-{}", id), &mut player.account)
+                    ui.input_text(format!("##acc-{id}"), &mut player.account)
                         .build();
 
                     // profession select
@@ -115,7 +115,7 @@ impl Component<&Definitions> for Demo {
                         .position(|prof| *prof == player.profession)
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo(format!("##prof-{}", id), &mut index, PROFESSIONS, |prof| {
+                    if ui.combo(format!("##prof-{id}"), &mut index, PROFESSIONS, |prof| {
                         <&str>::from(prof).into()
                     }) {
                         player.profession = PROFESSIONS[index];
@@ -130,7 +130,7 @@ impl Component<&Definitions> for Demo {
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
                     if ui.combo(
-                        format!("##food-{}", id),
+                        format!("##food-{id}"),
                         &mut food_id,
                         &self.all_foods,
                         |buff| Self::food_name(defs, *buff),
@@ -147,7 +147,7 @@ impl Component<&Definitions> for Demo {
                         .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
                     if ui.combo(
-                        format!("##util-{}", id),
+                        format!("##util-{id}"),
                         &mut util_id,
                         &self.all_utils,
                         |buff| Self::util_name(defs, *buff),

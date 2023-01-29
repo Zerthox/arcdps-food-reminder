@@ -32,8 +32,7 @@ pub fn render_buff_context_menu(
             }
             if ui.small_button("Open Wiki") {
                 let _ = open::that(format!(
-                    "https://wiki-en.guildwars2.com/wiki/Special:Search/{}",
-                    name
+                    "https://wiki-en.guildwars2.com/wiki/Special:Search/{name}"
                 ));
             }
         }
@@ -53,7 +52,7 @@ pub fn render_food_context_menu(
 ) {
     render_buff_context_menu(
         ui,
-        format!("##food-context-{}", menu_id),
+        format!("##food-context-{menu_id}"),
         "Food Options",
         buff_id,
         name,
@@ -71,7 +70,7 @@ pub fn render_util_context_menu(
 ) {
     render_buff_context_menu(
         ui,
-        format!("##util-context-{}", menu_id),
+        format!("##util-context-{menu_id}"),
         "Utility Options",
         buff_id,
         name,

@@ -155,7 +155,7 @@ impl Builds {
                     .position(|prof| *prof == build.prof)
                     .unwrap();
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.combo(format!("##prof-{}", i), &mut index, PROFESSIONS, |prof| {
+                if ui.combo(format!("##prof-{i}"), &mut index, PROFESSIONS, |prof| {
                     <&str>::from(prof).into()
                 }) {
                     build.prof = PROFESSIONS[index];
@@ -164,13 +164,13 @@ impl Builds {
                 // name input
                 ui.table_next_column();
                 ui.set_next_item_width(INPUT_SIZE);
-                ui.input_text(format!("##name-{}", i), &mut build.name)
+                ui.input_text(format!("##name-{i}"), &mut build.name)
                     .build();
 
                 // notes input
                 ui.table_next_column();
                 ui.set_next_item_width(INPUT_SIZE);
-                ui.input_text(format!("##notes-{}", i), &mut build.notes)
+                ui.input_text(format!("##notes-{i}"), &mut build.notes)
                     .build();
 
                 // food select
@@ -178,7 +178,7 @@ impl Builds {
                 ui.set_next_item_width(INPUT_SIZE);
                 if let Some(changed) = buff_ui::render_buff_combo(
                     ui,
-                    format!("##food-{}", i),
+                    format!("##food-{i}"),
                     build.food,
                     defs.all_food(),
                 ) {
@@ -190,7 +190,7 @@ impl Builds {
                 ui.set_next_item_width(INPUT_SIZE);
                 if let Some(changed) = buff_ui::render_buff_combo(
                     ui,
-                    format!("##util-{}", i),
+                    format!("##util-{i}"),
                     build.util,
                     defs.all_util(),
                 ) {
@@ -204,7 +204,7 @@ impl Builds {
                 let is_first = i == 0;
                 let style =
                     ui.push_style_var(StyleVar::Alpha(if is_first { 0.3 } else { current_alpha }));
-                if ui.button(format!("^##{}", i)) && !is_first {
+                if ui.button(format!("^##{i}")) && !is_first {
                     action = Action::Up(i);
                 }
                 style.pop();
@@ -213,13 +213,13 @@ impl Builds {
                 let is_last = i == last;
                 let style =
                     ui.push_style_var(StyleVar::Alpha(if is_last { 0.3 } else { current_alpha }));
-                if ui.button(format!("v##{}", i)) && !is_last {
+                if ui.button(format!("v##{i}")) && !is_last {
                     action = Action::Down(i);
                 }
                 style.pop();
 
                 ui.same_line();
-                if ui.button(format!("X##{}", i)) {
+                if ui.button(format!("X##{i}")) {
                     action = Action::Remove(i);
                 }
             }

@@ -1,12 +1,37 @@
-[env]
-GW2_PATH = { value = "C:/Program Files/Guild Wars 2", condition = { env_not_set = ["GW2_PATH"] } }
-GW2_ADDON_MANAGER = { value = "true", condition = { files_exist = ["${GW2_PATH}/addons/arcdps/gw2addon_arcdps.dll"] } }
+env_scripts = [
+"""
+#!@duckscript
+if is_empty ${GW2_PATH}
+    GW2_PATH = set "C:/Program Files/Guild Wars 2"
 
-[env.ARCDPS_PATH]
-default_value = "${GW2_PATH}/bin64"
-source = "${GW2_ADDON_MANAGER}"
-mapping = { true = "${GW2_PATH}/addons/arcdps" }
-condition = { env_not_set = ["ARCDPS_PATH"] }
+    steam_path = set "C:/Program Files (x86)/Steam/steamapps/common/Guild Wars 2"
+    if get_env GW2_STEAM
+        GW2_PATH = set ${steam_path}
+    elseif is_empty ${GW2_STEAM}
+        if is_path_exists ${steam_path}
+            GW2_PATH = set ${steam_path}
+        end
+    end
+end
+
+addon_path = join_path ${GW2_PATH} addons/arcdps
+has_addon_manager = set false
+if not is_empty ${GW2_ADDON_MANAGER}
+    has_addon_manager = get_env GW2_ADDON_MANAGER
+else
+    arcdps_path = join_path ${addon_path} gw2addon_arcdps.dll
+    has_addon_manager = is_path_exists ${arcdps_path}
+end
+
+if ${has_addon_manager}
+    GW2_PATH = set ${addon_path}
+else
+    GW2_PATH = join_path ${GW2_PATH} bin64
+end
+
+set_env GW2_PATH ${GW2_PATH}
+"""
+]
 
 [tasks.build]
 script = "cargo build --release"
@@ -19,15 +44,15 @@ script = "cargo build --release --features demo"
 script = "cargo build"
 
 [tasks.copy]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${ARCDPS_PATH}\""
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}\""
 script_runner = "@shell"
 
 [tasks.copy-debug]
-script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${ARCDPS_PATH}\""
+script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/debug/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}\""
 script_runner = "@shell"
 
 [tasks.remove]
-script = "rm \"${ARCDPS_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
+script = "rm \"${GW2_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
 script_runner = "@shell"
 
 [tasks.install]

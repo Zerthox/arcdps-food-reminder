@@ -52,8 +52,8 @@ impl Component<&Definitions> for Demo {
             }
 
             ui.same_line_with_spacing(0.0, 5.0);
-            if ui.button("Trigger Reinf") {
-                self.reminder.trigger_reinforced();
+            if ui.button("Trigger Custom") {
+                self.reminder.trigger_custom();
             }
 
             ui.spacing();

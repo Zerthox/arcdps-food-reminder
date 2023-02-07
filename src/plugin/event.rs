@@ -1,5 +1,5 @@
 use super::{ExtrasState, Plugin};
-use crate::data::{BuffKind, REINFORCED};
+use crate::data::BuffKind;
 use arc_util::{
     api::calc_delta,
     tracking::{Entry, Player},
@@ -125,15 +125,15 @@ impl Plugin {
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             match self.defs.get_buff(buff_id, buff_name) {
-                BuffKind::Reinforced => {
+                BuffKind::Custom(remind) => {
                     debug!(
-                        "Reinf apply id {} time {} statechange {}",
-                        event_id, time, statechange
+                        "Custom {} apply id {} time {} statechange {}",
+                        remind.name, event_id, time, statechange
                     );
-                    if data.apply_reinf(time) {
+                    if data.apply_custom(buff_id, time) {
                         info!(
-                            "Reinforced ({}) applied to {}",
-                            REINFORCED, player.character
+                            "{} ({}) applied to {}",
+                            remind.name, buff_id, player.character
                         );
                     }
                 }
@@ -200,20 +200,20 @@ impl Plugin {
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             match self.defs.get_buff(buff_id, buff_name) {
-                BuffKind::Reinforced => {
+                BuffKind::Custom(remind) => {
                     debug!(
-                        "Reinf remove id {} time {} statechange {}",
-                        event_id, time, statechange
+                        "Custom {} remove id {} time {} statechange {}",
+                        remind.name, event_id, time, statechange
                     );
-                    if data.remove_reinf(time) {
+                    if data.remove_custom(buff_id, time) {
                         info!(
-                            "Reinforced ({}) removed from {}",
-                            REINFORCED, player.character
+                            "{} ({}) removed from {}",
+                            remind.name, buff_id, player.character
                         );
 
-                        // check for reinforced running out
+                        // check for custom buff running out
                         if player.is_self {
-                            self.reminder.self_reinf_remove(data);
+                            self.reminder.self_custom_remove(data);
                         }
                     }
                 }

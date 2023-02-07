@@ -102,8 +102,8 @@ impl Plugin {
         ui.checkbox("Remind for Food buff", &mut self.reminder.settings.food);
         ui.checkbox("Remind for Utility buff", &mut self.reminder.settings.util);
         ui.checkbox(
-            "Remind for Reinforced Armor buff",
-            &mut self.reminder.settings.reinforced,
+            "Remind for Custom Reminder buffs",
+            &mut self.reminder.settings.custom,
         );
 
         ui.checkbox(

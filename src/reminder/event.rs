@@ -77,10 +77,10 @@ impl Reminder {
         }
     }
 
-    /// Handles a reinforced remove from self.
-    pub fn self_reinf_remove(&mut self, buffs: &Buffs) {
+    /// Handles a custom tracked buff remove from self.
+    pub fn self_custom_remove(&mut self, buffs: &Buffs) {
         if self.settings.during_encounter {
-            self.check_reinforced(buffs);
+            self.check_custom(buffs);
         }
     }
 
@@ -98,7 +98,7 @@ impl Reminder {
         if let Some(player) = players.get_self() {
             self.check_food(&player.data);
             self.check_util(&player.data);
-            self.check_reinforced(&player.data);
+            self.check_custom(&player.data);
         }
     }
 
@@ -124,13 +124,15 @@ impl Reminder {
         }
     }
 
-    /// Checks for missing reinforced buff.
-    fn check_reinforced(&mut self, buffs: &Buffs) {
+    /// Checks for missing custom tracked buffs.
+    fn check_custom(&mut self, buffs: &Buffs) {
         if self.can_remind() {
-            let Buffs { reinf, .. } = buffs;
-            debug!("Checking reinforced on self: {:?}", reinf.state);
-            if let BuffState::None = reinf.state {
-                self.trigger_reinforced();
+            for (id, buff) in &buffs.custom {
+                debug!("Checking custom buff {} on self: {:?}", id, buff.state);
+                if let BuffState::None = buff.state {
+                    // TODO: reminder per custom buff
+                    self.trigger_custom();
+                }
             }
         }
     }

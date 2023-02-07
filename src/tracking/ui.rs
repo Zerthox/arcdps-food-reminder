@@ -191,12 +191,21 @@ impl Tracker {
             }
         }
 
-        // render reinforced cell
+        // render buffs cell
         ui.table_next_column();
-        match data.reinf.state {
-            BuffState::Unknown => ui.text("???"),
-            BuffState::None => ui.text_colored(red, "No"),
-            BuffState::Some(_) => ui.text_colored(green, "Yes"),
+        for remind in defs.all_custom_reminder() {
+            let name = &remind.name[..1];
+            let state = data
+                .custom
+                .get(&remind.id)
+                .map(|buff| buff.state)
+                .unwrap_or_default();
+            match state {
+                BuffState::Unknown => ui.text(name),
+                BuffState::None => ui.text_colored(red, name),
+                BuffState::Some(_) => ui.text_colored(green, name),
+            }
+            ui.same_line_with_spacing(0.0, 0.0);
         }
     }
 
@@ -233,10 +242,10 @@ impl Tracker {
                 init_width_or_weight: 0.0,
             };
 
-            let col_reinf = TableColumnSetup {
-                name: "Reinf",
+            let col_buffs = TableColumnSetup {
+                name: "Buffs",
                 user_id: 4.into(),
-                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
+                flags: TableColumnFlags::NO_SORT_ASCENDING | TableColumnFlags::NO_SORT_DESCENDING,
                 init_width_or_weight: 0.0,
             };
 
@@ -244,16 +253,17 @@ impl Tracker {
             let table_flags =
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE;
 
+            // TODO: begin manually with slice for dynamic column count
             if let Some(_table) = if self.settings.show_sub {
                 ui.begin_table_header_with_flags(
                     TABLE_ID,
-                    [col_sub, col_player, col_food, col_util, col_reinf],
+                    [col_sub, col_player, col_food, col_util, col_buffs],
                     table_flags,
                 )
             } else {
                 ui.begin_table_header_with_flags(
                     TABLE_ID,
-                    [col_player, col_food, col_util, col_reinf],
+                    [col_player, col_food, col_util, col_buffs],
                     table_flags,
                 )
             } {
@@ -270,7 +280,6 @@ impl Tracker {
                                 1 => self.sorting = Sorting::Name,
                                 2 => self.sorting = Sorting::Food,
                                 3 => self.sorting = Sorting::Util,
-                                4 => self.sorting = Sorting::Reinf,
                                 _ => {}
                             }
 
@@ -312,7 +321,7 @@ impl Tracker {
                 TableColumnSetup::new("Player"),
                 TableColumnSetup::new("Food"),
                 TableColumnSetup::new("Util"),
-                TableColumnSetup::new("Reinf"),
+                TableColumnSetup::new("Buffs"),
             ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
         ) {

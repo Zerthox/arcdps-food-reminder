@@ -50,7 +50,11 @@ impl HasSettings for Demo {
             let Entry { data, .. } = self.tracker.players.player_mut(id).unwrap();
             data.food = TrackedBuff::new(loaded.food);
             data.util = TrackedBuff::new(loaded.util);
-            data.reinf = TrackedBuff::new(loaded.reinforced);
+            data.custom = loaded
+                .buffs
+                .into_iter()
+                .map(|(id, state)| (id, TrackedBuff::new(state)))
+                .collect();
         }
         self.tracker.set_visibility(loaded.tracker);
     }

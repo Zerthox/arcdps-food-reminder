@@ -12,8 +12,8 @@ pub struct ReminderSettings {
     /// Whether to remind for utility.
     pub util: bool,
 
-    /// Whether to remind for reinforced.
-    pub reinforced: bool,
+    /// Whether to remind for custom reminders.
+    pub custom: bool,
 
     /// Duration of the reminder display.
     pub duration: Duration,
@@ -43,7 +43,7 @@ impl ReminderSettings {
         Self {
             food: true,
             util: true,
-            reinforced: true,
+            custom: true,
             duration: Reminder::DEFAULT_DURATION,
             position: 0.2,
             only_bosses: true,

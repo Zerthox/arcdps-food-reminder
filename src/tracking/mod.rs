@@ -58,8 +58,8 @@ impl Tracker {
         if log_enabled!(Level::Debug) && cached {
             let Entry { player, data } = self.players.player(id).unwrap();
             debug!(
-                "Cached for {}: Food {:?}, Util {:?}, Reinf {:?}",
-                player.character, data.food.state, data.util.state, data.reinf.state
+                "Cached for {}: Food {:?}, Util {:?}, Custom {:?}",
+                player.character, data.food.state, data.util.state, data.custom
             );
         }
 
@@ -96,11 +96,6 @@ impl Tracker {
             (Sorting::Util, true) => self
                 .players
                 .sort_by_key(|entry| Reverse(entry.data.util.state)),
-
-            (Sorting::Reinf, false) => self.players.sort_by_key(|entry| entry.data.reinf.state),
-            (Sorting::Reinf, true) => self
-                .players
-                .sort_by_key(|entry| Reverse(entry.data.reinf.state)),
         }
     }
 }
@@ -112,5 +107,4 @@ pub enum Sorting {
     Name,
     Food,
     Util,
-    Reinf,
 }

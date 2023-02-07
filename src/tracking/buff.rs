@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 // TODO: track buff duration & reset to unset when duration runs out?
 
@@ -11,26 +12,29 @@ pub struct Buffs {
     /// Current utility buff applied to the player.
     pub util: TrackedBuff<u32>,
 
-    /// Whether the Reinforced Armor buff is applied to the player.
-    pub reinf: TrackedBuff<()>,
+    /// Custom tracked buffs.
+    pub custom: BTreeMap<u32, TrackedBuff<()>>,
 }
 
 impl Buffs {
     /// Creates new buff information with initial states.
-    pub const fn new() -> Self {
-        Self::with_states(BuffState::Unknown, BuffState::Unknown, BuffState::Unknown)
+    pub fn new() -> Self {
+        Self::with_states(BuffState::Unknown, BuffState::Unknown, BTreeMap::new())
     }
 
     /// Creates new buff information with given buff states.
-    pub const fn with_states(
+    pub fn with_states(
         food: BuffState<u32>,
         util: BuffState<u32>,
-        reinf: BuffState<()>,
+        custom: BTreeMap<u32, BuffState<()>>,
     ) -> Self {
         Self::with_buffs(
             TrackedBuff::new(food),
             TrackedBuff::new(util),
-            TrackedBuff::new(reinf),
+            custom
+                .into_iter()
+                .map(|(id, state)| (id, TrackedBuff::new(state)))
+                .collect(),
         )
     }
 
@@ -38,23 +42,25 @@ impl Buffs {
     pub const fn with_buffs(
         food: TrackedBuff<u32>,
         util: TrackedBuff<u32>,
-        reinf: TrackedBuff<()>,
+        custom: BTreeMap<u32, TrackedBuff<()>>,
     ) -> Self {
-        Self { food, util, reinf }
+        Self { food, util, custom }
     }
 
     /// Resets all buffs.
     pub fn reset_buffs(&mut self) {
-        self.food = TrackedBuff::default();
-        self.util = TrackedBuff::default();
-        self.reinf = TrackedBuff::default();
+        self.food = Default::default();
+        self.util = Default::default();
+        self.custom = Default::default();
     }
 
     /// Sets all buffs to none.
     pub fn buffs_to_none(&mut self, time: u64) {
         self.food.update(BuffState::None, time, false);
         self.util.update(BuffState::None, time, false);
-        self.reinf.update(BuffState::None, time, false);
+        for buff in self.custom.values_mut() {
+            buff.update(BuffState::None, time, false);
+        }
     }
 
     /// Applies a food buff to the player.
@@ -109,18 +115,25 @@ impl Buffs {
         }
     }
 
-    /// Applies the Reinforced Armor buff to the player.
+    /// Applies a custom tracked buff to the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn apply_reinf(&mut self, time: u64) -> bool {
-        self.reinf.update(BuffState::Some(()), time, true)
+    pub fn apply_custom(&mut self, id: u32, time: u64) -> bool {
+        self.custom
+            .entry(id)
+            .or_default()
+            .update(BuffState::Some(()), time, true)
     }
 
-    /// Removes the Reinforced Armor buff from the player.
+    /// Removes a custom tracked buff from the player.
     ///
     /// Returns `false` if this update was ignored.
-    pub fn remove_reinf(&mut self, time: u64) -> bool {
-        self.reinf.update(BuffState::None, time, false)
+    pub fn remove_custom(&mut self, id: u32, time: u64) -> bool {
+        if let Some(buff) = self.custom.get_mut(&id) {
+            buff.update(BuffState::None, time, false)
+        } else {
+            false
+        }
     }
 }
 
@@ -174,11 +187,12 @@ where
 }
 
 /// Possible buff states.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum BuffState<T> {
     /// Buff state is not set (yet).
     ///
     /// This is the initial value.
+    #[default]
     Unknown,
 
     /// No buff is applied.
@@ -186,10 +200,4 @@ pub enum BuffState<T> {
 
     /// Some buff is applied.
     Some(T),
-}
-
-impl<T> Default for BuffState<T> {
-    fn default() -> Self {
-        Self::Unknown
-    }
 }

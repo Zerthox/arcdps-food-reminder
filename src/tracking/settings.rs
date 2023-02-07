@@ -8,7 +8,7 @@ use arc_util::{
     tracking::{Entry, Player},
 };
 use serde::{Deserialize, Serialize};
-use std::fmt::{self, Display};
+use std::{collections::BTreeMap, fmt};
 
 /// Settings for the tracker.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,7 +84,7 @@ pub struct SettingsEntry {
     pub util: BuffState<u32>,
 
     #[serde(default)]
-    pub reinforced: BuffState<()>,
+    pub buffs: BTreeMap<u32, BuffState<()>>,
 }
 
 impl SettingsEntry {
@@ -92,13 +92,13 @@ impl SettingsEntry {
         player: Player,
         food: BuffState<u32>,
         util: BuffState<u32>,
-        reinforced: BuffState<()>,
+        buffs: BTreeMap<u32, BuffState<()>>,
     ) -> Self {
         Self {
             player,
             food,
             util,
-            reinforced,
+            buffs,
         }
     }
 }
@@ -109,7 +109,12 @@ impl From<Entry<Buffs>> for SettingsEntry {
             entry.player,
             entry.data.food.state,
             entry.data.util.state,
-            entry.data.reinf.state,
+            entry
+                .data
+                .custom
+                .into_iter()
+                .map(|(id, buff)| (id, buff.state))
+                .collect(),
         )
     }
 }
@@ -118,7 +123,7 @@ impl From<SettingsEntry> for Entry<Buffs> {
     fn from(entry: SettingsEntry) -> Self {
         Self::new(
             entry.player,
-            Buffs::with_states(entry.food, entry.util, entry.reinforced),
+            Buffs::with_states(entry.food, entry.util, entry.buffs),
         )
     }
 }
@@ -165,7 +170,7 @@ pub enum Color {
     Prof,
 }
 
-impl Display for Color {
+impl fmt::Display for Color {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::None => write!(f, "None"),

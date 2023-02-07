@@ -50,10 +50,10 @@ impl Component<()> for Reminder {
         // check for triggers
         let food = Self::check_trigger(&mut self.food_trigger, self.settings.duration);
         let util = Self::check_trigger(&mut self.util_trigger, self.settings.duration);
-        let reinf = Self::check_trigger(&mut self.reinf_trigger, self.settings.duration);
+        let custom = Self::check_trigger(&mut self.custom_trigger, self.settings.duration);
 
         // check if any is triggered
-        if food || util || reinf {
+        if food || util || custom {
             // calculate window position
             let [screen_width, screen_height] = ui.io().display_size;
 
@@ -82,8 +82,8 @@ impl Component<()> for Reminder {
                     if util {
                         Self::render_text(ui, "Utility reminder!");
                     }
-                    if reinf {
-                        Self::render_text(ui, "Reinforced reminder!");
+                    if custom {
+                        Self::render_text(ui, "Custom reminder!");
                     }
                 });
         }

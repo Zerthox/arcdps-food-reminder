@@ -18,8 +18,8 @@ pub struct Reminder {
     /// Timestamp of utility reminder trigger.
     util_trigger: Option<Instant>,
 
-    /// Timestamp of reinforced reminder trigger.
-    reinf_trigger: Option<Instant>,
+    /// Timestamp of custom buff reminder trigger.
+    custom_trigger: Option<Instant>,
 
     /// Current ongoing encounter.
     encounter: Option<Encounter>,
@@ -35,7 +35,7 @@ impl Reminder {
             settings: ReminderSettings::new(),
             food_trigger: None,
             util_trigger: None,
-            reinf_trigger: None,
+            custom_trigger: None,
             encounter: None,
         }
     }
@@ -44,7 +44,7 @@ impl Reminder {
     pub fn trigger_all(&mut self) {
         self.trigger_food();
         self.trigger_util();
-        self.trigger_reinforced();
+        self.trigger_custom();
     }
 
     /// Triggers the food reminder.
@@ -63,11 +63,11 @@ impl Reminder {
         }
     }
 
-    /// Triggers the reinforced reminder.
-    pub fn trigger_reinforced(&mut self) {
-        if self.settings.reinforced {
-            info!("Reinforced reminder triggered");
-            self.reinf_trigger = Some(Instant::now());
+    /// Triggers the custom buff reminder.
+    pub fn trigger_custom(&mut self) {
+        if self.settings.custom {
+            info!("Custom reminder triggered");
+            self.custom_trigger = Some(Instant::now());
         }
     }
 }

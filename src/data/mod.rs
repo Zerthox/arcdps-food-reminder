@@ -15,6 +15,9 @@ fn default_definitions() -> DefData {
 /// Shared buff definitions data.
 #[derive(Debug)]
 pub struct Definitions {
+    /// Custom reminders.
+    reminders: Vec<CustomReminder>,
+
     /// Buff definitions data.
     ///
     /// Sorted alphabetically for UI usage.
@@ -24,7 +27,10 @@ pub struct Definitions {
 impl Definitions {
     /// Creates a new empty set of definitions.
     pub const fn empty() -> Self {
-        Self { data: Vec::new() }
+        Self {
+            reminders: Vec::new(),
+            data: Vec::new(),
+        }
     }
 
     /// Creates a new set of definitions with the default definitions.
@@ -46,31 +52,22 @@ impl Definitions {
         }
     }
 
-    /// Adds new buff definitions.
-    pub fn add_buffs(
-        &mut self,
-        food: impl IntoIterator<Item = BuffData>,
-        util: impl IntoIterator<Item = BuffData>,
-        ignored: impl IntoIterator<Item = u32>,
-    ) {
-        // insert
-        for entry in food.into_iter() {
+    /// Add definitions from a [`DefData`] collection.
+    pub fn add_data(&mut self, data: DefData) {
+        self.reminders = data.reminders;
+
+        for entry in data.food {
             self.update_or_insert(DefinitionEntry::new_food(entry));
         }
-        for entry in util.into_iter() {
+        for entry in data.utility {
             self.update_or_insert(DefinitionEntry::new_util(entry));
         }
-        for id in ignored.into_iter() {
+        for id in data.ignore {
             self.update_or_insert(DefinitionEntry::new(id, DefinitionKind::Ignore));
         }
 
-        // sort
+        // sort alphabetically
         self.data.sort_by(|a, b| a.def.name().cmp(b.def.name()));
-    }
-
-    /// Add definitions from a [`DefData`] collection.
-    pub fn add_data(&mut self, data: DefData) {
-        self.add_buffs(data.food, data.utility, data.ignore);
     }
 
     /// Attempts to load custom definitions from a given file.
@@ -90,8 +87,8 @@ impl Definitions {
 
     /// Returns the kind for the given buff id & name.
     pub fn get_buff(&self, id: u32, name: Option<&str>) -> BuffKind {
-        if id == REINFORCED {
-            BuffKind::Reinforced
+        if let Some(remind) = self.get_custom_reminder(id) {
+            BuffKind::Custom(remind)
         } else if let Some(def) = self.get_definition(id) {
             match def {
                 DefinitionKind::Food(data) => BuffKind::Food(Some(data)),
@@ -105,6 +102,16 @@ impl Definitions {
                 _ => BuffKind::Unknown,
             }
         }
+    }
+
+    /// Returns the custom reminder for the buff with the given id.
+    pub fn get_custom_reminder(&self, buff_id: u32) -> Option<&CustomReminder> {
+        self.reminders.iter().find(|entry| entry.id == buff_id)
+    }
+
+    /// Returns all custom reminders.
+    pub fn all_custom_reminder(&self) -> impl Iterator<Item = &CustomReminder> {
+        self.reminders.iter()
     }
 
     /// Returns the definition for the buff with the given id.
@@ -181,7 +188,7 @@ impl DefinitionKind {
 #[derive(Debug, Clone)]
 pub enum BuffKind<'a> {
     Unknown,
-    Reinforced,
+    Custom(&'a CustomReminder),
     Food(Option<&'a BuffData>),
     Util(Option<&'a BuffData>),
     Ignore,
@@ -201,11 +208,13 @@ mod tests {
     #[test]
     fn definitions() {
         let DefData {
+            reminders,
             food,
             utility,
             ignore,
         } = default_definitions();
 
+        assert!(!reminders.is_empty());
         assert!(!food.is_empty());
         assert!(!utility.is_empty());
         assert!(!ignore.is_empty());

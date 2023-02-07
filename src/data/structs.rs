@@ -10,10 +10,25 @@ pub struct DefData {
     pub ignore: Vec<u32>,
 }
 
+/// Custom buff to remind for.
+// TODO: stacks?
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomReminder {
+    /// Id of the buff.
     pub id: u32,
+
+    /// Name of the reminder (usually buff name).
     pub name: String,
+
+    /// [`GameMode`] this reminder is restricted to.
+    pub mode: Option<GameMode>,
+}
+
+/// Game mode.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub enum GameMode {
+    Raid,
+    Fractal,
 }
 
 /// Single buff data entry.

@@ -12,24 +12,24 @@ if is_empty ${GW2_PATH}
             GW2_PATH = set ${steam_path}
         end
     end
-end
 
-addon_path = join_path ${GW2_PATH} addons/arcdps
-has_addon_manager = set false
-if not is_empty ${GW2_ADDON_MANAGER}
-    has_addon_manager = get_env GW2_ADDON_MANAGER
-else
-    arcdps_path = join_path ${addon_path} gw2addon_arcdps.dll
-    has_addon_manager = is_path_exists ${arcdps_path}
-end
+    addon_path = join_path ${GW2_PATH} addons/arcdps
+    has_addon_manager = set false
+    if not is_empty ${GW2_ADDON_MANAGER}
+        has_addon_manager = get_env GW2_ADDON_MANAGER
+    else
+        arcdps_path = join_path ${addon_path} gw2addon_arcdps.dll
+        has_addon_manager = is_path_exists ${arcdps_path}
+    end
 
-if ${has_addon_manager}
-    GW2_PATH = set ${addon_path}
-else
-    GW2_PATH = join_path ${GW2_PATH} bin64
-end
+    if ${has_addon_manager}
+        GW2_PATH = set ${addon_path}
+    elseif not ends_with ${GW2_PATH} bin64
+        GW2_PATH = join_path ${GW2_PATH} bin64
+    end
 
-set_env GW2_PATH ${GW2_PATH}
+    set_env GW2_PATH ${GW2_PATH}
+end
 """
 ]
 

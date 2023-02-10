@@ -4,7 +4,12 @@ mod ui;
 
 use log::info;
 use settings::ReminderSettings;
-use std::time::{Duration, Instant};
+use std::{
+    collections::BTreeMap,
+    time::{Duration, Instant},
+};
+
+use crate::data::Definitions;
 
 /// Reminder UI component.
 #[derive(Debug)]
@@ -18,8 +23,8 @@ pub struct Reminder {
     /// Timestamp of utility reminder trigger.
     util_trigger: Option<Instant>,
 
-    /// Timestamp of custom buff reminder trigger.
-    custom_trigger: Option<Instant>,
+    /// Timestamps of custom buff reminder triggers.
+    custom_triggers: BTreeMap<u32, Instant>,
 
     /// Current ongoing encounter.
     encounter: Option<Encounter>,
@@ -35,16 +40,18 @@ impl Reminder {
             settings: ReminderSettings::new(),
             food_trigger: None,
             util_trigger: None,
-            custom_trigger: None,
+            custom_triggers: BTreeMap::new(),
             encounter: None,
         }
     }
 
     /// Triggers all reminders.
-    pub fn trigger_all(&mut self) {
+    pub fn trigger_all(&mut self, defs: &Definitions) {
         self.trigger_food();
         self.trigger_util();
-        self.trigger_custom();
+        for remind in defs.all_custom_reminder() {
+            self.trigger_custom(remind.id);
+        }
     }
 
     /// Triggers the food reminder.
@@ -64,10 +71,10 @@ impl Reminder {
     }
 
     /// Triggers the custom buff reminder.
-    pub fn trigger_custom(&mut self) {
+    pub fn trigger_custom(&mut self, id: u32) {
         if self.settings.custom {
             info!("Custom reminder triggered");
-            self.custom_trigger = Some(Instant::now());
+            self.custom_triggers.insert(id, Instant::now());
         }
     }
 }

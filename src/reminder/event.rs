@@ -130,8 +130,7 @@ impl Reminder {
             for (id, buff) in &buffs.custom {
                 debug!("Checking custom buff {} on self: {:?}", id, buff.state);
                 if let BuffState::None = buff.state {
-                    // TODO: reminder per custom buff
-                    self.trigger_custom();
+                    self.trigger_custom(*id);
                 }
             }
         }

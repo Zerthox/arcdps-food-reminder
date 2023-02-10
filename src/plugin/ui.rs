@@ -21,7 +21,7 @@ impl Plugin {
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // reminder, log & demo render always
-        self.reminder.render(ui, ());
+        self.reminder.render(ui, &self.defs);
 
         #[cfg(feature = "demo")]
         self.demo.render(ui, &self.defs);
@@ -171,7 +171,7 @@ impl Plugin {
 
         // test button
         if ui.button("Test reminder") {
-            self.reminder.trigger_all();
+            self.reminder.trigger_all(&self.defs);
         }
 
         ui.spacing();

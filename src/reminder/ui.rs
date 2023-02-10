@@ -1,3 +1,5 @@
+use crate::data::Definitions;
+
 use super::Reminder;
 use arc_util::ui::Component;
 use arcdps::{
@@ -14,16 +16,20 @@ const FONT_SIZE: f32 = 2.0;
 
 impl Reminder {
     /// Checks if a trigger is currently active and resets it if necessary.
-    fn check_trigger(trigger: &mut Option<Instant>, duration: Duration) -> bool {
-        let now = Instant::now();
+    fn update_trigger(trigger: &mut Option<Instant>, duration: Duration) -> bool {
         match trigger {
-            Some(time) if now.saturating_duration_since(*time) <= duration => true,
+            Some(time) if Self::is_triggered(*time, duration) => true,
             Some(_) => {
                 *trigger = None;
                 false
             }
             None => false,
         }
+    }
+
+    /// Checks if a trigger is currently active.
+    fn is_triggered(time: Instant, duration: Duration) -> bool {
+        Instant::now().saturating_duration_since(time) <= duration
     }
 
     /// Helper to render text.
@@ -45,15 +51,16 @@ impl Reminder {
     }
 }
 
-impl Component<()> for Reminder {
-    fn render(&mut self, ui: &Ui, _props: ()) {
-        // check for triggers
-        let food = Self::check_trigger(&mut self.food_trigger, self.settings.duration);
-        let util = Self::check_trigger(&mut self.util_trigger, self.settings.duration);
-        let custom = Self::check_trigger(&mut self.custom_trigger, self.settings.duration);
+impl Component<&Definitions> for Reminder {
+    fn render(&mut self, ui: &Ui, defs: &Definitions) {
+        // update triggers
+        let food = Self::update_trigger(&mut self.food_trigger, self.settings.duration);
+        let util = Self::update_trigger(&mut self.util_trigger, self.settings.duration);
+        self.custom_triggers
+            .retain(|_, time| Self::is_triggered(*time, self.settings.duration));
 
         // check if any is triggered
-        if food || util || custom {
+        if food || util || !self.custom_triggers.is_empty() {
             // calculate window position
             let [screen_width, screen_height] = ui.io().display_size;
 
@@ -82,8 +89,10 @@ impl Component<()> for Reminder {
                     if util {
                         Self::render_text(ui, "Utility reminder!");
                     }
-                    if custom {
-                        Self::render_text(ui, "Custom reminder!");
+                    for id in self.custom_triggers.keys() {
+                        if let Some(remind) = defs.get_custom_reminder(*id) {
+                            Self::render_text(ui, &format!("{} reminder!", remind.name));
+                        }
                     }
                 });
         }

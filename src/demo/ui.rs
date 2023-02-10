@@ -42,18 +42,20 @@ impl Component<&Definitions> for Demo {
             ui.text("Reminders:");
 
             ui.same_line_with_spacing(0.0, 10.0);
-            if ui.button("Trigger Food") {
+            if ui.button("Food") {
                 self.reminder.trigger_food();
             }
 
             ui.same_line_with_spacing(0.0, 5.0);
-            if ui.button("Trigger Util") {
+            if ui.button("Util") {
                 self.reminder.trigger_util();
             }
 
-            ui.same_line_with_spacing(0.0, 5.0);
-            if ui.button("Trigger Custom") {
-                self.reminder.trigger_custom();
+            for remind in defs.all_custom_reminder() {
+                ui.same_line_with_spacing(0.0, 5.0);
+                if ui.button(&remind.name) {
+                    self.reminder.trigger_custom(remind.id);
+                }
             }
 
             ui.spacing();
@@ -181,7 +183,7 @@ impl Component<&Definitions> for Demo {
         }
 
         // render children
-        self.reminder.render(ui, ());
+        self.reminder.render(ui, defs);
         self.tracker.render(ui, defs);
     }
 }

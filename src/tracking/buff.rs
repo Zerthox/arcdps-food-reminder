@@ -1,3 +1,4 @@
+use crate::data::Definitions;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
@@ -55,11 +56,14 @@ impl Buffs {
     }
 
     /// Sets all buffs to none.
-    pub fn buffs_to_none(&mut self, time: u64) {
+    pub fn buffs_to_none(&mut self, time: u64, defs: &Definitions) {
         self.food.update(BuffState::None, time, false);
         self.util.update(BuffState::None, time, false);
-        for buff in self.custom.values_mut() {
-            buff.update(BuffState::None, time, false);
+        for remind in defs.all_custom_reminder() {
+            self.custom
+                .entry(remind.id)
+                .or_default()
+                .update(BuffState::None, time, false);
         }
     }
 

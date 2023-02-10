@@ -1,3 +1,6 @@
+// TODO: use raid & fractal maps for reminder filtering
+#![allow(unused)]
+
 use arcdps::Profession;
 
 /// Malnourished buff id.

@@ -35,7 +35,7 @@ impl Plugin {
 
                         // change buffs to none, initial buffs should be reported right after
                         for entry in self.tracker.players.iter_mut() {
-                            entry.data.buffs_to_none(event.time);
+                            entry.data.buffs_to_none(event.time, &self.defs);
                         }
 
                         self.reminder.start_encounter(target_id, event.time);

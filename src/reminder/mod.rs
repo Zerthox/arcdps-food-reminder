@@ -2,14 +2,13 @@ mod event;
 pub mod settings;
 mod ui;
 
+use crate::data::Definitions;
 use log::info;
 use settings::ReminderSettings;
 use std::{
     collections::BTreeMap,
     time::{Duration, Instant},
 };
-
-use crate::data::Definitions;
 
 /// Reminder UI component.
 #[derive(Debug)]

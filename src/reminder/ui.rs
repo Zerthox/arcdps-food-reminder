@@ -1,6 +1,5 @@
-use crate::data::Definitions;
-
 use super::Reminder;
+use crate::data::Definitions;
 use arc_util::ui::Component;
 use arcdps::{
     exports::{self, CoreColor},

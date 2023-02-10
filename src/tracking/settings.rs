@@ -2,7 +2,7 @@ use super::{
     buff::{BuffState, Buffs},
     Tracker,
 };
-use crate::builds::Builds;
+use crate::{builds::Builds, data::REINFORCED};
 use arc_util::{
     settings::HasSettings,
     tracking::{Entry, Player},
@@ -85,6 +85,10 @@ pub struct SettingsEntry {
 
     #[serde(default)]
     pub buffs: BTreeMap<u32, BuffState<()>>,
+
+    /// Reinforced state for backwards compatibility.
+    #[serde(skip_serializing)]
+    pub reinforced: Option<BuffState<()>>,
 }
 
 impl SettingsEntry {
@@ -98,6 +102,7 @@ impl SettingsEntry {
             player,
             food,
             util,
+            reinforced: None,
             buffs,
         }
     }
@@ -120,7 +125,12 @@ impl From<Entry<Buffs>> for SettingsEntry {
 }
 
 impl From<SettingsEntry> for Entry<Buffs> {
-    fn from(entry: SettingsEntry) -> Self {
+    fn from(mut entry: SettingsEntry) -> Self {
+        // load old reinforced
+        if let Some(reinf) = entry.reinforced {
+            entry.buffs.insert(REINFORCED, reinf);
+        }
+
         Self::new(
             entry.player,
             Buffs::with_states(entry.food, entry.util, entry.buffs),
@@ -128,7 +138,6 @@ impl From<SettingsEntry> for Entry<Buffs> {
     }
 }
 
-// required to save window settings
 impl HasSettings for Tracker {
     type Settings = TrackerState;
 

@@ -8,20 +8,20 @@ repository = "https://github.com/zerthox/arcdps-food-reminder"
 [dependencies]
 arc_util = { git = "https://github.com/zerthox/arcdps-utils", features = ["serde", "settings"] }
 arcdps = { git = "https://github.com/zerthox/arcdps-bindings", features = ["extras", "log", "serde", "strum"] }
-jsonc-parser = { version = "0.21", features = ["serde"] }
-log = { version = "0.4", features = ["release_max_level_info"] }
-once_cell = "1.9"
-open = "3.0"
-semver = { version = "1.0", features = ["serde"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-windows = { version = "0.44", features = ["System"] }
+jsonc-parser = { version = "0.21.0", features = ["serde"] }
+log = { version = "0.4.17", features = ["release_max_level_info"] }
+once_cell = "1.17.0"
+open = "3.2.0"
+semver = { version = "1.0.16", features = ["serde"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.92"
+windows = { version = "0.44.0", features = ["System"] }
 
 [build-dependencies]
-jsonc-parser = { version = "0.21", features = ["serde"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-uneval = "0.2"
+jsonc-parser = { version = "0.21.0", features = ["serde"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.92"
+uneval = "0.2.4"
 
 [lib]
 crate-type = ["cdylib"]

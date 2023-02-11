@@ -87,6 +87,7 @@ version = "0.6.0"
 dependencies = [
  "arc_util",
  "arcdps",
+ "gw2_mumble",
  "jsonc-parser",
  "log",
  "once_cell",
@@ -208,6 +209,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "gw2_mumble"
+version = "0.1.0"
+source = "git+https://github.com/zerthox/gw2-mumble-rs#84d9b790c69a7d8eefbbbd35ae19b78f9d95d3fa"
+dependencies = [
+ "bitflags",
+ "thiserror",
+ "windows",
 ]
 
 [[package]]

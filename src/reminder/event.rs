@@ -1,6 +1,6 @@
 use super::{Encounter, Reminder};
 use crate::{
-    data::{DIMINISHED, MALNOURISHED},
+    data::{Definitions, DIMINISHED, MALNOURISHED},
     tracking::buff::{BuffState, Buffs},
 };
 use arc_util::tracking::CachedTracker;
@@ -34,20 +34,25 @@ impl Reminder {
     }
 
     /// Handles encounter end.
-    pub fn end_encounter(&mut self, players: &CachedTracker<Buffs>) {
+    pub fn end_encounter(&mut self, players: &CachedTracker<Buffs>, defs: &Definitions) {
         if self.settings.encounter_end {
-            self.check_self_all(players);
+            self.check_self_all(players, defs);
         }
         self.encounter = None;
     }
 
     /// Updates pending buff check.
-    pub fn update_pending_check(&mut self, players: &CachedTracker<Buffs>, time: u64) {
+    pub fn update_pending_check(
+        &mut self,
+        players: &CachedTracker<Buffs>,
+        time: u64,
+        defs: &Definitions,
+    ) {
         // handle pending check
         if let Some(encounter) = &mut self.encounter {
             if encounter.pending_check && time >= encounter.start_time + CHECK_TIME_DIFF {
                 encounter.pending_check = false;
-                self.check_self_all(players);
+                self.check_self_all(players, defs);
             }
         }
     }
@@ -78,9 +83,9 @@ impl Reminder {
     }
 
     /// Handles a custom tracked buff remove from self.
-    pub fn self_custom_remove(&mut self, buffs: &Buffs) {
+    pub fn self_custom_remove(&mut self, buffs: &Buffs, defs: &Definitions) {
         if self.settings.during_encounter {
-            self.check_custom(buffs);
+            self.check_custom(buffs, defs);
         }
     }
 
@@ -94,11 +99,11 @@ impl Reminder {
     }
 
     /// Performs a check for all reminders.
-    fn check_self_all(&mut self, players: &CachedTracker<Buffs>) {
+    fn check_self_all(&mut self, players: &CachedTracker<Buffs>, defs: &Definitions) {
         if let Some(player) = players.get_self() {
             self.check_food(&player.data);
             self.check_util(&player.data);
-            self.check_custom(&player.data);
+            self.check_custom(&player.data, defs);
         }
     }
 
@@ -125,12 +130,12 @@ impl Reminder {
     }
 
     /// Checks for missing custom tracked buffs.
-    fn check_custom(&mut self, buffs: &Buffs) {
+    fn check_custom(&mut self, buffs: &Buffs, defs: &Definitions) {
         if self.can_remind() {
             for (id, buff) in &buffs.custom {
                 debug!("Checking custom buff {} on self: {:?}", id, buff.state);
-                if let BuffState::None = buff.state {
-                    self.trigger_custom(*id);
+                if let (BuffState::None, Some(remind)) = (buff.state, defs.custom_reminder(*id)) {
+                    self.trigger_custom(remind);
                 }
             }
         }

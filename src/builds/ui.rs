@@ -81,7 +81,7 @@ impl Builds {
 
                     // food
                     ui.table_next_column();
-                    if let Some(DefinitionKind::Food(food)) = defs.get_definition(build.food) {
+                    if let Some(DefinitionKind::Food(food)) = defs.definition(build.food) {
                         match current_food {
                             BuffState::Unknown => ui.text(&food.display),
                             BuffState::Some(id) if id == food.id => {
@@ -102,7 +102,7 @@ impl Builds {
 
                     // util
                     ui.table_next_column();
-                    if let Some(DefinitionKind::Util(util)) = defs.get_definition(build.util) {
+                    if let Some(DefinitionKind::Util(util)) = defs.definition(build.util) {
                         match current_util {
                             BuffState::Unknown => ui.text(&util.display),
                             BuffState::Some(id) if id == util.id => {

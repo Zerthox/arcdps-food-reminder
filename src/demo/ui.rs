@@ -54,7 +54,7 @@ impl Component<&Definitions> for Demo {
             for remind in defs.all_custom_reminder() {
                 ui.same_line_with_spacing(0.0, 5.0);
                 if ui.button(&remind.name) {
-                    self.reminder.trigger_custom(remind.id);
+                    self.reminder.trigger_custom(remind);
                 }
             }
 

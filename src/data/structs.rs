@@ -4,9 +4,16 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DefData {
+    /// Custom reminders for buffs.
     pub reminders: Vec<CustomReminder>,
+
+    /// Food buff definitions.
     pub food: Vec<BuffData>,
+
+    /// Utility buff definitions.
     pub utility: Vec<BuffData>,
+
+    /// Ignored buffs.
     pub ignore: Vec<u32>,
 }
 
@@ -21,12 +28,17 @@ pub struct CustomReminder {
     pub name: String,
 
     /// [`GameMode`] this reminder is restricted to.
-    pub mode: Option<GameMode>,
+    #[serde(default)]
+    pub mode: GameMode,
 }
 
 /// Game mode.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
+)]
 pub enum GameMode {
+    #[default]
+    All,
     Raid,
     Fractal,
 }
@@ -34,11 +46,16 @@ pub enum GameMode {
 /// Single buff data entry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BuffData {
+    /// Ingame buff id.
     pub id: u32,
+
+    /// Full name of the buff (or item applying it).
     pub name: String,
 
+    /// Buff stats.
     #[serde(default)]
     pub stats: Vec<String>,
 
+    /// Short display name in buff tracker table.
     pub display: String,
 }

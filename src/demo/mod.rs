@@ -43,7 +43,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(DefinitionKind::Food(food)) = defs.get_definition(buff) {
+                if let Some(DefinitionKind::Food(food)) = defs.definition(buff) {
                     food.name.clone().into()
                 } else {
                     "Unknown".into()
@@ -58,7 +58,7 @@ impl Demo {
             BuffState::Unknown => "Unset".into(),
             BuffState::None => "None".into(),
             BuffState::Some(buff) => {
-                if let Some(DefinitionKind::Util(util)) = defs.get_definition(buff) {
+                if let Some(DefinitionKind::Util(util)) = defs.definition(buff) {
                     util.name.clone().into()
                 } else {
                     "Unknown".into()

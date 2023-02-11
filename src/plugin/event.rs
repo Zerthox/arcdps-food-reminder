@@ -54,7 +54,8 @@ impl Plugin {
                     StateChange::LogEnd => {
                         let target_id = event.src_agent;
                         debug!("Log for id {} ended", target_id);
-                        self.reminder.end_encounter(&self.tracker.players);
+                        self.reminder
+                            .end_encounter(&self.tracker.players, &self.defs);
                     }
 
                     statechange @ (StateChange::None
@@ -91,8 +92,11 @@ impl Plugin {
 
                 // buff initial events will happen at the start
                 if event.is_statechange != StateChange::BuffInitial {
-                    self.reminder
-                        .update_pending_check(&self.tracker.players, event.time);
+                    self.reminder.update_pending_check(
+                        &self.tracker.players,
+                        event.time,
+                        &self.defs,
+                    );
                 }
             } else {
                 // check for player tracking change
@@ -124,7 +128,7 @@ impl Plugin {
         time: u64,
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
-            match self.defs.get_buff(buff_id, buff_name) {
+            match self.defs.buff_kind(buff_id, buff_name) {
                 BuffKind::Custom(remind) => {
                     debug!(
                         "Custom {} apply id {} time {} statechange {}",
@@ -199,7 +203,7 @@ impl Plugin {
         time: u64,
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
-            match self.defs.get_buff(buff_id, buff_name) {
+            match self.defs.buff_kind(buff_id, buff_name) {
                 BuffKind::Custom(remind) => {
                     debug!(
                         "Custom {} remove id {} time {} statechange {}",
@@ -213,7 +217,7 @@ impl Plugin {
 
                         // check for custom buff running out
                         if player.is_self {
-                            self.reminder.self_custom_remove(data);
+                            self.reminder.self_custom_remove(data, &self.defs);
                         }
                     }
                 }

@@ -85,11 +85,21 @@ impl Definitions {
         Ok(())
     }
 
+    /// Returns the custom reminder for the buff with the given id.
+    pub fn custom_reminder(&self, buff_id: u32) -> Option<&CustomReminder> {
+        self.reminders.iter().find(|entry| entry.id == buff_id)
+    }
+
+    /// Returns all custom reminders.
+    pub fn all_custom_reminder(&self) -> impl Iterator<Item = &CustomReminder> {
+        self.reminders.iter()
+    }
+
     /// Returns the kind for the given buff id & name.
-    pub fn get_buff(&self, id: u32, name: Option<&str>) -> BuffKind {
-        if let Some(remind) = self.get_custom_reminder(id) {
+    pub fn buff_kind(&self, id: u32, name: Option<&str>) -> BuffKind {
+        if let Some(remind) = self.custom_reminder(id) {
             BuffKind::Custom(remind)
-        } else if let Some(def) = self.get_definition(id) {
+        } else if let Some(def) = self.definition(id) {
             match def {
                 DefinitionKind::Food(data) => BuffKind::Food(Some(data)),
                 DefinitionKind::Util(data) => BuffKind::Util(Some(data)),
@@ -104,18 +114,8 @@ impl Definitions {
         }
     }
 
-    /// Returns the custom reminder for the buff with the given id.
-    pub fn get_custom_reminder(&self, buff_id: u32) -> Option<&CustomReminder> {
-        self.reminders.iter().find(|entry| entry.id == buff_id)
-    }
-
-    /// Returns all custom reminders.
-    pub fn all_custom_reminder(&self) -> impl Iterator<Item = &CustomReminder> {
-        self.reminders.iter()
-    }
-
     /// Returns the definition for the buff with the given id.
-    pub fn get_definition(&self, buff_id: u32) -> Option<&DefinitionKind> {
+    pub fn definition(&self, buff_id: u32) -> Option<&DefinitionKind> {
         self.data.iter().find_map(|entry| {
             if entry.id == buff_id {
                 Some(&entry.def)
@@ -199,6 +199,17 @@ pub enum LoadError {
     NotFound,
     FailedToRead,
     InvalidJSON,
+}
+
+impl GameMode {
+    /// Checks whether the [`GameMode`] includes the map id.
+    pub fn is_map(&self, map_id: u32) -> bool {
+        match self {
+            GameMode::All => true,
+            GameMode::Raid => RAID_MAPS.contains(&map_id),
+            GameMode::Fractal => FRACTAL_MAPS.contains(&map_id),
+        }
+    }
 }
 
 #[cfg(test)]

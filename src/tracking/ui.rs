@@ -191,21 +191,29 @@ impl Tracker {
             }
         }
 
-        // render buffs cell
+        // render custom buffs cell
         ui.table_next_column();
-        for remind in defs.all_custom_reminder() {
-            let name = &remind.name[..1];
-            let state = data
-                .custom
-                .get(&remind.id)
-                .map(|buff| buff.state)
-                .unwrap_or_default();
-            match state {
-                BuffState::Unknown => ui.text(name),
-                BuffState::None => ui.text_colored(red, name),
-                BuffState::Some(_) => ui.text_colored(green, name),
+        ui.group(|| {
+            for remind in defs.all_custom_reminder() {
+                let short = &remind.name[..1];
+                match data.custom_state(remind.id) {
+                    BuffState::Unknown => ui.text(short),
+                    BuffState::None => ui.text_colored(red, short),
+                    BuffState::Some(_) => ui.text_colored(green, short),
+                }
+                ui.same_line_with_spacing(0.0, 0.0);
             }
-            ui.same_line_with_spacing(0.0, 0.0);
+        });
+        if ui.is_item_hovered() {
+            ui.tooltip(|| {
+                for remind in defs.all_custom_reminder() {
+                    match data.custom_state(remind.id) {
+                        BuffState::Unknown => ui.text(&remind.name),
+                        BuffState::None => ui.text_colored(red, &remind.name),
+                        BuffState::Some(_) => ui.text_colored(green, &remind.name),
+                    }
+                }
+            });
         }
     }
 

@@ -139,6 +139,14 @@ impl Buffs {
             false
         }
     }
+
+    /// Returns the [`BuffState`] of the given custom buff id.
+    pub fn custom_state(&self, id: u32) -> BuffState<()> {
+        self.custom
+            .get(&id)
+            .map(|buff| buff.state)
+            .unwrap_or_default()
+    }
 }
 
 impl Default for Buffs {

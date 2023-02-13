@@ -95,6 +95,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "strum",
  "uneval",
  "windows",
 ]

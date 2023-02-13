@@ -1,10 +1,15 @@
 use crate::data::{FRACTAL_MAPS, RAID_MAPS};
 use serde::{Deserialize, Serialize};
+use strum::{AsRefStr, EnumIter};
 
 /// Custom buff to remind for.
 // TODO: stacks?
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CustomReminder {
+    /// Whether the reminder is active.
+    #[serde(default)]
+    pub active: bool,
+
     /// Id of the buff.
     pub id: u32,
 
@@ -20,10 +25,16 @@ impl CustomReminder {
     /// Creates a new custom reminder.
     pub fn new(id: u32, name: impl Into<String>, mode: GameMode) -> Self {
         Self {
+            active: true,
             id,
             name: name.into(),
             mode,
         }
+    }
+
+    /// Creates a new empty custom reminder.
+    pub fn empty() -> Self {
+        Self::new(0, "", GameMode::All)
     }
 
     /// Returns the default custom reminders.
@@ -40,7 +51,19 @@ impl CustomReminder {
 
 /// Game mode.
 #[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    AsRefStr,
+    EnumIter,
+    Serialize,
+    Deserialize,
 )]
 pub enum GameMode {
     #[default]

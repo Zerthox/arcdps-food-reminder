@@ -1,5 +1,6 @@
-use super::{build::Build, Action, Builds};
+use super::{build::Build, Builds};
 use crate::{
+    action::Action,
     buff_ui,
     data::{DefinitionKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
@@ -7,7 +8,7 @@ use crate::{
 use arc_util::ui::{render, Component, Ui};
 use arcdps::{
     exports::{self, CoreColor},
-    imgui::{StyleVar, TableColumnSetup, TableFlags},
+    imgui::{TableColumnSetup, TableFlags},
     Profession,
 };
 
@@ -134,9 +135,6 @@ impl Builds {
 
     /// Renders edit mode contents.
     fn render_edit(&mut self, ui: &Ui, defs: &Definitions) {
-        let mut action = Action::None;
-        let last = self.entries.len() - 1;
-
         // render builds table
         if let Some(_table) = ui.begin_table_header_with_flags(
             "##builds-table",
@@ -150,6 +148,9 @@ impl Builds {
             ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
         ) {
+            let mut action = Action::None;
+            let len = self.entries.len();
+
             for (i, build) in self.entries.iter_mut().enumerate() {
                 const INPUT_SIZE: f32 = 100.0;
 
@@ -206,44 +207,9 @@ impl Builds {
 
                 // buttons
                 ui.table_next_column();
-                let current_alpha = ui.clone_style().alpha;
-
-                let is_first = i == 0;
-                let style =
-                    ui.push_style_var(StyleVar::Alpha(if is_first { 0.3 } else { current_alpha }));
-                if ui.button(format!("^##{i}")) && !is_first {
-                    action = Action::Up(i);
-                }
-                style.pop();
-
-                ui.same_line();
-                let is_last = i == last;
-                let style =
-                    ui.push_style_var(StyleVar::Alpha(if is_last { 0.3 } else { current_alpha }));
-                if ui.button(format!("v##{i}")) && !is_last {
-                    action = Action::Down(i);
-                }
-                style.pop();
-
-                ui.same_line();
-                if ui.button(format!("X##{i}")) {
-                    action = Action::Remove(i);
-                }
+                action.render_buttons(ui, i, len);
             }
-        }
-
-        // perform action
-        match action {
-            Action::None => {}
-            Action::Up(i) => {
-                self.entries.swap(i - 1, i);
-            }
-            Action::Down(i) => {
-                self.entries.swap(i, i + 1);
-            }
-            Action::Remove(i) => {
-                self.entries.remove(i);
-            }
+            action.perform(&mut self.entries);
         }
 
         // add button

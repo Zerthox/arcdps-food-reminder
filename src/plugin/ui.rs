@@ -1,14 +1,14 @@
 use super::Plugin;
 use crate::{
+    action::Action,
+    combo_ui::render_enum_combo,
     data::{Definitions, LoadError},
     plugin::{ExtrasState, DEFINITIONS_FILE},
+    reminder::custom::CustomReminder,
 };
 use arc_util::{
     settings::{HasSettings, Settings},
-    ui::{
-        render::{self, input_float_with_format},
-        Component, Hideable,
-    },
+    ui::{render, Component, Hideable},
 };
 use arcdps::{
     exports::{self, CoreColor},
@@ -98,7 +98,6 @@ impl Plugin {
         // reminder settings
         ui.spacing();
         ui.spacing();
-
         ui.text_colored(grey, "Reminder");
 
         ui.checkbox("Remind for Food buff", &mut self.reminder.settings.food);
@@ -154,7 +153,7 @@ impl Plugin {
         // reminder position
         let mut pos = self.reminder.settings.position * 100.0;
         ui.set_next_item_width(input_width);
-        if input_float_with_format(
+        if render::input_float_with_format(
             "Position (%)",
             &mut pos,
             1.0,
@@ -171,6 +170,42 @@ impl Plugin {
         // test button
         if ui.button("Test reminder") {
             self.reminder.trigger_all();
+        }
+
+        ui.spacing();
+        ui.spacing();
+        ui.text_colored(grey, "Custom reminders");
+
+        let custom = &mut self.reminder.settings.custom;
+        let mut action = Action::None;
+        let len = custom.len();
+
+        for (i, remind) in custom.iter_mut().enumerate() {
+            ui.checkbox(format!("##custom-active-{i}"), &mut remind.active);
+
+            let mut id = remind.id.try_into().unwrap_or(0);
+            ui.same_line();
+            ui.set_next_item_width(render::ch_width(ui, 7));
+            if ui.input_int("##custom-id-{i}", &mut id).step(0).build() {
+                remind.id = id.max(0) as u32;
+            }
+
+            ui.same_line();
+            ui.set_next_item_width(input_width);
+            ui.input_text("##custom-name-{i}", &mut remind.name).build();
+
+            ui.same_line();
+            ui.set_next_item_width(70.0);
+            render_enum_combo(ui, format!("##custom-mode-{i}"), &mut remind.mode);
+
+            // action buttons
+            ui.same_line();
+            action.render_buttons(ui, i, len);
+        }
+        action.perform(custom);
+
+        if ui.button("Add##custom") {
+            custom.push(CustomReminder::empty());
         }
 
         ui.spacing();

@@ -1,6 +1,7 @@
 use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
 use crate::{
     buff_ui,
+    combo_ui::render_enum_combo,
     data::{DefinitionKind, Definitions, DIMINISHED, MALNOURISHED},
     reminder::custom::CustomReminder,
 };
@@ -433,32 +434,13 @@ impl Windowable<Props<'_>> for Tracker {
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
             ui.checkbox("Show build notes", &mut self.builds.display_notes);
 
-            const COLORS: &[Color] = &[Color::None, Color::Sub, Color::Prof];
             let input_width = render::ch_width(ui, 16);
 
-            let mut sub_index = COLORS
-                .iter()
-                .position(|entry| *entry == self.settings.color_sub)
-                .unwrap();
+            ui.set_next_item_width(input_width);
+            render_enum_combo(ui, "Subgroup color", &mut self.settings.color_sub);
 
             ui.set_next_item_width(input_width);
-            if ui.combo("Subgroup color", &mut sub_index, COLORS, |entry| {
-                entry.to_string().into()
-            }) {
-                self.settings.color_sub = COLORS[sub_index];
-            }
-
-            let mut name_index = COLORS
-                .iter()
-                .position(|entry| *entry == self.settings.color_name)
-                .unwrap();
-
-            ui.set_next_item_width(input_width);
-            if ui.combo("Name color", &mut name_index, COLORS, |entry| {
-                entry.to_string().into()
-            }) {
-                self.settings.color_name = COLORS[name_index];
-            }
+            render_enum_combo(ui, "Name color", &mut self.settings.color_name);
         });
     }
 }

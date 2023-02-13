@@ -55,14 +55,6 @@ impl Default for Builds {
     }
 }
 
-#[derive(Debug, Clone)]
-enum Action {
-    None,
-    Remove(usize),
-    Up(usize),
-    Down(usize),
-}
-
 impl HasSettings for Builds {
     type Settings = Builds;
 

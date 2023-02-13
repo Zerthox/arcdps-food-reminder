@@ -8,7 +8,8 @@ use arc_util::{
     tracking::{Entry, Player},
 };
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fmt};
+use std::collections::BTreeMap;
+use strum::EnumIter;
 
 /// Settings for the tracker.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -172,19 +173,21 @@ impl HasSettings for Tracker {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, EnumIter, Serialize, Deserialize,
+)]
 pub enum Color {
     None,
     Sub,
     Prof,
 }
 
-impl fmt::Display for Color {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl AsRef<str> for Color {
+    fn as_ref(&self) -> &str {
         match self {
-            Self::None => write!(f, "None"),
-            Self::Sub => write!(f, "Subgroup"),
-            Self::Prof => write!(f, "Profession"),
+            Self::None => "None",
+            Self::Sub => "Subgroup",
+            Self::Prof => "Profession",
         }
     }
 }

@@ -101,8 +101,7 @@ impl Reminder {
 
     /// Triggers the custom buff reminder.
     pub fn trigger_custom(&mut self, id: u32) {
-        // TODO: setting for each custom reminder
-        if let Some(remind) = self.custom(id) {
+        if let Some(remind @ CustomReminder { active: true, .. }) = self.custom(id) {
             let applies = if let Some(mumble) = &self.mumble {
                 let link = mumble.read();
                 remind.mode.is_map(link.context.map_id)

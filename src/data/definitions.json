@@ -1,29 +1,4 @@
 {
-  // custom buff reminders
-  "reminders": [
-    {
-      "id": 9283,
-      "name": "Reinforced"
-    },
-
-    // fractal potions
-    {
-      "id": 32473,
-      "name": "Offensive",
-      "mode": "Fractal"
-    },
-    {
-      "id": 32134,
-      "name": "Defensive",
-      "mode": "Fractal"
-    },
-    {
-      "id": 33024,
-      "name": "Mobility",
-      "mode": "Fractal"
-    }
-  ],
-
   // food buff definitions
   "food": [
     {

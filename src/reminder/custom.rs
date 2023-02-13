@@ -16,6 +16,28 @@ pub struct CustomReminder {
     pub mode: GameMode,
 }
 
+impl CustomReminder {
+    /// Creates a new custom reminder.
+    pub fn new(id: u32, name: impl Into<String>, mode: GameMode) -> Self {
+        Self {
+            id,
+            name: name.into(),
+            mode,
+        }
+    }
+
+    /// Returns the default custom reminders.
+    pub fn defaults() -> Vec<Self> {
+        vec![
+            Self::new(9283, "Reinforced", GameMode::All),
+            // fractal potions
+            Self::new(32473, "Offensive", GameMode::Fractal),
+            Self::new(32134, "Defensive", GameMode::Fractal),
+            Self::new(33024, "Mobility", GameMode::Fractal),
+        ]
+    }
+}
+
 /// Game mode.
 #[derive(
     Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,

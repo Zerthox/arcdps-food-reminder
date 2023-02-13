@@ -39,11 +39,11 @@ pub struct ReminderSettings {
 
 impl ReminderSettings {
     /// Creates new reminder settings with the defaults.
-    pub const fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             food: true,
             util: true,
-            custom: Vec::new(),
+            custom: CustomReminder::defaults(),
             duration: Reminder::DEFAULT_DURATION,
             position: 0.2,
             only_bosses: true,

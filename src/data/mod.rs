@@ -4,8 +4,8 @@ mod structs;
 use crate::util::parse_jsonc;
 use std::{fs, io, path::Path};
 
-pub use constants::*;
-pub use structs::*;
+pub use self::constants::*;
+pub use self::structs::*;
 
 /// Returns the default definitions.
 fn default_definitions() -> DefData {
@@ -15,9 +15,6 @@ fn default_definitions() -> DefData {
 /// Shared buff definitions data.
 #[derive(Debug)]
 pub struct Definitions {
-    /// Custom reminders.
-    reminders: Vec<CustomReminder>,
-
     /// Buff definitions data.
     ///
     /// Sorted alphabetically for UI usage.
@@ -27,10 +24,7 @@ pub struct Definitions {
 impl Definitions {
     /// Creates a new empty set of definitions.
     pub const fn empty() -> Self {
-        Self {
-            reminders: Vec::new(),
-            data: Vec::new(),
-        }
+        Self { data: Vec::new() }
     }
 
     /// Creates a new set of definitions with the default definitions.
@@ -54,8 +48,6 @@ impl Definitions {
 
     /// Add definitions from a [`DefData`] collection.
     pub fn add_data(&mut self, data: DefData) {
-        self.reminders = data.reminders;
-
         for entry in data.food {
             self.update_or_insert(DefinitionEntry::new_food(entry));
         }
@@ -85,21 +77,9 @@ impl Definitions {
         Ok(())
     }
 
-    /// Returns the custom reminder for the buff with the given id.
-    pub fn custom_reminder(&self, buff_id: u32) -> Option<&CustomReminder> {
-        self.reminders.iter().find(|entry| entry.id == buff_id)
-    }
-
-    /// Returns all custom reminders.
-    pub fn all_custom_reminder(&self) -> impl Iterator<Item = &CustomReminder> {
-        self.reminders.iter()
-    }
-
     /// Returns the kind for the given buff id & name.
     pub fn buff_kind(&self, id: u32, name: Option<&str>) -> BuffKind {
-        if let Some(remind) = self.custom_reminder(id) {
-            BuffKind::Custom(remind)
-        } else if let Some(def) = self.definition(id) {
+        if let Some(def) = self.definition(id) {
             match def {
                 DefinitionKind::Food(data) => BuffKind::Food(Some(data)),
                 DefinitionKind::Util(data) => BuffKind::Util(Some(data)),
@@ -188,7 +168,6 @@ impl DefinitionKind {
 #[derive(Debug, Clone)]
 pub enum BuffKind<'a> {
     Unknown,
-    Custom(&'a CustomReminder),
     Food(Option<&'a BuffData>),
     Util(Option<&'a BuffData>),
     Ignore,
@@ -201,17 +180,6 @@ pub enum LoadError {
     InvalidJSON,
 }
 
-impl GameMode {
-    /// Checks whether the [`GameMode`] includes the map id.
-    pub fn is_map(&self, map_id: u32) -> bool {
-        match self {
-            GameMode::All => true,
-            GameMode::Raid => RAID_MAPS.contains(&map_id),
-            GameMode::Fractal => FRACTAL_MAPS.contains(&map_id),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -219,13 +187,11 @@ mod tests {
     #[test]
     fn definitions() {
         let DefData {
-            reminders,
             food,
             utility,
             ignore,
         } = default_definitions();
 
-        assert!(!reminders.is_empty());
         assert!(!food.is_empty());
         assert!(!utility.is_empty());
         assert!(!ignore.is_empty());

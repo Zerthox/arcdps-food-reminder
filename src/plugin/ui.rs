@@ -21,15 +21,17 @@ impl Plugin {
     /// Callback for standalone UI creation.
     pub fn render_windows(&mut self, ui: &Ui, not_loading: bool) {
         // reminder, log & demo render always
-        self.reminder.render(ui, &self.defs);
+        self.reminder.render(ui, ());
 
         #[cfg(feature = "demo")]
-        self.demo.render(ui, &self.defs);
+        self.demo
+            .render(ui, (&self.defs, self.reminder.all_custom()));
 
         // other ui renders conditionally
         let ui_settings = exports::ui_settings();
         if !ui_settings.hidden && (not_loading || ui_settings.draw_always) {
-            self.tracker.render(ui, &self.defs);
+            self.tracker
+                .render(ui, (&self.defs, self.reminder.all_custom()));
         }
     }
 
@@ -101,10 +103,7 @@ impl Plugin {
 
         ui.checkbox("Remind for Food buff", &mut self.reminder.settings.food);
         ui.checkbox("Remind for Utility buff", &mut self.reminder.settings.util);
-        ui.checkbox(
-            "Remind for custom reminder buffs",
-            &mut self.reminder.settings.custom,
-        );
+        // TODO: custom reminders
 
         ui.checkbox(
             "Remind on encounter start",
@@ -171,7 +170,7 @@ impl Plugin {
 
         // test button
         if ui.button("Test reminder") {
-            self.reminder.trigger_all(&self.defs);
+            self.reminder.trigger_all();
         }
 
         ui.spacing();

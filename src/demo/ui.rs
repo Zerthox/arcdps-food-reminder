@@ -1,7 +1,7 @@
 use super::Demo;
 use crate::{
-    data::{Definitions, PROFESSIONS},
-    tracking::buff::BuffState,
+    data::PROFESSIONS,
+    tracking::{buff::BuffState, ui::Props as TrackerProps},
 };
 use arc_util::{
     tracking::{Entry, Player},
@@ -12,11 +12,13 @@ use arcdps::{
     Profession, Specialization,
 };
 
+pub type Props<'p> = TrackerProps<'p>;
+
 const SPECIAL_BUFFS: [BuffState<u32>; 3] =
     [BuffState::Unknown, BuffState::None, BuffState::Some(0)];
 
-impl Component<&Definitions> for Demo {
-    fn render(&mut self, ui: &Ui, defs: &Definitions) {
+impl Component<Props<'_>> for Demo {
+    fn render(&mut self, ui: &Ui, (defs, custom): Props) {
         // initialize data
         if self.all_foods.is_empty() {
             self.all_foods = SPECIAL_BUFFS
@@ -51,10 +53,10 @@ impl Component<&Definitions> for Demo {
                 self.reminder.trigger_util();
             }
 
-            for remind in defs.all_custom_reminder() {
+            for remind in custom {
                 ui.same_line_with_spacing(0.0, 5.0);
                 if ui.button(&remind.name) {
-                    self.reminder.trigger_custom(remind);
+                    self.reminder.trigger_custom(remind.id);
                 }
             }
 
@@ -183,11 +185,11 @@ impl Component<&Definitions> for Demo {
         }
 
         // render children
-        self.reminder.render(ui, defs);
-        self.tracker.render(ui, defs);
+        self.reminder.render(ui, ());
+        self.tracker.render(ui, (defs, custom));
     }
 }
 
-impl Windowable<&Definitions> for Demo {
+impl Windowable<Props<'_>> for Demo {
     const CONTEXT_MENU: bool = true;
 }

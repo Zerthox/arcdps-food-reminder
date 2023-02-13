@@ -11,6 +11,13 @@ use arcdps::{
     Profession,
 };
 
+pub type Props<'p> = (
+    &'p Definitions,
+    Option<Profession>,
+    BuffState<u32>,
+    BuffState<u32>,
+);
+
 impl Builds {
     /// Renders viewing mode contents.
     fn render_view(
@@ -245,13 +252,6 @@ impl Builds {
         }
     }
 }
-
-type Props<'p> = (
-    &'p Definitions,
-    Option<Profession>,
-    BuffState<u32>,
-    BuffState<u32>,
-);
 
 impl<'p> Component<Props<'p>> for Builds {
     /// Renders the builds UI.

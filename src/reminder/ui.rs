@@ -1,5 +1,4 @@
 use super::Reminder;
-use crate::data::Definitions;
 use arc_util::ui::Component;
 use arcdps::{
     exports::{self, CoreColor},
@@ -50,8 +49,8 @@ impl Reminder {
     }
 }
 
-impl Component<&Definitions> for Reminder {
-    fn render(&mut self, ui: &Ui, defs: &Definitions) {
+impl Component<()> for Reminder {
+    fn render(&mut self, ui: &Ui, _: ()) {
         // update triggers
         let food = Self::update_trigger(&mut self.food_trigger, self.settings.duration);
         let util = Self::update_trigger(&mut self.util_trigger, self.settings.duration);
@@ -89,7 +88,7 @@ impl Component<&Definitions> for Reminder {
                         Self::render_text(ui, "Utility reminder!");
                     }
                     for id in self.custom_triggers.keys() {
-                        if let Some(remind) = defs.custom_reminder(*id) {
+                        if let Some(remind) = self.custom(*id) {
                             Self::render_text(ui, &format!("{} reminder!", remind.name));
                         }
                     }

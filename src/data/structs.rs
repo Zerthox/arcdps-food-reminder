@@ -4,9 +4,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DefData {
-    /// Custom reminders for buffs.
-    pub reminders: Vec<CustomReminder>,
-
     /// Food buff definitions.
     pub food: Vec<BuffData>,
 
@@ -15,32 +12,6 @@ pub struct DefData {
 
     /// Ignored buffs.
     pub ignore: Vec<u32>,
-}
-
-/// Custom buff to remind for.
-// TODO: stacks?
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CustomReminder {
-    /// Id of the buff.
-    pub id: u32,
-
-    /// Name of the reminder (usually buff name).
-    pub name: String,
-
-    /// [`GameMode`] this reminder is restricted to.
-    #[serde(default)]
-    pub mode: GameMode,
-}
-
-/// Game mode.
-#[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
-)]
-pub enum GameMode {
-    #[default]
-    All,
-    Raid,
-    Fractal,
 }
 
 /// Single buff data entry.

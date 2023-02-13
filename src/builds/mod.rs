@@ -1,10 +1,10 @@
-pub mod build;
+mod build;
 pub mod ui;
+
+pub use self::build::*;
 
 use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
-
-pub use build::Build;
 
 /// Component for user-defined builds.
 #[derive(Debug, Clone, Serialize, Deserialize)]

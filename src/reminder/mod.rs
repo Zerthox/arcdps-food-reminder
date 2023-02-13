@@ -1,11 +1,12 @@
-mod event;
+pub mod custom;
+pub mod event;
 pub mod settings;
-mod ui;
+pub mod ui;
 
-use crate::data::{CustomReminder, Definitions, GameMode};
+use self::custom::{CustomReminder, GameMode};
+use self::settings::ReminderSettings;
 use gw2_mumble::MumbleLink;
 use log::{error, info};
-use settings::ReminderSettings;
 use std::{
     collections::BTreeMap,
     time::{Duration, Instant},
@@ -55,12 +56,30 @@ impl Reminder {
         }
     }
 
+    /// Returns the custom reminder for the buff with the given id.
+    pub fn custom(&self, buff_id: u32) -> Option<&CustomReminder> {
+        self.settings
+            .custom
+            .iter()
+            .find(|entry| entry.id == buff_id)
+    }
+
+    /// Returns all custom reminders.
+    pub fn all_custom(&self) -> &[CustomReminder] {
+        &self.settings.custom
+    }
+
     /// Triggers all reminders.
-    pub fn trigger_all(&mut self, defs: &Definitions) {
+    pub fn trigger_all(&mut self) {
         self.trigger_food();
         self.trigger_util();
-        for remind in defs.all_custom_reminder() {
-            self.trigger_custom(remind);
+        let ids = self
+            .all_custom()
+            .iter()
+            .map(|remind| remind.id)
+            .collect::<Vec<_>>();
+        for id in ids {
+            self.trigger_custom(id);
         }
     }
 
@@ -81,9 +100,9 @@ impl Reminder {
     }
 
     /// Triggers the custom buff reminder.
-    pub fn trigger_custom(&mut self, remind: &CustomReminder) {
+    pub fn trigger_custom(&mut self, id: u32) {
         // TODO: setting for each custom reminder
-        if self.settings.custom {
+        if let Some(remind) = self.custom(id) {
             let applies = if let Some(mumble) = &self.mumble {
                 let link = mumble.read();
                 remind.mode.is_map(link.context.map_id)

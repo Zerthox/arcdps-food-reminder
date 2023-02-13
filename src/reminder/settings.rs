@@ -1,4 +1,4 @@
-use super::Reminder;
+use super::{custom::CustomReminder, Reminder};
 use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -12,8 +12,8 @@ pub struct ReminderSettings {
     /// Whether to remind for utility.
     pub util: bool,
 
-    /// Whether to remind for custom reminders.
-    pub custom: bool,
+    /// User-defined custom reminders for buffs.
+    pub custom: Vec<CustomReminder>,
 
     /// Duration of the reminder display.
     pub duration: Duration,
@@ -43,7 +43,7 @@ impl ReminderSettings {
         Self {
             food: true,
             util: true,
-            custom: true,
+            custom: Vec::new(),
             duration: Reminder::DEFAULT_DURATION,
             position: 0.2,
             only_bosses: true,

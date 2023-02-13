@@ -2,9 +2,10 @@ use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
 use crate::{
     buff_ui,
     data::{DefinitionKind, Definitions, DIMINISHED, MALNOURISHED},
+    reminder::custom::CustomReminder,
 };
 use arc_util::{
-    tracking::Entry,
+    tracking::Player,
     ui::{render, Component, Windowable},
 };
 use arcdps::{
@@ -13,6 +14,8 @@ use arcdps::{
         TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
     },
 };
+
+pub type Props<'p> = (&'p Definitions, &'p [CustomReminder]);
 
 impl Tracker {
     /// Renders reset buttons for squad & characters.
@@ -63,13 +66,16 @@ impl Tracker {
     fn render_table_entry(
         &self,
         ui: &Ui,
-        defs: &Definitions,
-        entry_id: usize,
-        entry: &Entry<Buffs>,
+        (defs, custom): Props,
         colors: &exports::Colors,
-        sub: bool,
+        entry: TableEntry,
     ) {
-        let Entry { player, data } = entry;
+        let TableEntry {
+            player,
+            buffs,
+            show_sub,
+            ..
+        } = entry;
         let sub_color = colors
             .sub_base(player.subgroup)
             .map(|color| render::with_alpha(color, 1.0));
@@ -90,7 +96,7 @@ impl Tracker {
         ui.table_next_row();
 
         // render subgroup cell
-        if sub {
+        if show_sub {
             ui.table_next_column();
             let sub = format!("{:>2}", player.subgroup);
             match (self.settings.color_sub, sub_color, prof_color) {
@@ -113,7 +119,7 @@ impl Tracker {
 
         // render food cell
         ui.table_next_column();
-        match data.food.state {
+        match buffs.food.state {
             BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
@@ -126,8 +132,8 @@ impl Tracker {
                     ui.tooltip_text("No Food");
                 }
             }
-            BuffState::Some(id) => {
-                if let Some(DefinitionKind::Food(food)) = defs.definition(id) {
+            BuffState::Some(buff_id) => {
+                if let Some(DefinitionKind::Food(food)) = defs.definition(buff_id) {
                     let color = match food.id {
                         MALNOURISHED => red,
                         _ => green,
@@ -136,7 +142,7 @@ impl Tracker {
                     buff_ui::render_buff_tooltip(ui, food);
                     buff_ui::render_food_context_menu(
                         ui,
-                        entry_id,
+                        entry.id,
                         food.id,
                         Some(&food.name),
                         colors,
@@ -146,14 +152,14 @@ impl Tracker {
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Food");
                     }
-                    buff_ui::render_food_context_menu(ui, entry_id, id, None, colors);
+                    buff_ui::render_food_context_menu(ui, entry.id, buff_id, None, colors);
                 }
             }
         }
 
         // render util cell
         ui.table_next_column();
-        match data.util.state {
+        match buffs.util.state {
             BuffState::Unknown => {
                 ui.text("???");
                 if ui.is_item_hovered() {
@@ -166,8 +172,8 @@ impl Tracker {
                     ui.tooltip_text("No Utility");
                 }
             }
-            BuffState::Some(id) => {
-                if let Some(DefinitionKind::Util(util)) = defs.definition(id) {
+            BuffState::Some(buff_id) => {
+                if let Some(DefinitionKind::Util(util)) = defs.definition(buff_id) {
                     let color = match util.id {
                         DIMINISHED => red,
                         _ => green,
@@ -176,7 +182,7 @@ impl Tracker {
                     buff_ui::render_buff_tooltip(ui, util);
                     buff_ui::render_util_context_menu(
                         ui,
-                        entry_id,
+                        entry.id,
                         util.id,
                         Some(&util.name),
                         colors,
@@ -186,7 +192,7 @@ impl Tracker {
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Utility");
                     }
-                    buff_ui::render_util_context_menu(ui, entry_id, id, None, colors);
+                    buff_ui::render_util_context_menu(ui, entry.id, buff_id, None, colors);
                 }
             }
         }
@@ -194,9 +200,9 @@ impl Tracker {
         // render custom buffs cell
         ui.table_next_column();
         ui.group(|| {
-            for remind in defs.all_custom_reminder() {
+            for remind in custom {
                 let short = &remind.name[..1];
-                match data.custom_state(remind.id) {
+                match buffs.custom_state(remind.id) {
                     BuffState::Unknown => ui.text(short),
                     BuffState::None => ui.text_colored(red, short),
                     BuffState::Some(_) => ui.text_colored(green, short),
@@ -206,8 +212,8 @@ impl Tracker {
         });
         if ui.is_item_hovered() {
             ui.tooltip(|| {
-                for remind in defs.all_custom_reminder() {
-                    match data.custom_state(remind.id) {
+                for remind in custom {
+                    match buffs.custom_state(remind.id) {
                         BuffState::Unknown => ui.text(&remind.name),
                         BuffState::None => ui.text_colored(red, &remind.name),
                         BuffState::Some(_) => ui.text_colored(green, &remind.name),
@@ -218,7 +224,7 @@ impl Tracker {
     }
 
     /// Renders the tracker tab for the squad.
-    fn render_squad_tab(&mut self, ui: &Ui, defs: &Definitions) {
+    fn render_squad_tab(&mut self, ui: &Ui, props: Props) {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
@@ -306,11 +312,14 @@ impl Tracker {
                 for entry in self.players.iter() {
                     self.render_table_entry(
                         ui,
-                        defs,
-                        entry.player.id,
-                        entry,
+                        props,
                         &colors,
-                        self.settings.show_sub,
+                        TableEntry {
+                            id: entry.player.id,
+                            player: &entry.player,
+                            buffs: &entry.data,
+                            show_sub: self.settings.show_sub,
+                        },
                     );
                 }
             }
@@ -318,7 +327,7 @@ impl Tracker {
     }
 
     /// Renders the tracker tab for own characters.
-    fn render_characters_tab(&mut self, ui: &Ui, defs: &Definitions) {
+    fn render_characters_tab(&mut self, ui: &Ui, props: Props) {
         let current = self.players.get_self();
 
         if current.is_none() && !self.players.cached() {
@@ -336,16 +345,36 @@ impl Tracker {
             // render table content
             let colors = exports::colors();
             if let Some(entry) = current {
-                self.render_table_entry(ui, defs, usize::MAX, entry, &colors, false);
+                self.render_table_entry(
+                    ui,
+                    props,
+                    &colors,
+                    TableEntry {
+                        id: usize::MAX,
+                        player: &entry.player,
+                        buffs: &entry.data,
+                        show_sub: false,
+                    },
+                );
             }
             for (i, entry) in self.players.cache_iter().enumerate() {
-                self.render_table_entry(ui, defs, i, entry, &colors, false);
+                self.render_table_entry(
+                    ui,
+                    props,
+                    &colors,
+                    TableEntry {
+                        id: i,
+                        player: &entry.player,
+                        buffs: &entry.data,
+                        show_sub: false,
+                    },
+                );
             }
         }
     }
 
     /// Renders the builds tab for user-defined builds.
-    fn render_builds_tab(&mut self, ui: &Ui, defs: &Definitions) {
+    fn render_builds_tab(&mut self, ui: &Ui, (defs, ..): Props) {
         let current = self.players.get_self();
         let prof = current.map(|entry| entry.player.profession);
         let food = current
@@ -359,28 +388,28 @@ impl Tracker {
     }
 }
 
-impl Component<&Definitions> for Tracker {
-    fn render(&mut self, ui: &Ui, defs: &Definitions) {
+impl Component<Props<'_>> for Tracker {
+    fn render(&mut self, ui: &Ui, props: Props) {
         TabBar::new("##tabs").build(ui, || {
             TabItem::new("Squad").build(ui, || {
-                self.render_squad_tab(ui, defs);
+                self.render_squad_tab(ui, props);
             });
 
             TabItem::new("Characters").build(ui, || {
-                self.render_characters_tab(ui, defs);
+                self.render_characters_tab(ui, props);
             });
 
             TabItem::new("Builds").build(ui, || {
-                self.render_builds_tab(ui, defs);
+                self.render_builds_tab(ui, props);
             })
         });
     }
 }
 
-impl Windowable<&Definitions> for Tracker {
+impl Windowable<Props<'_>> for Tracker {
     const CONTEXT_MENU: bool = true;
 
-    fn render_menu(&mut self, ui: &Ui, _defs: &&Definitions) {
+    fn render_menu(&mut self, ui: &Ui, _: &(&Definitions, &[CustomReminder])) {
         let colors = exports::colors();
         let grey = colors
             .core(CoreColor::MediumGrey)
@@ -432,4 +461,12 @@ impl Windowable<&Definitions> for Tracker {
             }
         });
     }
+}
+
+#[derive(Debug)]
+struct TableEntry<'a> {
+    id: usize,
+    player: &'a Player,
+    buffs: &'a Buffs,
+    show_sub: bool,
 }

@@ -2,11 +2,11 @@ pub mod buff;
 pub mod settings;
 pub mod ui;
 
+use self::buff::{BuffState, Buffs};
+use self::settings::TrackerSettings;
 use crate::builds::Builds;
 use arc_util::tracking::{CachedTracker, Entry, Player};
-use buff::{BuffState, Buffs};
 use log::{debug, log_enabled, Level};
-use settings::TrackerSettings;
 use std::cmp::Reverse;
 use windows::System::VirtualKey;
 

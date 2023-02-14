@@ -39,27 +39,11 @@ impl Tracker {
         }
 
         // reset characters
-        if !self.chars_reset {
-            if ui.button("Reset characters") {
-                self.chars_reset = true;
-            }
-            if ui.is_item_hovered() {
-                ui.tooltip_text("Clear the cache for own characters.");
-            }
-        } else {
-            ui.align_text_to_frame_padding();
-            ui.text("Reset characters?");
-
-            ui.same_line();
-            if ui.button("Confirm") {
-                self.players.clear_cache();
-                self.chars_reset = false;
-            }
-
-            ui.same_line_with_spacing(0.0, SPACING);
-            if ui.button("Cancel") {
-                self.chars_reset = false;
-            }
+        if render::reset_button(ui, "Reset characters", &mut self.chars_reset) {
+            self.players.clear_cache();
+        }
+        if !self.chars_reset && ui.is_item_hovered() {
+            ui.tooltip_text("Clear the cache for own characters.");
         }
     }
 

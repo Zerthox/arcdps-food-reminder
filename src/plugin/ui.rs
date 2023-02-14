@@ -102,7 +102,6 @@ impl Plugin {
 
         ui.checkbox("Remind for Food buff", &mut self.reminder.settings.food);
         ui.checkbox("Remind for Utility buff", &mut self.reminder.settings.util);
-        // TODO: custom reminders
 
         ui.checkbox(
             "Remind on encounter start",
@@ -207,6 +206,8 @@ impl Plugin {
         if ui.button("Add##custom") {
             custom.push(CustomReminder::empty());
         }
+        ui.same_line();
+        self.reminder.render_custom_reset(ui);
 
         ui.spacing();
         ui.spacing();
@@ -251,25 +252,9 @@ impl Plugin {
         ui.spacing();
 
         // reset button
-        if !self.reset_confirm {
-            if ui.button("Reset to default") {
-                self.reset_confirm = true;
-            }
-        } else {
-            ui.align_text_to_frame_padding();
-            ui.text("Reset to default?");
-
-            ui.same_line();
-            if ui.button("Confirm") {
-                self.tracker.reset_settings();
-                self.reminder.reset_settings();
-                self.reset_confirm = false;
-            }
-
-            ui.same_line_with_spacing(0.0, SPACING);
-            if ui.button("Cancel") {
-                self.reset_confirm = false;
-            }
+        if render::reset_button(ui, "Reset to default", &mut self.reset_confirm) {
+            self.tracker.reset_settings();
+            self.reminder.reset_settings();
         }
 
         #[cfg(feature = "demo")]

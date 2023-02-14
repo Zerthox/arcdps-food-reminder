@@ -30,7 +30,7 @@ impl Action {
         style.pop();
 
         ui.same_line();
-        if ui.button(format!("X##{index}")) {
+        if ui.button(format!("x##{index}")) {
             *self = Self::Remove(index);
         }
     }
@@ -38,10 +38,10 @@ impl Action {
     /// Performs the action on a [`Vec`].
     pub fn perform<T>(&self, vec: &mut Vec<T>) {
         match *self {
-            Action::None => {}
-            Action::Up(i) => vec.swap(i - 1, i),
-            Action::Down(i) => vec.swap(i, i + 1),
-            Action::Remove(i) => {
+            Self::None => {}
+            Self::Up(i) => vec.swap(i - 1, i),
+            Self::Down(i) => vec.swap(i, i + 1),
+            Self::Remove(i) => {
                 vec.remove(i);
             }
         }

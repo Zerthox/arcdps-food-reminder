@@ -32,6 +32,9 @@ pub struct Reminder {
 
     /// Current ongoing encounter.
     encounter: Option<Encounter>,
+
+    /// Reset confirm state for custom reminders.
+    custom_reset: bool,
 }
 
 impl Reminder {
@@ -53,6 +56,7 @@ impl Reminder {
             util_trigger: None,
             custom_triggers: BTreeMap::new(),
             encounter: None,
+            custom_reset: false,
         }
     }
 

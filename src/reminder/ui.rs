@@ -1,5 +1,5 @@
-use super::Reminder;
-use arc_util::ui::Component;
+use super::{custom::CustomReminder, Reminder};
+use arc_util::ui::{render, Component};
 use arcdps::{
     exports::{self, CoreColor},
     imgui::{self, Ui},
@@ -46,6 +46,13 @@ impl Reminder {
 
         // render text
         ui.text_colored(red, text);
+    }
+
+    /// Renders the custom reminder reset button.
+    pub fn render_custom_reset(&mut self, ui: &Ui) {
+        if render::reset_button(ui, "Reset custom", &mut self.custom_reset) {
+            self.settings.custom = CustomReminder::defaults();
+        }
     }
 }
 

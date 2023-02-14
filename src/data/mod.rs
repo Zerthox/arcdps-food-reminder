@@ -7,9 +7,25 @@ use std::{fs, io, path::Path};
 pub use self::constants::*;
 pub use self::structs::*;
 
-/// Returns the default definitions.
-fn default_definitions() -> DefData {
-    include!(concat!(env!("OUT_DIR"), "/definitions.rs"))
+impl DefData {
+    /// Returns the default definitions data.
+    pub fn with_defaults() -> Self {
+        include!(concat!(env!("OUT_DIR"), "/definitions.rs"))
+    }
+
+    /// Returns the total number of definition entries.
+    pub fn len(&self) -> usize {
+        self.food.len() + self.utility.len() + self.ignore.len()
+    }
+
+    /// Converts this into an iterator over all entries.
+    pub fn into_entries(self) -> impl Iterator<Item = DefinitionEntry> {
+        self.food
+            .into_iter()
+            .map(DefinitionEntry::new_food)
+            .chain(self.utility.into_iter().map(DefinitionEntry::new_util))
+            .chain(self.ignore.into_iter().map(DefinitionEntry::new_ignore))
+    }
 }
 
 /// Shared buff definitions data.
@@ -32,7 +48,7 @@ impl Definitions {
         let mut defs = Self::empty();
 
         // add default defs data
-        defs.add_data(default_definitions());
+        defs.add_data(DefData::with_defaults());
 
         defs
     }
@@ -48,14 +64,14 @@ impl Definitions {
 
     /// Add definitions from a [`DefData`] collection.
     pub fn add_data(&mut self, data: DefData) {
-        for entry in data.food {
-            self.update_or_insert(DefinitionEntry::new_food(entry));
+        // reserve for initial load
+        if self.data.is_empty() {
+            self.data.reserve(data.len());
         }
-        for entry in data.utility {
-            self.update_or_insert(DefinitionEntry::new_util(entry));
-        }
-        for id in data.ignore {
-            self.update_or_insert(DefinitionEntry::new(id, DefinitionKind::Ignore));
+
+        // convert & add entries
+        for entry in data.into_entries() {
+            self.update_or_insert(entry);
         }
 
         // sort alphabetically
@@ -144,6 +160,11 @@ impl DefinitionEntry {
     pub const fn new_util(data: BuffData) -> Self {
         Self::new(data.id, DefinitionKind::Util(data))
     }
+
+    /// Creates a new definitions entry for an ignored buff.
+    pub const fn new_ignore(id: u32) -> Self {
+        Self::new(id, DefinitionKind::Ignore)
+    }
 }
 
 /// Buff definition kind.
@@ -190,7 +211,7 @@ mod tests {
             food,
             utility,
             ignore,
-        } = default_definitions();
+        } = DefData::with_defaults();
 
         assert!(!food.is_empty());
         assert!(!utility.is_empty());

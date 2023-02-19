@@ -1,11 +1,10 @@
 use super::{build::Build, Builds};
 use crate::{
-    action::Action,
     buff_ui,
     data::{DefinitionKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
 };
-use arc_util::ui::{render, Component, Ui};
+use arc_util::ui::{action::Action, render, Component, Ui};
 use arcdps::{
     exports::{self, CoreColor},
     imgui::{TableColumnSetup, TableFlags},
@@ -207,7 +206,7 @@ impl Builds {
 
                 // buttons
                 ui.table_next_column();
-                action.render_buttons(ui, i, len);
+                action.render_buttons(ui, "actions", i, len);
             }
             action.perform(&mut self.entries);
         }

@@ -1,6 +1,5 @@
 use super::Plugin;
 use crate::{
-    action::Action,
     combo_ui::render_enum_combo,
     data::{Definitions, LoadError},
     plugin::{ExtrasState, DEFINITIONS_FILE},
@@ -8,7 +7,7 @@ use crate::{
 };
 use arc_util::{
     settings::{HasSettings, Settings},
-    ui::{render, Component, Hideable},
+    ui::{action::Action, render, Component, Hideable},
 };
 use arcdps::{
     exports::{self, CoreColor},
@@ -176,7 +175,7 @@ impl Plugin {
         ui.text_colored(grey, "Custom reminders");
 
         let custom = &mut self.reminder.settings.custom;
-        let mut action = Action::None;
+        let mut action = Action::new();
         let len = custom.len();
 
         for (i, remind) in custom.iter_mut().enumerate() {
@@ -199,7 +198,7 @@ impl Plugin {
 
             // action buttons
             ui.same_line();
-            action.render_buttons(ui, i, len);
+            action.render_buttons(ui, "custom-actions", i, len);
         }
         action.perform(custom);
 

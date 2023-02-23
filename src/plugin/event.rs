@@ -1,5 +1,5 @@
 use super::{ExtrasState, Plugin};
-use crate::data::BuffKind;
+use crate::{data::BuffKind, tracking::Sorting};
 use arc_util::{
     api::calc_delta,
     tracking::{Entry, Player},
@@ -41,6 +41,10 @@ impl Plugin {
                             );
                         }
 
+                        // refresh if food or util sorting
+                        self.tracker.refresh_sort_if(Sorting::Food);
+                        self.tracker.refresh_sort_if(Sorting::Util);
+
                         self.reminder.start_encounter(target_id, event.time);
                     }
 
@@ -63,8 +67,6 @@ impl Plugin {
                     statechange @ (StateChange::None
                     | StateChange::ApiDelayed
                     | StateChange::BuffInitial) => {
-                        // FIXME: tracking "nourishment" & "enhancement" buff names need adjustment for other client languages
-
                         if let BuffRemove::None = event.is_buff_remove {
                             if event.buff != 0 && event.buff_dmg == 0 {
                                 if let Some(dst) = dst {
@@ -158,6 +160,8 @@ impl Plugin {
                             if player.is_self {
                                 self.reminder.self_buff_apply(buff_id);
                             }
+
+                            self.tracker.refresh_sort_if(Sorting::Food);
                         }
                     }
                     BuffKind::Util(util) => {
@@ -181,6 +185,8 @@ impl Plugin {
                             if player.is_self {
                                 self.reminder.self_buff_apply(buff_id);
                             }
+
+                            self.tracker.refresh_sort_if(Sorting::Util);
                         }
                     }
                     BuffKind::Ignore => {
@@ -240,6 +246,8 @@ impl Plugin {
                             if player.is_self {
                                 self.reminder.self_food_remove(data);
                             }
+
+                            self.tracker.refresh_sort_if(Sorting::Food);
                         }
                     }
                     BuffKind::Util(util) => {
@@ -264,6 +272,8 @@ impl Plugin {
                             if player.is_self {
                                 self.reminder.self_util_remove(data);
                             }
+
+                            self.tracker.refresh_sort_if(Sorting::Util);
                         }
                     }
                     BuffKind::Ignore => {
@@ -309,5 +319,7 @@ impl Plugin {
                 }
             }
         }
+
+        self.tracker.refresh_sort_if(Sorting::Sub);
     }
 }

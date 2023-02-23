@@ -1,5 +1,4 @@
 use arcdps::imgui::{Selectable, Ui};
-use std::cmp::PartialEq;
 use strum::IntoEnumIterator;
 
 /// Renders a combo box for items from an iterator.

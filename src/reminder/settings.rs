@@ -3,6 +3,8 @@ use arc_util::settings::HasSettings;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
+// TODO: game mode setting for inbuilt food & util reminders
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ReminderSettings {

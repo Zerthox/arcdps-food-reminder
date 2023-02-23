@@ -102,6 +102,7 @@ impl Definitions {
                 DefinitionKind::Ignore => BuffKind::Ignore,
             }
         } else {
+            // FIXME: "nourishment" & "enhancement" buff names need adjustment for other client languages
             match name {
                 Some("Nourishment") => BuffKind::Food(None),
                 Some("Enhancement") => BuffKind::Util(None),

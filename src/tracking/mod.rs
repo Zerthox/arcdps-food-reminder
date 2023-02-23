@@ -98,6 +98,13 @@ impl Tracker {
                 .sort_by_key(|entry| Reverse(entry.data.util.state)),
         }
     }
+
+    /// Refreshes the sort if the current sorting matches.
+    pub fn refresh_sort_if(&mut self, sorting: Sorting) {
+        if self.sorting == sorting {
+            self.refresh_sort();
+        }
+    }
 }
 
 /// Current column sorted by.

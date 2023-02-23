@@ -215,44 +215,37 @@ impl Tracker {
         } else {
             let col_sub = TableColumnSetup {
                 name: "Sub",
-                user_id: 0.into(),
                 flags: TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
-                init_width_or_weight: 0.0,
+                ..Default::default()
             };
 
             let col_player = TableColumnSetup {
                 name: "Player",
-                user_id: 1.into(),
                 flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                init_width_or_weight: 0.0,
+                ..Default::default()
             };
 
             let col_food = TableColumnSetup {
                 name: "Food",
-                user_id: 2.into(),
                 flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                init_width_or_weight: 0.0,
+                ..Default::default()
             };
 
             let col_util = TableColumnSetup {
                 name: "Util",
-                user_id: 3.into(),
                 flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                init_width_or_weight: 0.0,
+                ..Default::default()
             };
 
             let col_buffs = TableColumnSetup {
                 name: "Buffs",
-                user_id: 4.into(),
-                flags: TableColumnFlags::NO_SORT_ASCENDING | TableColumnFlags::NO_SORT_DESCENDING,
-                init_width_or_weight: 0.0,
+                flags: TableColumnFlags::NO_SORT,
+                ..Default::default()
             };
 
             const TABLE_ID: &str = "##squad-table";
             let table_flags =
                 TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE;
-
-            // TODO: begin manually with slice for dynamic column count
             if let Some(_table) = if self.settings.show_sub {
                 ui.begin_table_header_with_flags(
                     TABLE_ID,
@@ -269,22 +262,23 @@ impl Tracker {
                 // update sorting if necessary
                 if let Some(sort_specs) = ui.table_sort_specs_mut() {
                     sort_specs.conditional_sort(|column_specs| {
-                        if let Some(sorted_column) = column_specs
-                            .iter()
-                            .find(|column| column.sort_direction().is_some())
-                        {
+                        let column = column_specs.iter().next().unwrap();
+                        if let Some(dir) = column.sort_direction() {
+                            // increase index by 1 if no sub column
+                            let index =
+                                column.column_idx() + if self.settings.show_sub { 0 } else { 1 };
+
                             // update sorting state
-                            match sorted_column.column_user_id() {
-                                0 => self.sorting = Sorting::Sub,
-                                1 => self.sorting = Sorting::Name,
-                                2 => self.sorting = Sorting::Food,
-                                3 => self.sorting = Sorting::Util,
-                                _ => {}
-                            }
+                            self.sorting = match index {
+                                0 => Sorting::Sub,
+                                1 => Sorting::Name,
+                                2 => Sorting::Food,
+                                3 => Sorting::Util,
+                                _ => unreachable!("column sort spec index out of range"),
+                            };
 
                             // ascending is reverse order for us
-                            self.reverse = sorted_column.sort_direction().unwrap()
-                                == TableSortDirection::Ascending;
+                            self.reverse = dir == TableSortDirection::Ascending;
 
                             // refresh sorting
                             self.refresh_sort();

@@ -14,7 +14,7 @@ dependencies = [
 [[package]]
 name = "arc_util"
 version = "0.9.1"
-source = "git+https://github.com/zerthox/arcdps-utils#13f0b8870e4f4ca659d4dbebda82efee363f8660"
+source = "git+https://github.com/zerthox/arcdps-utils#84ed621f370ba44c05e240ffb29f566715fcc459"
 dependencies = [
  "arcdps",
  "serde",
@@ -25,7 +25,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.9.2"
-source = "git+https://github.com/zerthox/arcdps-bindings#f315fce07d5852bbc1831b3a9165019c782c6ade"
+source = "git+https://github.com/zerthox/arcdps-bindings#c363820c5f6b1e84c6eda97ede8ba5ab0a7cc9cd"
 dependencies = [
  "arcdps-imgui",
  "arcdps_codegen",
@@ -62,7 +62,7 @@ dependencies = [
 [[package]]
 name = "arcdps_codegen"
 version = "0.9.2"
-source = "git+https://github.com/zerthox/arcdps-bindings#f315fce07d5852bbc1831b3a9165019c782c6ade"
+source = "git+https://github.com/zerthox/arcdps-bindings#c363820c5f6b1e84c6eda97ede8ba5ab0a7cc9cd"
 dependencies = [
  "cfg-if",
  "paste",
@@ -74,7 +74,7 @@ dependencies = [
 [[package]]
 name = "arcdps_evtc"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#f315fce07d5852bbc1831b3a9165019c782c6ade"
+source = "git+https://github.com/zerthox/arcdps-bindings#c363820c5f6b1e84c6eda97ede8ba5ab0a7cc9cd"
 dependencies = [
  "num_enum",
  "serde",
@@ -215,7 +215,7 @@ dependencies = [
 [[package]]
 name = "gw2_mumble"
 version = "0.1.0"
-source = "git+https://github.com/zerthox/gw2-mumble-rs#84d9b790c69a7d8eefbbbd35ae19b78f9d95d3fa"
+source = "git+https://github.com/zerthox/gw2-mumble-rs#08b14f88e283a343f038ae2004c6fdc074b0de3d"
 dependencies = [
  "bitflags",
  "thiserror",
@@ -574,9 +574,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.107"
+version = "1.0.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f4064b5b16e03ae50984a5a8ed5d4f8803e6bc1fd170a3cda91a1be4b18e3f5"
+checksum = "d56e159d99e6c2b93995d171050271edb50ecc5288fbc7cc17de8fdce4e58c14"
 dependencies = [
  "proc-macro2",
  "quote",

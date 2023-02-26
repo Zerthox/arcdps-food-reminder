@@ -21,6 +21,9 @@ pub struct TrackerSettings {
     /// Hotkey for the tracker window.
     pub hotkey: Option<u32>,
 
+    /// Whether to show table header icons.
+    pub show_icons: bool,
+
     /// Whether to show the subgroup column.
     pub show_sub: bool,
 
@@ -36,6 +39,7 @@ impl TrackerSettings {
         Self {
             save_chars: true,
             hotkey: Some(Tracker::DEFAULT_HOTKEY),
+            show_icons: true,
             show_sub: true,
             color_sub: Color::Sub,
             color_name: Color::Prof,

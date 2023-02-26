@@ -1,5 +1,6 @@
 use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
 use crate::{
+    assets::{FOOD_ICON, UNKNOWN_ICON, UTIL_ICON},
     buff_ui,
     combo_ui::render_enum_combo,
     data::{DefinitionKind, Definitions, DIMINISHED, MALNOURISHED},
@@ -7,13 +8,14 @@ use crate::{
 };
 use arc_util::{
     tracking::Player,
-    ui::{render, Component, Windowable},
+    ui::{
+        render::{self, TableIconColumn},
+        Component, Windowable,
+    },
 };
 use arcdps::{
     exports::{self, CoreColor},
-    imgui::{
-        TabBar, TabItem, TableColumnFlags, TableColumnSetup, TableFlags, TableSortDirection, Ui,
-    },
+    imgui::{TabBar, TabItem, TableColumnFlags, TableFlags, TableSortDirection, Ui},
 };
 
 pub type Props<'p> = (&'p Definitions, &'p [CustomReminder]);
@@ -213,60 +215,45 @@ impl Tracker {
         if self.players.is_empty() {
             ui.text("No players in range");
         } else {
-            let col_sub = TableColumnSetup {
-                name: "Sub",
-                flags: TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
-                ..Default::default()
-            };
+            let show_sub = self.settings.show_sub;
+            let columns = [
+                TableIconColumn::with_flags("Sub", None, TableColumnFlags::PREFER_SORT_DESCENDING),
+                TableIconColumn::with_flags(
+                    "Player",
+                    None,
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                ),
+                TableIconColumn::with_flags(
+                    "Food",
+                    FOOD_ICON.as_ref(),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                ),
+                TableIconColumn::with_flags(
+                    "Util",
+                    UTIL_ICON.as_ref(),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                ),
+                TableIconColumn::with_flags(
+                    "Buffs",
+                    UNKNOWN_ICON.as_ref(),
+                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                ),
+            ];
 
-            let col_player = TableColumnSetup {
-                name: "Player",
-                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                ..Default::default()
-            };
-
-            let col_food = TableColumnSetup {
-                name: "Food",
-                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                ..Default::default()
-            };
-
-            let col_util = TableColumnSetup {
-                name: "Util",
-                flags: TableColumnFlags::PREFER_SORT_DESCENDING,
-                ..Default::default()
-            };
-
-            let col_buffs = TableColumnSetup {
-                name: "Buffs",
-                flags: TableColumnFlags::NO_SORT,
-                ..Default::default()
-            };
-
-            const TABLE_ID: &str = "##squad-table";
-            let table_flags =
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE;
-            if let Some(_table) = if self.settings.show_sub {
-                ui.begin_table_header_with_flags(
-                    TABLE_ID,
-                    [col_sub, col_player, col_food, col_util, col_buffs],
-                    table_flags,
-                )
-            } else {
-                ui.begin_table_header_with_flags(
-                    TABLE_ID,
-                    [col_player, col_food, col_util, col_buffs],
-                    table_flags,
-                )
-            } {
+            if let Some(_table) = render::table_with_icons(
+                ui,
+                "##squad-table",
+                if show_sub { &columns } else { &columns[1..] },
+                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
+                self.settings.show_icons,
+            ) {
                 // update sorting if necessary
                 if let Some(sort_specs) = ui.table_sort_specs_mut() {
                     sort_specs.conditional_sort(|column_specs| {
                         let column = column_specs.iter().next().unwrap();
                         if let Some(dir) = column.sort_direction() {
                             // increase index by 1 if no sub column
-                            let index =
-                                column.column_idx() + if self.settings.show_sub { 0 } else { 1 };
+                            let index = column.column_idx() + if show_sub { 0 } else { 1 };
 
                             // update sorting state
                             self.sorting = match index {
@@ -297,7 +284,7 @@ impl Tracker {
                             id: entry.player.id,
                             player: &entry.player,
                             buffs: &entry.data,
-                            show_sub: self.settings.show_sub,
+                            show_sub,
                         },
                     );
                 }
@@ -311,15 +298,17 @@ impl Tracker {
 
         if current.is_none() && !self.players.cached() {
             ui.text("No characters found");
-        } else if let Some(_table) = ui.begin_table_header_with_flags(
+        } else if let Some(_table) = render::table_with_icons(
+            ui,
             "##self-table",
-            [
-                TableColumnSetup::new("Player"),
-                TableColumnSetup::new("Food"),
-                TableColumnSetup::new("Util"),
-                TableColumnSetup::new("Buffs"),
+            &[
+                TableIconColumn::new("Player", None),
+                TableIconColumn::new("Food", FOOD_ICON.as_ref()),
+                TableIconColumn::new("Util", UTIL_ICON.as_ref()),
+                TableIconColumn::new("Buffs", UNKNOWN_ICON.as_ref()),
             ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            self.settings.show_icons,
         ) {
             // render table content
             let colors = exports::colors();
@@ -409,6 +398,7 @@ impl Windowable<Props<'_>> for Tracker {
             ui.text_colored(grey, "Display");
 
             // table column checkboxes
+            ui.checkbox("Show icons", &mut self.settings.show_icons);
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
             ui.checkbox("Show build notes", &mut self.builds.display_notes);
 

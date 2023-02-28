@@ -217,7 +217,11 @@ impl Tracker {
         } else {
             let show_sub = self.settings.show_sub;
             let columns = [
-                TableIconColumn::with_flags("Sub", None, TableColumnFlags::PREFER_SORT_DESCENDING),
+                TableIconColumn::with_flags(
+                    "Sub",
+                    None,
+                    TableColumnFlags::PREFER_SORT_DESCENDING | TableColumnFlags::DEFAULT_SORT,
+                ),
                 TableIconColumn::with_flags(
                     "Player",
                     None,
@@ -236,7 +240,7 @@ impl Tracker {
                 TableIconColumn::with_flags(
                     "Buffs",
                     UNKNOWN_ICON.as_ref(),
-                    TableColumnFlags::PREFER_SORT_DESCENDING,
+                    TableColumnFlags::NO_SORT,
                 ),
             ];
 

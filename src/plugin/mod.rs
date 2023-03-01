@@ -86,6 +86,11 @@ impl Plugin {
     pub fn load(&mut self) {
         info!("v{} load", VERSION);
 
+        let d3d_version = arcdps::d3d_version();
+        if d3d_version != 11 {
+            warn!("directx version {d3d_version}");
+        }
+
         // load settings
         let mut settings = Settings::from_file(SETTINGS_FILE);
         let settings_version: Option<Version> = settings.load_data("version");

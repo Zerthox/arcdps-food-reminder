@@ -134,12 +134,17 @@ impl Plugin {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
                     "Custom {} apply id {} time {} statechange {}",
-                    remind.name, event_id, time, statechange
+                    remind.display_name(),
+                    event_id,
+                    time,
+                    statechange
                 );
                 if data.apply_custom(buff_id, time) {
                     info!(
                         "{} ({}) applied to {}",
-                        remind.name, buff_id, player.character
+                        remind.display_name(),
+                        buff_id,
+                        player.character
                     );
                 }
             } else {
@@ -216,12 +221,14 @@ impl Plugin {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
                     "Custom {} remove id {event_id} time {time} statechange {statechange} kind {kind}",
-                    remind.name
+                    remind.display_name()
                 );
                 if data.remove_custom(buff_id, time) {
                     info!(
                         "{} ({}) removed from {}",
-                        remind.name, buff_id, player.character
+                        remind.display_name(),
+                        buff_id,
+                        player.character
                     );
 
                     // check for custom buff running out

@@ -96,7 +96,7 @@ impl Component<()> for Reminder {
                     }
                     for id in self.custom_triggers.keys() {
                         if let Some(remind) = self.custom(*id) {
-                            Self::render_text(ui, &format!("{} reminder!", remind.name));
+                            Self::render_text(ui, &format!("{} reminder!", remind.display_name()));
                         }
                     }
                 });

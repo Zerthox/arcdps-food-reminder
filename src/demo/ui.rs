@@ -55,7 +55,7 @@ impl Component<Props<'_>> for Demo {
 
             for remind in custom {
                 ui.same_line_with_spacing(0.0, 5.0);
-                if ui.button(&remind.name) {
+                if ui.button(remind.display_name()) {
                     self.reminder.trigger_custom(remind.id);
                 }
             }

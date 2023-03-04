@@ -57,6 +57,7 @@ fn combat(
     id: u64,
     revision: u64,
 ) {
+    // TODO: put relevant event information in priority queue, update state in worker thread?
     PLUGIN
         .lock()
         .unwrap()

@@ -81,10 +81,12 @@ impl Plugin {
                                 }
                             }
                         } else {
+                            // TODO: only remove when last stack removed
                             self.buff_remove(
                                 src.id,
                                 event.skill_id,
                                 skill_name,
+                                event.is_buff_remove,
                                 statechange,
                                 event_id,
                                 event.time,
@@ -199,11 +201,13 @@ impl Plugin {
     }
 
     /// Handles a buff remove event.
+    #[allow(clippy::too_many_arguments)]
     fn buff_remove(
         &mut self,
         player_id: usize,
         buff_id: u32,
         buff_name: Option<&str>,
+        kind: BuffRemove,
         statechange: StateChange,
         event_id: u64,
         time: u64,
@@ -211,8 +215,8 @@ impl Plugin {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
-                    "Custom {} remove id {} time {} statechange {}",
-                    remind.name, event_id, time, statechange
+                    "Custom {} remove id {event_id} time {time} statechange {statechange} kind {kind}",
+                    remind.name
                 );
                 if data.remove_custom(buff_id, time) {
                     info!(
@@ -228,10 +232,7 @@ impl Plugin {
             } else {
                 match self.defs.buff_kind(buff_id, buff_name) {
                     BuffKind::Food(food) => {
-                        debug!(
-                            "Food remove id {} time {} statechange {}",
-                            event_id, time, statechange
-                        );
+                        debug!("Food remove id {event_id} time {time} statechange {statechange} kind {kind}");
                         if data.remove_food(buff_id, time) {
                             if let Some(food) = food {
                                 info!(
@@ -251,10 +252,7 @@ impl Plugin {
                         }
                     }
                     BuffKind::Util(util) => {
-                        debug!(
-                            "Utility remove id {} time {} statechange {}",
-                            event_id, time, statechange
-                        );
+                        debug!("Utility remove id {event_id} time {time} statechange {statechange} kind {kind}");
                         if data.remove_util(buff_id, time) {
                             if let Some(util) = util {
                                 info!(
@@ -304,17 +302,17 @@ impl Plugin {
                 ..
             } = user
             {
-                if let Some(entry) = self
+                if let Some(Entry { player, .. }) = self
                     .tracker
                     .players
                     .iter_mut()
                     .find(|entry| entry.player.account == name)
                 {
-                    entry.player.subgroup = subgroup as usize + 1;
+                    player.subgroup = subgroup as usize + 1;
 
                     debug!(
                         "Updated subgroup {} for {}",
-                        entry.player.subgroup, entry.player.character
+                        player.subgroup, player.character
                     );
                 }
             }

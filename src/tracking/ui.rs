@@ -188,7 +188,7 @@ impl Tracker {
         ui.table_next_column();
         ui.group(|| {
             for remind in custom {
-                let short = &remind.name[..1];
+                let short = remind.short();
                 match buffs.custom_state(remind.id) {
                     BuffState::Unknown => ui.text(short),
                     BuffState::None => ui.text_colored(red, short),
@@ -200,10 +200,11 @@ impl Tracker {
         if ui.is_item_hovered() {
             ui.tooltip(|| {
                 for remind in custom {
+                    let name = remind.display_name();
                     match buffs.custom_state(remind.id) {
-                        BuffState::Unknown => ui.text(&remind.name),
-                        BuffState::None => ui.text_colored(red, &remind.name),
-                        BuffState::Some(_) => ui.text_colored(green, &remind.name),
+                        BuffState::Unknown => ui.text(name),
+                        BuffState::None => ui.text_colored(red, name),
+                        BuffState::Some(_) => ui.text_colored(green, name),
                     }
                 }
             });

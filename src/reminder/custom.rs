@@ -47,6 +47,20 @@ impl CustomReminder {
             Self::new(33024, "Mobility", GameMode::Fractal),
         ]
     }
+
+    /// Returns the name of the reminder while replacing empty names.
+    pub fn display_name(&self) -> &str {
+        if !self.name.is_empty() {
+            &self.name
+        } else {
+            "Unnamed"
+        }
+    }
+
+    /// Returns the shortened reminder name.
+    pub fn short(&self) -> &str {
+        &self.display_name()[..1]
+    }
 }
 
 /// Game mode.

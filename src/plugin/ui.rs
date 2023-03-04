@@ -184,13 +184,18 @@ impl Plugin {
             let mut id = remind.id.try_into().unwrap_or(0);
             ui.same_line();
             ui.set_next_item_width(render::ch_width(ui, 7));
-            if ui.input_int("##custom-id-{i}", &mut id).step(0).build() {
+            if ui
+                .input_int(format!("##custom-id-{i}"), &mut id)
+                .step(0)
+                .build()
+            {
                 remind.id = id.max(0) as u32;
             }
 
             ui.same_line();
             ui.set_next_item_width(input_width);
-            ui.input_text("##custom-name-{i}", &mut remind.name).build();
+            ui.input_text(format!("##custom-name-{i}"), &mut remind.name)
+                .build();
 
             ui.same_line();
             ui.set_next_item_width(70.0);

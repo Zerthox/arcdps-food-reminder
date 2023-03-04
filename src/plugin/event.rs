@@ -6,7 +6,7 @@ use arc_util::{
 };
 use arcdps::{
     extras::{ExtrasAddonInfo, UserInfo, UserInfoIter, UserRole},
-    Agent, BuffRemove, CombatEvent, StateChange,
+    Activation, Agent, BuffRemove, CombatEvent, StateChange,
 };
 use log::{debug, info, log_enabled, Level};
 
@@ -64,33 +64,34 @@ impl Plugin {
                         self.reminder.end_encounter(&self.tracker.players);
                     }
 
-                    statechange @ (StateChange::None
-                    | StateChange::ApiDelayed
-                    | StateChange::BuffInitial) => {
-                        if let BuffRemove::None = event.is_buff_remove {
-                            if event.buff != 0 && event.buff_dmg == 0 {
-                                if let Some(dst) = dst {
-                                    self.buff_apply(
-                                        dst.id,
-                                        event.skill_id,
-                                        skill_name,
-                                        statechange,
-                                        event_id,
-                                        event.time,
-                                    );
+                    StateChange::None | StateChange::ApiDelayed | StateChange::BuffInitial => {
+                        if event.is_activation == Activation::None {
+                            match event.is_buff_remove {
+                                BuffRemove::None => {
+                                    if event.buff != 0 && event.buff_dmg == 0 {
+                                        if let Some(dst) = dst {
+                                            self.buff_apply(
+                                                dst.id,
+                                                event.skill_id,
+                                                skill_name,
+                                                &event,
+                                                event_id,
+                                            );
+                                        }
+                                    }
                                 }
+
+                                // remove on all or single manual
+                                BuffRemove::All | BuffRemove::Manual => self.buff_remove(
+                                    src.id,
+                                    event.skill_id,
+                                    skill_name,
+                                    &event,
+                                    event_id,
+                                ),
+
+                                BuffRemove::Single | BuffRemove::Unknown => {}
                             }
-                        } else {
-                            // TODO: only remove when last stack removed
-                            self.buff_remove(
-                                src.id,
-                                event.skill_id,
-                                skill_name,
-                                event.is_buff_remove,
-                                statechange,
-                                event_id,
-                                event.time,
-                            );
                         }
                     }
                     _ => {}
@@ -126,9 +127,8 @@ impl Plugin {
         player_id: usize,
         buff_id: u32,
         buff_name: Option<&str>,
-        statechange: StateChange,
+        event: &CombatEvent,
         event_id: u64,
-        time: u64,
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             if let Some(remind) = self.reminder.custom(buff_id) {
@@ -136,10 +136,10 @@ impl Plugin {
                     "Custom {} apply id {} time {} statechange {}",
                     remind.display_name(),
                     event_id,
-                    time,
-                    statechange
+                    event.time,
+                    event.is_statechange
                 );
-                if data.apply_custom(buff_id, time) {
+                if data.apply_custom(buff_id, event.time) {
                     info!(
                         "{} ({}) applied to {}",
                         remind.display_name(),
@@ -152,9 +152,9 @@ impl Plugin {
                     BuffKind::Food(food) => {
                         debug!(
                             "Food apply id {} time {} statechange {}",
-                            event_id, time, statechange
+                            event_id, event.time, event.is_statechange
                         );
-                        if data.apply_food(buff_id, time) {
+                        if data.apply_food(buff_id, event.time) {
                             if let Some(food) = food {
                                 info!(
                                     "Food {} ({}) applied to {}",
@@ -174,9 +174,9 @@ impl Plugin {
                     BuffKind::Util(util) => {
                         debug!(
                             "Util apply id {} time {} statechange {}",
-                            event_id, time, statechange
+                            event_id, event.time, event.is_statechange
                         );
-                        if data.apply_util(buff_id, time) {
+                        if data.apply_util(buff_id, event.time) {
                             if let Some(util) = util {
                                 info!(
                                     "Utility {} ({}) applied to {}",
@@ -206,24 +206,25 @@ impl Plugin {
     }
 
     /// Handles a buff remove event.
-    #[allow(clippy::too_many_arguments)]
     fn buff_remove(
         &mut self,
         player_id: usize,
         buff_id: u32,
         buff_name: Option<&str>,
-        kind: BuffRemove,
-        statechange: StateChange,
+        event: &CombatEvent,
         event_id: u64,
-        time: u64,
     ) {
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
-                    "Custom {} remove id {event_id} time {time} statechange {statechange} kind {kind}",
-                    remind.display_name()
+                    "Custom {} remove id {} time {} statechange {} kind {}",
+                    remind.display_name(),
+                    event_id,
+                    event.time,
+                    event.is_statechange,
+                    event.is_buff_remove
                 );
-                if data.remove_custom(buff_id, time) {
+                if data.remove_custom(buff_id, event.time) {
                     info!(
                         "{} ({}) removed from {}",
                         remind.display_name(),
@@ -239,8 +240,11 @@ impl Plugin {
             } else {
                 match self.defs.buff_kind(buff_id, buff_name) {
                     BuffKind::Food(food) => {
-                        debug!("Food remove id {event_id} time {time} statechange {statechange} kind {kind}");
-                        if data.remove_food(buff_id, time) {
+                        debug!(
+                            "Food remove id {} time {} statechange {} kind {}",
+                            event_id, event.time, event.is_statechange, event.is_buff_remove
+                        );
+                        if data.remove_food(buff_id, event.time) {
                             if let Some(food) = food {
                                 info!(
                                     "Food {} ({}) removed from {}",
@@ -259,8 +263,11 @@ impl Plugin {
                         }
                     }
                     BuffKind::Util(util) => {
-                        debug!("Utility remove id {event_id} time {time} statechange {statechange} kind {kind}");
-                        if data.remove_util(buff_id, time) {
+                        debug!(
+                            "Utility remove id {} time {} statechange {} kind {}",
+                            event_id, event.time, event.is_statechange, event.is_buff_remove
+                        );
+                        if data.remove_util(buff_id, event.time) {
                             if let Some(util) = util {
                                 info!(
                                     "Utility {} ({}) removed from {}",

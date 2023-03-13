@@ -375,6 +375,12 @@
       "stats": ["3% Condition Damage from Precision", "3% Expertise from Precision"],
       "display": "EXP"
     },
+    {
+      "id": 38678,
+      "name": "Magnanimous Tuning Crystal",
+      "stats": ["3% Condition Damage from Vitality", "3% Condition Damage from Toughness"],
+      "display": "CND"
+    },
 
     // concentration
     {

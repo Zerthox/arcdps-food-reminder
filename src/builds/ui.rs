@@ -1,13 +1,18 @@
 use super::{build::Build, Builds};
 use crate::{
+    assets::{FOOD_ICON, UTIL_ICON},
     buff_ui,
     data::{DefinitionKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
 };
-use arc_util::ui::{action::Action, render, Component, Ui};
+use arc_util::ui::{
+    action::Action,
+    render::{self, TableIconColumn},
+    Component, Ui,
+};
 use arcdps::{
     exports::{self, CoreColor},
-    imgui::{TableColumnSetup, TableFlags},
+    imgui::TableFlags,
     Profession,
 };
 
@@ -16,6 +21,7 @@ pub type Props<'p> = (
     Option<Profession>,
     BuffState<u32>,
     BuffState<u32>,
+    bool,
 );
 
 impl Builds {
@@ -27,33 +33,30 @@ impl Builds {
         current_prof: Option<Profession>,
         current_food: BuffState<u32>,
         current_util: BuffState<u32>,
+        show_icons: bool,
     ) {
         // render builds table
-        let name = "##builds-table";
-        let flags = TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X;
-        let table = if self.display_notes {
-            ui.begin_table_header_with_flags(
-                name,
-                [
-                    TableColumnSetup::new("Build"),
-                    TableColumnSetup::new("Notes"),
-                    TableColumnSetup::new("Food"),
-                    TableColumnSetup::new("Util"),
-                ],
-                flags,
-            )
+        let build_column = TableIconColumn::new("Build", None);
+        let food_column = TableIconColumn::new("Food", FOOD_ICON.as_ref());
+        let util_column = TableIconColumn::new("Util", UTIL_ICON.as_ref());
+        let columns = if self.display_notes {
+            vec![
+                build_column,
+                TableIconColumn::new("Notes", None),
+                food_column,
+                util_column,
+            ]
         } else {
-            ui.begin_table_header_with_flags(
-                name,
-                [
-                    TableColumnSetup::new("Build"),
-                    TableColumnSetup::new("Food"),
-                    TableColumnSetup::new("Util"),
-                ],
-                flags,
-            )
+            vec![build_column, food_column, util_column]
         };
-        if let Some(_table) = table {
+
+        if let Some(_table) = render::table_with_icons(
+            ui,
+            "##builds-table",
+            &columns,
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            show_icons,
+        ) {
             let colors = exports::colors();
 
             for (i, build) in self.entries.iter_mut().enumerate() {
@@ -133,19 +136,21 @@ impl Builds {
     }
 
     /// Renders edit mode contents.
-    fn render_edit(&mut self, ui: &Ui, defs: &Definitions) {
+    fn render_edit(&mut self, ui: &Ui, defs: &Definitions, show_icons: bool) {
         // render builds table
-        if let Some(_table) = ui.begin_table_header_with_flags(
+        if let Some(_table) = render::table_with_icons(
+            ui,
             "##builds-table",
-            [
-                TableColumnSetup::new("Profession"),
-                TableColumnSetup::new("Name"),
-                TableColumnSetup::new("Notes"),
-                TableColumnSetup::new("Food"),
-                TableColumnSetup::new("Utility"),
-                TableColumnSetup::new(""),
+            &[
+                TableIconColumn::new("Profession", None),
+                TableIconColumn::new("Name", None),
+                TableIconColumn::new("Notes", None),
+                TableIconColumn::new("Food", FOOD_ICON.as_ref()),
+                TableIconColumn::new("Utility", UTIL_ICON.as_ref()),
+                TableIconColumn::new("##actions", None),
             ],
             TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            show_icons,
         ) {
             let mut action = Action::None;
             let len = self.entries.len();
@@ -220,7 +225,11 @@ impl Builds {
 
 impl<'p> Component<Props<'p>> for Builds {
     /// Renders the builds UI.
-    fn render(&mut self, ui: &Ui, (defs, current_prof, current_food, current_util): Props<'p>) {
+    fn render(
+        &mut self,
+        ui: &Ui,
+        (defs, current_prof, current_food, current_util, show_icons): Props<'p>,
+    ) {
         let _style = render::small_padding(ui);
 
         // profession filter
@@ -247,9 +256,16 @@ impl<'p> Component<Props<'p>> for Builds {
 
         // contents
         if self.edit {
-            self.render_edit(ui, defs);
+            self.render_edit(ui, defs, show_icons);
         } else {
-            self.render_view(ui, defs, current_prof, current_food, current_util);
+            self.render_view(
+                ui,
+                defs,
+                current_prof,
+                current_food,
+                current_util,
+                show_icons,
+            );
         }
     }
 }

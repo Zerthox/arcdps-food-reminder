@@ -357,7 +357,8 @@ impl Tracker {
             .map(|entry| entry.data.util.state)
             .unwrap_or(BuffState::Unknown);
 
-        self.builds.render(ui, (defs, prof, food, util));
+        self.builds
+            .render(ui, (defs, prof, food, util, self.settings.show_icons));
     }
 }
 

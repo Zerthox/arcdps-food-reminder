@@ -24,8 +24,6 @@ if is_empty ${GW2_PATH}
 
     if ${has_addon_manager}
         GW2_PATH = set ${addon_path}
-    elseif not ends_with ${GW2_PATH} bin64
-        GW2_PATH = join_path ${GW2_PATH} bin64
     end
 
     set_env GW2_PATH ${GW2_PATH}

@@ -84,16 +84,17 @@ impl Component<()> for Reminder {
                 .movable(false)
                 .focus_on_appearing(false)
                 .build(ui, || {
-                    // font size
                     ui.set_window_font_scale(FONT_SIZE);
 
-                    // render text
-                    if food {
-                        Self::render_text(ui, "Food reminder!");
+                    // food/util
+                    match (food, util) {
+                        (true, true) => Self::render_text(ui, "Food & Utility reminder!"),
+                        (true, false) => Self::render_text(ui, "Food reminder!"),
+                        (false, true) => Self::render_text(ui, "Utility reminder!"),
+                        (false, false) => {}
                     }
-                    if util {
-                        Self::render_text(ui, "Utility reminder!");
-                    }
+
+                    // custom reminders
                     for id in self.custom_triggers.keys() {
                         if let Some(remind) = self.custom(*id) {
                             Self::render_text(ui, &format!("{} reminder!", remind.display_name()));

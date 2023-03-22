@@ -1,12 +1,17 @@
 use super::Demo;
-use crate::tracking::{buff::TrackedBuff, settings::SettingsEntry};
-use arc_util::{settings::HasSettings, tracking::Entry, ui::Hideable};
+use crate::tracking::buff::{BuffState, Buffs, TrackedBuff};
+use arc_util::{
+    settings::HasSettings,
+    tracking::{Entry, Player},
+    ui::Hideable,
+};
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DemoSettings {
-    players: Vec<SettingsEntry>,
+    players: Vec<DemoEntry>,
     tracker: bool,
 }
 
@@ -44,10 +49,9 @@ impl HasSettings for Demo {
     }
 
     fn load_settings(&mut self, loaded: Self::Settings) {
-        for loaded in loaded.players {
-            let id = loaded.player.id;
+        for (i, loaded) in loaded.players.into_iter().enumerate() {
             self.tracker.add_player(loaded.player);
-            let Entry { data, .. } = self.tracker.players.player_mut(id).unwrap();
+            let Entry { data, .. } = self.tracker.players.player_mut(i).unwrap();
             data.food = TrackedBuff::new(loaded.food);
             data.util = TrackedBuff::new(loaded.util);
             data.custom = loaded
@@ -57,5 +61,35 @@ impl HasSettings for Demo {
                 .collect();
         }
         self.tracker.set_visibility(loaded.tracker);
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct DemoEntry {
+    pub player: Player,
+
+    #[serde(default)]
+    pub food: BuffState<u32>,
+
+    #[serde(default)]
+    pub util: BuffState<u32>,
+
+    #[serde(default)]
+    pub buffs: BTreeMap<u32, BuffState<()>>,
+}
+
+impl From<Entry<Buffs>> for DemoEntry {
+    fn from(entry: Entry<Buffs>) -> Self {
+        Self {
+            player: entry.player,
+            food: entry.data.food.state,
+            util: entry.data.util.state,
+            buffs: entry
+                .data
+                .custom
+                .into_iter()
+                .map(|(id, buff)| (id, buff.state))
+                .collect(),
+        }
     }
 }

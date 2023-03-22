@@ -5,7 +5,7 @@ use super::{
 use crate::{builds::Builds, data::REINFORCED};
 use arc_util::{
     settings::HasSettings,
-    tracking::{Entry, Player},
+    tracking::{CachedPlayer, Entry},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -80,7 +80,7 @@ impl Default for TrackerState {
 /// Saved Player entry.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SettingsEntry {
-    pub player: Player,
+    pub player: CachedPlayer,
 
     #[serde(default)]
     pub food: BuffState<u32>,
@@ -98,7 +98,7 @@ pub struct SettingsEntry {
 
 impl SettingsEntry {
     pub const fn new(
-        player: Player,
+        player: CachedPlayer,
         food: BuffState<u32>,
         util: BuffState<u32>,
         buffs: BTreeMap<u32, BuffState<()>>,
@@ -107,21 +107,25 @@ impl SettingsEntry {
             player,
             food,
             util,
-            reinforced: None,
             buffs,
+            reinforced: None,
         }
     }
 }
 
 impl From<Entry<Buffs>> for SettingsEntry {
     fn from(entry: Entry<Buffs>) -> Self {
+        (entry.player.into(), entry.data).into()
+    }
+}
+
+impl From<(CachedPlayer, Buffs)> for SettingsEntry {
+    fn from((player, data): (CachedPlayer, Buffs)) -> Self {
         Self::new(
-            entry.player,
-            entry.data.food.state,
-            entry.data.util.state,
-            entry
-                .data
-                .custom
+            player,
+            data.food.state,
+            data.util.state,
+            data.custom
                 .into_iter()
                 .map(|(id, buff)| (id, buff.state))
                 .collect(),
@@ -129,14 +133,14 @@ impl From<Entry<Buffs>> for SettingsEntry {
     }
 }
 
-impl From<SettingsEntry> for Entry<Buffs> {
+impl From<SettingsEntry> for (CachedPlayer, Buffs) {
     fn from(mut entry: SettingsEntry) -> Self {
         // load old reinforced
         if let Some(reinf) = entry.reinforced {
             entry.buffs.insert(REINFORCED, reinf);
         }
 
-        Self::new(
+        (
             entry.player,
             Buffs::with_states(entry.food, entry.util, entry.buffs),
         )
@@ -154,9 +158,10 @@ impl HasSettings for Tracker {
             own_chars: if self.settings.save_chars {
                 self.players
                     .get_self()
-                    .into_iter()
-                    .chain(self.players.cache_iter())
                     .cloned()
+                    .map(Into::<(CachedPlayer, Buffs)>::into)
+                    .into_iter()
+                    .chain(self.players.cache_iter().cloned())
                     .map(Into::into)
                     .collect()
             } else {

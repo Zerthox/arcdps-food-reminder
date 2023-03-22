@@ -7,7 +7,7 @@ use crate::{
     reminder::custom::CustomReminder,
 };
 use arc_util::{
-    tracking::Player,
+    tracking::Entry,
     ui::{
         render::{self, TableIconColumn},
         Component, Windowable,
@@ -16,6 +16,7 @@ use arc_util::{
 use arcdps::{
     exports::{self, CoreColor},
     imgui::{TabBar, TabItem, TableColumnFlags, TableFlags, TableSortDirection, Ui},
+    Profession,
 };
 
 pub type Props<'p> = (&'p Definitions, &'p [CustomReminder]);
@@ -56,18 +57,13 @@ impl Tracker {
         (defs, custom): Props,
         colors: &exports::Colors,
         entry: TableEntry,
+        show_sub: bool,
     ) {
-        let TableEntry {
-            player,
-            buffs,
-            show_sub,
-            ..
-        } = entry;
         let sub_color = colors
-            .sub_base(player.subgroup)
+            .sub_base(entry.subgroup)
             .map(|color| render::with_alpha(color, 1.0));
         let prof_color = colors
-            .prof_base(player.profession)
+            .prof_base(entry.profession)
             .map(|color| render::with_alpha(color, 1.0));
         let red = colors
             .core(CoreColor::LightRed)
@@ -85,7 +81,7 @@ impl Tracker {
         // render subgroup cell
         if show_sub {
             ui.table_next_column();
-            let sub = format!("{:>2}", player.subgroup);
+            let sub = format!("{:>2}", entry.subgroup);
             match (self.settings.color_sub, sub_color, prof_color) {
                 (Color::Sub, Some(color), _) => ui.text_colored(color, sub),
                 (Color::Prof, _, Some(color)) => ui.text_colored(color, sub),
@@ -96,13 +92,15 @@ impl Tracker {
         // render name cell
         ui.table_next_column();
         match (self.settings.color_name, sub_color, prof_color) {
-            (Color::Sub, Some(color), _) => ui.text_colored(color, &player.character),
-            (Color::Prof, _, Some(color)) => ui.text_colored(color, &player.character),
-            _ => ui.text(&player.character),
+            (Color::Sub, Some(color), _) => ui.text_colored(color, entry.character),
+            (Color::Prof, _, Some(color)) => ui.text_colored(color, entry.character),
+            _ => ui.text(entry.character),
         }
         if ui.is_item_hovered() {
-            ui.tooltip_text(&player.account);
+            ui.tooltip_text(entry.account);
         }
+
+        let TableEntry { buffs, .. } = entry;
 
         // render food cell
         ui.table_next_column();
@@ -285,12 +283,8 @@ impl Tracker {
                         ui,
                         props,
                         &colors,
-                        TableEntry {
-                            id: entry.player.id,
-                            player: &entry.player,
-                            buffs: &entry.data,
-                            show_sub,
-                        },
+                        TableEntry::from_entry(entry.player.id, entry),
+                        show_sub,
                     );
                 }
             }
@@ -322,25 +316,24 @@ impl Tracker {
                     ui,
                     props,
                     &colors,
-                    TableEntry {
-                        id: usize::MAX,
-                        player: &entry.player,
-                        buffs: &entry.data,
-                        show_sub: false,
-                    },
+                    TableEntry::from_entry(usize::MAX, entry),
+                    false,
                 );
             }
-            for (i, entry) in self.players.cache_iter().enumerate() {
+            for (i, (player, buffs)) in self.players.cache_iter().enumerate() {
                 self.render_table_entry(
                     ui,
                     props,
                     &colors,
                     TableEntry {
                         id: i,
-                        player: &entry.player,
-                        buffs: &entry.data,
-                        show_sub: false,
+                        account: &player.account,
+                        character: &player.character,
+                        profession: player.profession,
+                        buffs,
+                        subgroup: 0,
                     },
+                    false,
                 );
             }
         }
@@ -422,7 +415,22 @@ impl Windowable<Props<'_>> for Tracker {
 #[derive(Debug)]
 struct TableEntry<'a> {
     id: usize,
-    player: &'a Player,
+    account: &'a str,
+    character: &'a str,
+    profession: Profession,
+    subgroup: usize,
     buffs: &'a Buffs,
-    show_sub: bool,
+}
+
+impl<'a> TableEntry<'a> {
+    fn from_entry(id: usize, entry: &'a Entry<Buffs>) -> Self {
+        Self {
+            id,
+            account: &entry.player.account,
+            character: &entry.player.character,
+            profession: entry.player.profession,
+            subgroup: entry.player.subgroup,
+            buffs: &entry.data,
+        }
+    }
 }

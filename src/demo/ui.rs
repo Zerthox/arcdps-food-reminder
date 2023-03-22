@@ -166,6 +166,7 @@ impl Component<Props<'_>> for Demo {
                 let next_id = self.tracker.players.len();
                 self.tracker.add_player(Player::new(
                     next_id,
+                    0,
                     "char",
                     "acc",
                     false,

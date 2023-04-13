@@ -35,7 +35,7 @@ impl Plugin {
 
                         // change buffs to none, initial buffs should be reported right after
                         for entry in self.tracker.players.iter_mut() {
-                            entry.data.buffs_to_none(
+                            entry.data.unset_to_none(
                                 event.time,
                                 self.reminder.all_custom().iter().map(|remind| remind.id),
                             );

@@ -54,15 +54,15 @@ impl Buffs {
         self.custom = Default::default();
     }
 
-    /// Sets all buffs to none.
-    pub fn buffs_to_none(&mut self, time: u64, custom_ids: impl Iterator<Item = u32>) {
-        self.food.update(BuffState::None, time, false);
-        self.util.update(BuffState::None, time, false);
+    /// Sets all unset buff states to none.
+    pub fn unset_to_none(&mut self, time: u64, custom_ids: impl Iterator<Item = u32>) {
+        self.food.update_if_unknown(BuffState::None, time);
+        self.util.update_if_unknown(BuffState::None, time);
         for id in custom_ids {
             self.custom
                 .entry(id)
                 .or_default()
-                .update(BuffState::None, time, false);
+                .update_if_unknown(BuffState::None, time);
         }
     }
 
@@ -179,6 +179,19 @@ impl<T> TrackedBuff<T> {
     pub fn update(&mut self, state: BuffState<T>, time: u64, overwrite: bool) -> bool {
         // check for later time or same time & overwrite
         if time > self.time || (overwrite && time == self.time) {
+            self.state = state;
+            self.time = time;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Updates the tracked buff state if it is currently [`BuffState::Unknown`].
+    ///
+    /// Returns `false` if this update was ignored.
+    pub fn update_if_unknown(&mut self, state: BuffState<T>, time: u64) -> bool {
+        if let BuffState::Unknown = self.state {
             self.state = state;
             self.time = time;
             true

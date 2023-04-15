@@ -18,7 +18,7 @@ use arcdps::{
 };
 use once_cell::sync::Lazy;
 use plugin::Plugin;
-use std::{error::Error, sync::Mutex};
+use std::sync::Mutex;
 
 /// Main plugin instance.
 // FIXME: a single mutex for the whole thing is potentially inefficient
@@ -39,7 +39,7 @@ arcdps::export! {
     extras_squad_update,
 }
 
-fn init() -> Result<(), Box<dyn Error>> {
+fn init() -> Result<(), String> {
     // TODO: use error
     PLUGIN.lock().unwrap().load();
     Ok(())

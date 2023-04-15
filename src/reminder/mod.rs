@@ -131,7 +131,7 @@ impl Default for Reminder {
 #[derive(Debug)]
 struct Encounter {
     /// Id of the encounter target.
-    pub target_id: usize,
+    pub target_id: u64,
 
     /// Time the encounter started (or target changed).
     pub start_time: u64,

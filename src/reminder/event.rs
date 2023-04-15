@@ -11,12 +11,12 @@ const CHECK_TIME_DIFF: u64 = 250;
 
 impl Reminder {
     /// Returns the current encounter id.
-    pub fn current_encounter(&self) -> Option<usize> {
+    pub fn current_encounter(&self) -> Option<u64> {
         self.encounter.as_ref().map(|encounter| encounter.target_id)
     }
 
     /// Handles encounter start.
-    pub fn start_encounter(&mut self, target_id: usize, start_time: u64) {
+    pub fn start_encounter(&mut self, target_id: u64, start_time: u64) {
         self.encounter = Some(Encounter {
             target_id,
             start_time,
@@ -25,7 +25,7 @@ impl Reminder {
     }
 
     /// Handles encounter target change.
-    pub fn change_encounter(&mut self, target_id: usize, time: u64) {
+    pub fn change_encounter(&mut self, target_id: u64, time: u64) {
         // only change id if pending, otherwise start as new encounter
         match &mut self.encounter {
             Some(encounter) if encounter.pending_check => encounter.target_id = target_id,

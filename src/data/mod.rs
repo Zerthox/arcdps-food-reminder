@@ -221,4 +221,21 @@ mod tests {
         assert!(food.iter().any(|entry| entry.id == MALNOURISHED));
         assert!(utility.iter().any(|entry| entry.id == DIMINISHED));
     }
+
+    #[test]
+    fn duplicates() {
+        let data = DefData::with_defaults();
+
+        let mut ids = data
+            .into_entries()
+            .map(|entry| entry.id)
+            .collect::<Vec<_>>();
+        ids.sort_unstable();
+
+        for window in ids.windows(2) {
+            if let [a, b] = window {
+                assert!(a != b, "duplicate entry for id {a}");
+            }
+        }
+    }
 }

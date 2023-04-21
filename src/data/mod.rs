@@ -238,4 +238,16 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn display_len() {
+        const MAX: usize = 6;
+
+        let DefData { food, utility, .. } = DefData::with_defaults();
+
+        for BuffData { display, .. } in food.iter().chain(utility.iter()) {
+            let len = display.chars().count();
+            assert!(len <= MAX, "long display name {display}: {len} characters");
+        }
+    }
 }

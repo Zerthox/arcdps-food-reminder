@@ -3,7 +3,10 @@ use crate::{
     assets::{FOOD_ICON, UNKNOWN_ICON, UTIL_ICON},
     buff_ui,
     combo_ui::render_enum_combo,
-    data::{DefinitionKind, Definitions, DIMINISHED, MALNOURISHED},
+    data::{
+        DefinitionKind, Definitions, DIMINISHED, MALNOURISHED, NO_BUFF_TEXT, UNKNOWN_BUFF_TEXT,
+        UNKNOWN_STATE_TEXT,
+    },
     reminder::custom::CustomReminder,
 };
 use arc_util::{
@@ -106,13 +109,13 @@ impl Tracker {
         ui.table_next_column();
         match buffs.food.state {
             BuffState::Unknown => {
-                ui.text("???");
+                ui.text(UNKNOWN_STATE_TEXT);
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Uncertain");
                 }
             }
             BuffState::None => {
-                ui.text_colored(red, "NONE");
+                ui.text_colored(red, NO_BUFF_TEXT);
                 if ui.is_item_hovered() {
                     ui.tooltip_text("No Food");
                 }
@@ -133,7 +136,7 @@ impl Tracker {
                         colors,
                     );
                 } else {
-                    ui.text_colored(yellow, "SOME");
+                    ui.text_colored(yellow, UNKNOWN_BUFF_TEXT);
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Food");
                     }
@@ -146,13 +149,13 @@ impl Tracker {
         ui.table_next_column();
         match buffs.util.state {
             BuffState::Unknown => {
-                ui.text("???");
+                ui.text(UNKNOWN_STATE_TEXT);
                 if ui.is_item_hovered() {
                     ui.tooltip_text("Uncertain");
                 }
             }
             BuffState::None => {
-                ui.text_colored(red, "NONE");
+                ui.text_colored(red, NO_BUFF_TEXT);
                 if ui.is_item_hovered() {
                     ui.tooltip_text("No Utility");
                 }
@@ -173,7 +176,7 @@ impl Tracker {
                         colors,
                     );
                 } else {
-                    ui.text_colored(yellow, "SOME");
+                    ui.text_colored(yellow, UNKNOWN_BUFF_TEXT);
                     if ui.is_item_hovered() {
                         ui.tooltip_text("Unknown Utility");
                     }

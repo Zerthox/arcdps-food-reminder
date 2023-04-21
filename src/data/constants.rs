@@ -1,5 +1,14 @@
 use arcdps::Profession;
 
+/// Text shown when buff state is not known (yet).
+pub const UNKNOWN_STATE_TEXT: &str = "?";
+
+/// Text shown when no buff is applied.
+pub const NO_BUFF_TEXT: &str = "None";
+
+/// Text shown when an unknown buff is applied.
+pub const UNKNOWN_BUFF_TEXT: &str = "Some";
+
 /// Malnourished buff id.
 pub const MALNOURISHED: u32 = 46587;
 

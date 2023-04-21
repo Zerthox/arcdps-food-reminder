@@ -39,6 +39,12 @@
       "display": "PWR"
     },
     {
+      "id": 64357,
+      "name": "Bowl of Jade Sea",
+      "stats": ["+150 Fishing Power", "+100 Power", "+70 Ferocity"],
+      "display": "PWR"
+    },
+    {
       "id": 17825,
       "name": "Bowl of Sweet and Spicy Butternut Squash Soup",
       "stats": ["+100 Power", "+70 Ferocity"],
@@ -53,21 +59,33 @@
 
     // precision
     {
+      "id": 57253,
+      "name": "Plate of Coq Au Vin with Salsa",
+      "stats": ["66& Life Steal Chance", "+100 Power", "+70 Precision"],
+      "display": "PREC"
+    },
+    {
       "id": 57260,
       "name": "Plate of Peppercorn-Spiced Coq Au Vin",
-      "stats": ["-10% Incoming Damage", "+100 Precision", "+70 Power"],
+      "stats": ["-10% Incoming Damage", "+100 Power", "+70 Precision"],
+      "display": "PREC"
+    },
+    {
+      "id": 57348,
+      "name": "Plate of Clove-Spiced Coq Au Vin",
+      "stats": ["-20% Incoming Condition Duration", "+100 Power", "+70 Precision"],
       "display": "PREC"
     },
     {
       "id": 57290,
       "name": "Plate of Sesame-Crusted Coq Au Vin",
-      "stats": ["Health every second", "+100 Precision", "+70 Power"],
+      "stats": ["Health every second", "+100 Power", "+70 Precision"],
       "display": "PREC"
     },
     {
       "id": 57362,
       "name": "Plate of Coq Au Vin with Mint Garnish",
-      "stats": ["+10% Outgoing Healing", "+100 Precision", "+70 Power"],
+      "stats": ["+10% Outgoing Healing", "+100 Power", "+70 Precision"],
       "display": "PREC"
     },
     {
@@ -86,6 +104,12 @@
       "id": 9805,
       "name": "Bowl of Fancy Potato and Leek Soup",
       "stats": ["+100 Precision", "+70 Condition Damage"],
+      "display": "PREC"
+    },
+    {
+      "id": 9817,
+      "name": "Plate of Truffle Risotto",
+      "stats": ["+100 Condition Damage", "+70 Precision"],
       "display": "PREC"
     },
 
@@ -115,6 +139,18 @@
       "display": "CND"
     },
     {
+      "id": 57064,
+      "name": "Mint-Pear Cured Meat Flatbread",
+      "stats": ["+10% Outgoing Healing", "+100 Condition Damage", "+70 Expertise"],
+      "display": "CND"
+    },
+    {
+      "id": 66663,
+      "name": "Bowl of Echovald Hotpot",
+      "stats": ["+150 Fishing Power", "+100 Condition Damage", "+70 Expertise"],
+      "display": "CND"
+    },
+    {
       "id": 49686,
       "name": "Plate of Beef Rendang",
       "stats": ["+100 Condition Damage", "+70 Expertise"],
@@ -132,6 +168,12 @@
       "id": 57382,
       "name": "Peppercorn and Veggie Flatbread",
       "stats": ["-10% Incoming Damage", "+100 Expertise", "+70 Condition Damage"],
+      "display": "EXP"
+    },
+    {
+      "id": 57344,
+      "name": "Clove and Veggie Flatbread",
+      "stats": ["-20% Incoming Condition Duration", "+100 Expertise", "+70 Condition Damage"],
       "display": "EXP"
     },
     {
@@ -199,15 +241,33 @@
 
     // concentration
     {
+      "id": 57042,
+      "name": "Beef Carpaccio with Salsa Garnish",
+      "stats": ["66% Life Steal Chance", "+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+    {
       "id": 57114,
       "name": "Plate of Peppercorn-Spiced Beef Carpaccio",
       "stats": ["-10% Incoming Damage", "+100 Concentration", "+70 Power"],
       "display": "PCON"
     },
     {
+      "id": 57237,
+      "name": "Plate of Clove-Spiced Beef Carpaccio",
+      "stats": ["-20% Incoming Condition Duration", "+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+    {
       "id": 57231,
       "name": "Plate of Sesame-Ginger Beef Carpaccio",
       "stats": ["Health every second", "+100 Concentration", "+70 Power"],
+      "display": "PCON"
+    },
+    {
+      "id": 57251,
+      "name": "Plate of Beef Carpaccio with Mint Garnish",
+      "stats": ["+10% Outgoing Healing", "+100 Concentration", "+70 Power"],
       "display": "PCON"
     },
     {
@@ -249,6 +309,12 @@
       "display": "HEAL"
     },
     {
+      "id": 67265,
+      "name": "Plate of Imperial Palace Special",
+      "stats": ["+150 Fishing Power", "+100 Healing Power", "+70 Concentration"],
+      "display": "HEAL"
+    },
+    {
       "id": 26529,
       "name": "Delicious Rice Ball",
       "stats": ["+10% Outgoing Healing", "+100 Healing Power"],
@@ -277,6 +343,12 @@
 
     // all stats
     {
+      "id": 57356,
+      "name": "Spherified Cilantro Oyster Soup",
+      "stats": ["66% Life Steal Chance", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
       "id": 57165,
       "name": "Spherified Peppercorn-Spiced Oyster Soup",
       "stats": ["-10% Incoming Damage", "+45 All Attributes"],
@@ -301,6 +373,12 @@
       "display": "ALL"
     },
     {
+      "id": 67705,
+      "name": "Flight of Sushi",
+      "stats": ["+150 Fishing Power", "+45 All Attributes"],
+      "display": "ALL"
+    },
+    {
       "id": 19451,
       "name": "Dragon's Revelry Starcake",
       "stats": ["+45 All Attributes"],
@@ -313,6 +391,12 @@
       "name": "Bowl of Orrian Truffle and Meat Stew",
       "stats": ["100% Might on Dodge", "+40% to Endurance Regeneration"],
       "display": "ENDU"
+    },
+    {
+      "id": 33856,
+      "name": "Jerk Poultry and Nopal Flatbread Sandwich",
+      "stats": ["+200 Power on Heal", "+70 Precision"],
+      "display": "HPWR"
     },
     {
       "id": 34570,
@@ -402,6 +486,12 @@
       "display": "CCON"
     },
     {
+      "id": 9968,
+      "name": "Master Maintenance Oil",
+      "stats": ["3% Concentration from Precision", "6% Concentration from Healing Power"],
+      "display": "HCON"
+    },
+    {
       "id": 34187,
       "name": "Peppermint Oil",
       "stats": ["3% Concentration from Precision", "6% Concentration from Healing Power"],
@@ -412,6 +502,24 @@
       "name": "Magnanimous Maintenance Oil",
       "stats": ["3% Concentration from Vitality", "3% Concentration from Toughness"],
       "display": "TCON"
+    },
+    {
+       "id": 50320,
+      "name": "HolographicSuperCheese",
+      "stats": ["8% Power from Concentration", "3% Concentration from Precision"],
+      "display": "PCON"
+    },
+    {
+       "id": 50307,
+      "name": "HolographicSuperApple",
+      "stats": ["8% Power from Condition Damage", "3% Concentration from Precision"],
+      "display": "CCON"
+    },
+    {
+      "id": 50302,
+      "name": "HolographicSuperDrumstick",
+      "stats": ["8% Healing Power from Concentration", "3% Concentration from Precision"],
+      "display": "HCON"
     },
 
     // heal

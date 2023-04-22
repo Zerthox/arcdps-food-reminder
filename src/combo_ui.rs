@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use crate::data::PROFESSIONS;
 use arc_util::ui::render;
 use arcdps::{
@@ -7,22 +5,23 @@ use arcdps::{
     imgui::{Selectable, StyleColor, Ui},
     Profession,
 };
+use std::borrow::Cow;
 use strum::IntoEnumIterator;
 
 /// Renders a combo box for items from an iterator.
+// TODO: make generic enough to be used for buff combo & co as well?
 pub fn render_combo<T>(
     ui: &Ui,
     label: impl AsRef<str>,
-    all: impl Iterator<Item = T>,
+    all: impl IntoIterator<Item = T>,
     current: &mut T,
-    item_label: impl for<'a> Fn(&'a T) -> Cow<'a, str>,
+    item_label: impl Fn(&T) -> Cow<str>,
     item_color: impl Fn(&T) -> Option<[f32; 4]>,
 ) -> bool
 where
     T: PartialEq,
 {
     let mut changed = false;
-
     if let Some(_token) = ui.begin_combo(label, item_label(current)) {
         for entry in all {
             let selected = entry == *current;
@@ -45,7 +44,6 @@ where
             }
         }
     }
-
     changed
 }
 

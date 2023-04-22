@@ -91,12 +91,14 @@ pub fn render_buff_combo<'b>(
     selected_id: u32,
     buffs: impl Iterator<Item = &'b BuffData> + Clone,
 ) -> Option<&'b BuffData> {
-    let current = buffs.clone().find(|entry| entry.id == selected_id);
-    let preview = current.map(|buff| buff.name.clone()).unwrap_or_default();
-
-    let mut result = None;
+    let preview = buffs
+        .clone()
+        .find(|entry| entry.id == selected_id)
+        .map(|buff| buff.name.clone())
+        .unwrap_or_default();
 
     // TODO: search?
+    let mut result = None;
     if let Some(_token) = ui.begin_combo(label, preview) {
         for entry in buffs {
             let selected = entry.id == selected_id;
@@ -105,7 +107,6 @@ pub fn render_buff_combo<'b>(
                 .rarity
                 .color()
                 .map(|color| ui.push_style_color(StyleColor::Text, color));
-
             if Selectable::new(&entry.name).selected(selected).build(ui) {
                 result = Some(entry);
             }
@@ -122,6 +123,5 @@ pub fn render_buff_combo<'b>(
             }
         }
     }
-
     result
 }

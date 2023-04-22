@@ -1,5 +1,6 @@
 use super::Plugin;
 use crate::{
+    colors::{GREEN, GREY, RED, YELLOW},
     combo_ui::render_enum_combo,
     data::{Definitions, LoadError},
     plugin::{ExtrasState, DEFINITIONS_FILE},
@@ -38,18 +39,10 @@ impl Plugin {
     // TODO: split settings UI into components
     pub fn render_settings(&mut self, ui: &Ui) {
         let colors = exports::colors();
-        let grey = colors
-            .core(CoreColor::MediumGrey)
-            .unwrap_or([0.5, 0.5, 0.5, 1.0]);
-        let red = colors
-            .core(CoreColor::LightRed)
-            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
-        let green = colors
-            .core(CoreColor::LightGreen)
-            .unwrap_or([0.0, 1.0, 0.0, 1.0]);
-        let yellow = colors
-            .core(CoreColor::LightYellow)
-            .unwrap_or([1.0, 1.0, 0.0, 1.0]);
+        let grey = colors.core(CoreColor::MediumGrey).unwrap_or(GREY);
+        let red = colors.core(CoreColor::LightRed).unwrap_or(RED);
+        let green = colors.core(CoreColor::LightGreen).unwrap_or(GREEN);
+        let yellow = colors.core(CoreColor::LightYellow).unwrap_or(YELLOW);
 
         const SPACING: f32 = 5.0;
 

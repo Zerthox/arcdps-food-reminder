@@ -2,6 +2,7 @@ use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
 use crate::{
     assets::{FOOD_ICON, UNKNOWN_ICON, UTIL_ICON},
     buff_ui,
+    colors::{GREEN, RED, YELLOW},
     combo_ui::render_enum_combo,
     data::{
         DefinitionKind, Definitions, DIMINISHED, MALNOURISHED, NO_BUFF_TEXT, UNKNOWN_BUFF_TEXT,
@@ -68,15 +69,9 @@ impl Tracker {
         let prof_color = colors
             .prof_base(entry.profession)
             .map(|color| render::with_alpha(color, 1.0));
-        let red = colors
-            .core(CoreColor::LightRed)
-            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
-        let green = colors
-            .core(CoreColor::LightGreen)
-            .unwrap_or([0.0, 1.0, 0.0, 1.0]);
-        let yellow = colors
-            .core(CoreColor::LightYellow)
-            .unwrap_or([1.0, 1.0, 0.0, 1.0]);
+        let red = colors.core(CoreColor::LightRed).unwrap_or(RED);
+        let green = colors.core(CoreColor::LightGreen).unwrap_or(GREEN);
+        let yellow = colors.core(CoreColor::LightYellow).unwrap_or(YELLOW);
 
         // new row for each player
         ui.table_next_row();

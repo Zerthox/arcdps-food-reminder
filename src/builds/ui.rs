@@ -2,6 +2,7 @@ use super::{build::Build, Builds};
 use crate::{
     assets::{FOOD_ICON, UTIL_ICON},
     buff_ui,
+    colors::{GREEN, RED},
     data::{DefinitionKind, Definitions, PROFESSIONS},
     tracking::buff::BuffState,
 };
@@ -67,12 +68,8 @@ impl Builds {
                 if build.visible && prof_matches {
                     ui.table_next_row();
 
-                    let red = colors
-                        .core(CoreColor::LightRed)
-                        .unwrap_or([1.0, 0.0, 0.0, 1.0]);
-                    let green = colors
-                        .core(CoreColor::LightGreen)
-                        .unwrap_or([0.0, 1.0, 0.0, 1.0]);
+                    let red = colors.core(CoreColor::LightRed).unwrap_or(RED);
+                    let green = colors.core(CoreColor::LightGreen).unwrap_or(GREEN);
 
                     // name
                     ui.table_next_column();

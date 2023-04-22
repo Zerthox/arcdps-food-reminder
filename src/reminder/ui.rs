@@ -1,4 +1,5 @@
 use super::{custom::CustomReminder, Reminder};
+use crate::colors::RED;
 use arc_util::ui::{render, Component};
 use arcdps::{
     exports::{self, CoreColor},
@@ -34,9 +35,7 @@ impl Reminder {
     fn render_text(ui: &Ui, text: &str) {
         // grab colors
         let colors = exports::colors();
-        let red = colors
-            .core(CoreColor::LightRed)
-            .unwrap_or([1.0, 0.0, 0.0, 1.0]);
+        let red = colors.core(CoreColor::LightRed).unwrap_or(RED);
 
         // adjust cursor to center text
         let [cursor_x, cursor_y] = ui.cursor_pos();

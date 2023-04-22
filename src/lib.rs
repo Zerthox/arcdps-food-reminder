@@ -1,6 +1,7 @@
 mod assets;
 mod buff_ui;
 mod builds;
+mod colors;
 mod combo_ui;
 mod data;
 mod plugin;

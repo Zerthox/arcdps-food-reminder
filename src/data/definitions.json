@@ -134,14 +134,14 @@
     {
       "id": 57409,
       "name": "Cilantro and Cured Meat Flatbread",
-      "stats": ["66% Life Steal Chance", "+100 Condition Damage", "+ 70 Expertise"],
+      "stats": ["66% Life Steal Chance", "+100 Condition Damage", "+70 Expertise"],
       "display": "Condi",
       "rarity": "Ascended"
     },
     {
       "id": 57127,
       "name": "Peppered Cured Meat Flatbread",
-      "stats": ["-10% Incoming Damage", "+100 Condition Damage", "+ 70 Expertise"],
+      "stats": ["-10% Incoming Damage", "+100 Condition Damage", "+70 Expertise"],
       "display": "Condi",
       "rarity": "Ascended"
     },

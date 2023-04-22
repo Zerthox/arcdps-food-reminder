@@ -208,13 +208,13 @@ impl Component<Props<'_>> for Demo {
                             .map(|entry| matches!(entry.state, BuffState::Some(_)))
                             .unwrap_or(false);
                         ui.same_line();
-                        if ui.checkbox(format!("##custom-{}", custom.id), &mut applied) {
+                        if ui.checkbox(format!("##custom-{}-{}", custom.id, id), &mut applied) {
                             data.custom.insert(
                                 custom.id,
                                 TrackedBuff::new(if applied {
-                                    BuffState::None
-                                } else {
                                     BuffState::Some(())
+                                } else {
+                                    BuffState::None
                                 }),
                             );
                         }

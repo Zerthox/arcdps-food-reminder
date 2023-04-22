@@ -1,6 +1,8 @@
 use super::Demo;
 use crate::{
+    buff_ui::render_buff_tooltip,
     combo_ui::render_prof_select,
+    data::Definitions,
     tracking::{
         buff::{BuffState, TrackedBuff},
         ui::Props as TrackerProps,
@@ -11,14 +13,62 @@ use arc_util::{
     ui::{render, Component, Hideable, Windowable},
 };
 use arcdps::{
-    imgui::{TableColumnSetup, Ui},
+    imgui::{Selectable, StyleColor, TableColumnSetup, Ui},
     Profession, Specialization,
 };
+use std::borrow::Cow;
 
 pub type Props<'p> = TrackerProps<'p>;
 
 const SPECIAL_BUFFS: [BuffState<u32>; 3] =
     [BuffState::Unknown, BuffState::None, BuffState::Some(0)];
+
+impl Demo {
+    fn render_combo<'b>(
+        ui: &Ui,
+        defs: &Definitions,
+        label: impl AsRef<str>,
+        all: &'b [BuffState<u32>],
+        current: &mut BuffState<u32>,
+        item_label: impl Fn(&BuffState<u32>) -> Cow<str>,
+    ) -> Option<&'b BuffState<u32>> {
+        let mut result = None;
+        if let Some(_token) = ui.begin_combo(label, item_label(current)) {
+            for entry in all {
+                let selected = entry == current;
+                let data = match entry {
+                    BuffState::Some(id) => defs.definition(*id).and_then(|def| def.data()),
+                    _ => None,
+                };
+
+                // apply color to selectable
+                let style = data
+                    .and_then(|data| data.rarity.color())
+                    .map(|color| ui.push_style_color(StyleColor::Text, color));
+                if Selectable::new(item_label(entry))
+                    .selected(selected)
+                    .build(ui)
+                {
+                    result = Some(entry);
+                }
+                drop(style);
+
+                // handle focus
+                if selected {
+                    ui.set_item_default_focus();
+                }
+
+                // tooltip
+                if ui.is_item_hovered() {
+                    if let Some(buff) = data {
+                        render_buff_tooltip(ui, buff);
+                    }
+                }
+            }
+        }
+        result
+    }
+}
 
 impl Component<Props<'_>> for Demo {
     fn render(&mut self, ui: &Ui, (defs, custom): Props) {
@@ -123,36 +173,30 @@ impl Component<Props<'_>> for Demo {
 
                     // food select
                     ui.table_next_column();
-                    let mut food_id = self
-                        .all_foods
-                        .iter()
-                        .position(|buff| *buff == data.food.state)
-                        .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo(
+                    if let Some(new) = Self::render_combo(
+                        ui,
+                        defs,
                         format!("##food-{id}"),
-                        &mut food_id,
                         &self.all_foods,
+                        &mut data.food.state,
                         |buff| Self::food_name(defs, *buff),
                     ) {
-                        data.food.state = self.all_foods[food_id];
+                        data.food.state = *new;
                     }
 
-                    // utility
+                    // utility select
                     ui.table_next_column();
-                    let mut util_id = self
-                        .all_utils
-                        .iter()
-                        .position(|buff| *buff == data.util.state)
-                        .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo(
+                    if let Some(new) = Self::render_combo(
+                        ui,
+                        defs,
                         format!("##util-{id}"),
-                        &mut util_id,
                         &self.all_utils,
+                        &mut data.util.state,
                         |buff| Self::util_name(defs, *buff),
                     ) {
-                        data.util.state = self.all_utils[util_id];
+                        data.util.state = *new;
                     }
 
                     // custom

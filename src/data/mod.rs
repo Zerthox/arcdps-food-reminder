@@ -160,9 +160,16 @@ pub enum DefinitionKind {
 impl DefinitionKind {
     pub fn name(&self) -> &str {
         match self {
-            DefinitionKind::Food(data) => data.name.as_str(),
-            DefinitionKind::Util(data) => data.name.as_str(),
-            DefinitionKind::Ignore => "",
+            Self::Food(data) => data.name.as_str(),
+            Self::Util(data) => data.name.as_str(),
+            Self::Ignore => "",
+        }
+    }
+
+    pub fn data(&self) -> Option<&BuffData> {
+        match self {
+            Self::Food(data) | Self::Util(data) => Some(data),
+            Self::Ignore => None,
         }
     }
 }

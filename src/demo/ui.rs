@@ -1,7 +1,10 @@
 use super::Demo;
 use crate::{
     combo_ui::render_prof_select,
-    tracking::{buff::BuffState, ui::Props as TrackerProps},
+    tracking::{
+        buff::{BuffState, TrackedBuff},
+        ui::Props as TrackerProps,
+    },
 };
 use arc_util::{
     tracking::{Entry, Player},
@@ -76,6 +79,7 @@ impl Component<Props<'_>> for Demo {
                     TableColumnSetup::new("Class"),
                     TableColumnSetup::new("Food"),
                     TableColumnSetup::new("Util"),
+                    TableColumnSetup::new("Custom"),
                 ],
             ) {
                 const INPUT_SIZE: f32 = 100.0;
@@ -149,6 +153,30 @@ impl Component<Props<'_>> for Demo {
                         |buff| Self::util_name(defs, *buff),
                     ) {
                         data.util.state = self.all_utils[util_id];
+                    }
+
+                    // custom
+                    ui.table_next_column();
+                    for custom in self.reminder.all_custom() {
+                        let mut applied = data
+                            .custom
+                            .get(&custom.id)
+                            .map(|entry| matches!(entry.state, BuffState::Some(_)))
+                            .unwrap_or(false);
+                        ui.same_line();
+                        if ui.checkbox(format!("##custom-{}", custom.id), &mut applied) {
+                            data.custom.insert(
+                                custom.id,
+                                TrackedBuff::new(if applied {
+                                    BuffState::None
+                                } else {
+                                    BuffState::Some(())
+                                }),
+                            );
+                        }
+                        if ui.is_item_hovered() {
+                            ui.tooltip_text(&custom.name);
+                        }
                     }
                 }
             }

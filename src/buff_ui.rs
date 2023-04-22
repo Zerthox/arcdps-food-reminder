@@ -8,7 +8,13 @@ use arcdps::{
 /// Renders a tooltip for a buff.
 pub fn render_buff_tooltip(ui: &Ui, buff: &BuffData) {
     if ui.is_item_hovered() {
-        ui.tooltip_text(format!("{}\n{}", buff.name, buff.stats.join("\n")));
+        ui.tooltip(|| {
+            match buff.rarity.color() {
+                Some(color) => ui.text_colored(color, &buff.name),
+                None => ui.text(&buff.name),
+            }
+            ui.text(buff.stats.join("\n"));
+        });
     }
 }
 

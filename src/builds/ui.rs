@@ -3,7 +3,8 @@ use crate::{
     assets::{FOOD_ICON, UTIL_ICON},
     buff_ui,
     colors::{GREEN, RED},
-    data::{DefinitionKind, Definitions, PROFESSIONS},
+    combo_ui::render_prof_select,
+    data::{DefinitionKind, Definitions},
     tracking::buff::BuffState,
 };
 use arc_util::ui::{
@@ -159,16 +160,8 @@ impl Builds {
 
                 // prof select
                 ui.table_next_column();
-                let mut index = PROFESSIONS
-                    .iter()
-                    .position(|prof| *prof == build.prof)
-                    .unwrap();
                 ui.set_next_item_width(INPUT_SIZE);
-                if ui.combo(format!("##prof-{i}"), &mut index, PROFESSIONS, |prof| {
-                    <&str>::from(prof).into()
-                }) {
-                    build.prof = PROFESSIONS[index];
-                }
+                render_prof_select(ui, format!("##prof-{i}"), &mut build.prof);
 
                 // name input
                 ui.table_next_column();

@@ -2,7 +2,7 @@ use crate::data::BuffData;
 use arc_util::ui::{render, Ui};
 use arcdps::{
     exports::{self, CoreColor},
-    imgui::Selectable,
+    imgui::{Selectable, StyleColor},
 };
 
 /// Renders a tooltip for a buff.
@@ -91,16 +91,8 @@ pub fn render_buff_combo<'b>(
     selected_id: u32,
     buffs: impl Iterator<Item = &'b BuffData> + Clone,
 ) -> Option<&'b BuffData> {
-    let preview = buffs
-        .clone()
-        .find_map(|entry| {
-            if entry.id == selected_id {
-                Some(entry.name.clone())
-            } else {
-                None
-            }
-        })
-        .unwrap_or_default();
+    let current = buffs.clone().find(|entry| entry.id == selected_id);
+    let preview = current.map(|buff| buff.name.clone()).unwrap_or_default();
 
     let mut result = None;
 
@@ -108,9 +100,16 @@ pub fn render_buff_combo<'b>(
     if let Some(_token) = ui.begin_combo(label, preview) {
         for entry in buffs {
             let selected = entry.id == selected_id;
+
+            let style = entry
+                .rarity
+                .color()
+                .map(|color| ui.push_style_color(StyleColor::Text, color));
+
             if Selectable::new(&entry.name).selected(selected).build(ui) {
                 result = Some(entry);
             }
+            drop(style);
 
             // handle focus
             if selected {

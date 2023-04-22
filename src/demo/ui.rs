@@ -1,6 +1,6 @@
 use super::Demo;
 use crate::{
-    data::PROFESSIONS,
+    combo_ui::render_prof_select,
     tracking::{buff::BuffState, ui::Props as TrackerProps},
 };
 use arc_util::{
@@ -114,16 +114,8 @@ impl Component<Props<'_>> for Demo {
 
                     // profession select
                     ui.table_next_column();
-                    let mut index = PROFESSIONS
-                        .iter()
-                        .position(|prof| *prof == player.profession)
-                        .unwrap();
                     ui.set_next_item_width(INPUT_SIZE);
-                    if ui.combo(format!("##prof-{id}"), &mut index, PROFESSIONS, |prof| {
-                        <&str>::from(prof).into()
-                    }) {
-                        player.profession = PROFESSIONS[index];
-                    }
+                    render_prof_select(ui, format!("##prof-{id}"), &mut player.profession);
 
                     // food select
                     ui.table_next_column();

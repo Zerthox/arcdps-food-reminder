@@ -12,49 +12,57 @@
       "id": 57244,
       "name": "Cilantro Lime Sous-Vide Steak",
       "stats": ["66% Life Steal Chance", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 57051,
       "name": "Peppercorn-Crusted Sous-Vide Steak",
       "stats": ["-10% Incoming Damage", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 57393,
       "name": "Mushroom Clove Sous-Vide Steak",
       "stats": ["-20% Incoming Condition Duration", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 57241,
       "name": "Soy-Sesame Sous-Vide Steak",
       "stats": ["Health every second", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 57342,
       "name": "Sous-Vide Steak with Mint-Parsley Sauce",
       "stats": ["+10% Outgoing Healing", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 64357,
       "name": "Bowl of Jade Sea",
       "stats": ["+150 Fishing Power", "+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Ascended"
     },
     {
       "id": 17825,
       "name": "Bowl of Sweet and Spicy Butternut Squash Soup",
       "stats": ["+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Fine"
     },
     {
       "id": 57883,
       "name": "Plate of Spicy Moa Wings",
       "stats": ["+100 Power", "+70 Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Masterwork"
     },
 
     // precision
@@ -62,55 +70,64 @@
       "id": 57253,
       "name": "Plate of Coq Au Vin with Salsa",
       "stats": ["66& Life Steal Chance", "+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Ascended"
     },
     {
       "id": 57260,
       "name": "Plate of Peppercorn-Spiced Coq Au Vin",
       "stats": ["-10% Incoming Damage", "+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Ascended"
     },
     {
       "id": 57348,
       "name": "Plate of Clove-Spiced Coq Au Vin",
       "stats": ["-20% Incoming Condition Duration", "+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Ascended"
     },
     {
       "id": 57290,
       "name": "Plate of Sesame-Crusted Coq Au Vin",
       "stats": ["Health every second", "+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Ascended"
     },
     {
       "id": 57362,
       "name": "Plate of Coq Au Vin with Mint Garnish",
       "stats": ["+10% Outgoing Healing", "+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Ascended"
     },
     {
       "id": 9829,
       "name": "Bowl of Curry Butternut Squash Soup",
       "stats": ["+100 Precision", "+70 Power"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Fine"
     },
     {
       "id": 9769,
       "name": "Plate of Truffle Steak",
       "stats": ["+100 Power", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Fine"
     },
     {
       "id": 9805,
       "name": "Bowl of Fancy Potato and Leek Soup",
       "stats": ["+100 Precision", "+70 Condition Damage"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Fine"
     },
     {
       "id": 9817,
       "name": "Plate of Truffle Risotto",
       "stats": ["+100 Condition Damage", "+70 Precision"],
-      "display": "Prec"
+      "display": "Prec",
+      "rarity": "Fine"
     },
 
     // condi damage
@@ -118,43 +135,50 @@
       "id": 57409,
       "name": "Cilantro and Cured Meat Flatbread",
       "stats": ["66% Life Steal Chance", "+100 Condition Damage", "+ 70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 57127,
       "name": "Peppered Cured Meat Flatbread",
       "stats": ["-10% Incoming Damage", "+100 Condition Damage", "+ 70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 57072,
       "name": "Clove-Spiced Pear and Cured Meat Flatbread",
       "stats": ["-20% Incoming Condition Duration", "+100 Condition Damage", "+70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 57222,
       "name": "Sesame-Asparagus and Cured Meat Flatbread",
       "stats": ["Health every second", "+100 Condition Damage", "+70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 57064,
       "name": "Mint-Pear Cured Meat Flatbread",
       "stats": ["+10% Outgoing Healing", "+100 Condition Damage", "+70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 66663,
       "name": "Bowl of Echovald Hotpot",
       "stats": ["+150 Fishing Power", "+100 Condition Damage", "+70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Ascended"
     },
     {
       "id": 49686,
       "name": "Plate of Beef Rendang",
       "stats": ["+100 Condition Damage", "+70 Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Masterwork"
     },
 
     // expertise
@@ -162,43 +186,50 @@
       "id": 57269,
       "name": "Salsa-Topped Veggie Flatbread",
       "stats": ["66% Life Steal Chance", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Ascended"
     },
     {
       "id": 57382,
       "name": "Peppercorn and Veggie Flatbread",
       "stats": ["-10% Incoming Damage", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Ascended"
     },
     {
       "id": 57344,
       "name": "Clove and Veggie Flatbread",
       "stats": ["-20% Incoming Condition Duration", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Ascended"
     },
     {
       "id": 57050,
       "name": "Sesame Veggie Flatbread",
       "stats": ["Health every second", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Ascended"
     },
     {
       "id": 57263,
       "name": "Mint and Veggie Flatbread",
       "stats": ["+10% Outgoing Healing", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Ascended"
     },
     {
       "id": 46273,
       "name": "Red Lentil Saobosa",
       "stats": ["+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Rare"
     },
     {
       "id": 10009, // same as koi cake and bowl of garlic kale sautee
       "name": "Rare Veggie Pizza",
       "stats": ["+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Fine"
     },
 
     // condi duration
@@ -206,37 +237,43 @@
       "id": 10119,
       "name": "Bowl of Fire Meat Chili",
       "stats": ["+15% Burning Duration", "+70 Precision"],
-      "display": "Burn"
+      "display": "Burn",
+      "rarity": "Fine"
     },
     {
       "id": 66503,
       "name": "Fishy Rice Bowl",
       "stats": ["+15% Burning Duration", "+70 Condition Damage"],
-      "display": "Burn"
+      "display": "Burn",
+      "rarity": "Fine"
     },
     {
       "id": 65769,
       "name": "Plate of Kimchi Pancakes",
       "stats": ["+15% Bleed Duration", "+70 Condition Damage"],
-      "display": "Bleed"
+      "display": "Bleed",
+      "rarity": "Fine"
     },
     {
       "id": 64568,
       "name": "Meaty Asparagus Skewer",
       "stats": ["+15% Torment Duration", "+70 Condition Damage"],
-      "display": "Torm"
+      "display": "Torm",
+      "rarity": "Fine"
     },
     {
       "id": 65197,
       "name": "Bowl of Kimchi Tofu Stew",
       "stats": ["+15% Poison Duration", "+70 Condition Damage"],
-      "display": "Poison"
+      "display": "Poison",
+      "rarity": "Fine"
     },
     {
       "id": 65354,
       "name": "Meaty Rice Bowl",
       "stats": ["+15% Confusion Duration", "+70 Condition Damage"],
-      "display": "Confu"
+      "display": "Confu",
+      "rarity": "Fine"
     },
 
     // concentration
@@ -244,81 +281,136 @@
       "id": 57042,
       "name": "Beef Carpaccio with Salsa Garnish",
       "stats": ["66% Life Steal Chance", "+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57114,
       "name": "Plate of Peppercorn-Spiced Beef Carpaccio",
       "stats": ["-10% Incoming Damage", "+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57237,
       "name": "Plate of Clove-Spiced Beef Carpaccio",
       "stats": ["-20% Incoming Condition Duration", "+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57231,
       "name": "Plate of Sesame-Ginger Beef Carpaccio",
       "stats": ["Health every second", "+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57251,
       "name": "Plate of Beef Carpaccio with Mint Garnish",
       "stats": ["+10% Outgoing Healing", "+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Ascended"
     },
     {
       "id": 53222,
       "name": "Soul Pastry",
       "stats": ["+100 Concentration", "+70 Power"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Masterwork"
     },
     {
       "id": 57117,
       "name": "Salsa Eggs Benedict",
       "stats": ["66% Life Steal Chance", "+100 Concentration", "+70 Expertise"],
-      "display": "CConc"
+      "display": "CConc",
+      "rarity": "Ascended"
+    },
+    {
+      "id": 57210,
+      "name": "Peppercorn-Spiced Eggs Benedict",
+      "stats": ["-10% Incoming Damage", "+100 Concentration", "+70 Expertise"],
+      "display": "CConc",
+      "rarity": "Ascended"
+    },
+    {
+      "id": 57242,
+      "name": "Clove-Spiced Eggs Benedict",
+      "stats": ["-20% Incoming Condition Duration", "+100 Concentration", "+70 Expertise"],
+      "display": "CConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57084,
       "name": "Sesame Eggs Benedict",
       "stats": ["Health every second", "+100 Concentration", "+70 Expertise"],
-      "display": "CConc"
+      "display": "CConc",
+      "rarity": "Ascended"
+    },
+    {
+      "id": 57259,
+      "name": "Eggs Benedict with Mint-Parsley Sauce",
+      "stats": ["+10% Outgoing Healing", "+100 Concentration", "+70 Expertise"],
+      "display": "CConc",
+      "rarity": "Ascended"
     },
     {
       "id": 57187,
       "name": "Plage of Eggs Benedict",
       "stats": ["+100 Concentration", "+70 Expertise"],
-      "display": "CConc"
+      "display": "CConc",
+      "rarity": "Masterwork"
     },
 
     // heal
     {
+      "id": 57401,
+      "name": "Bowl of Fruit Salad with Cilantro Garnish",
+      "stats": ["66% Life Steal Chance", "+100 Healing Power", "+70 Concentration"],
+      "display": "Heal",
+      "rarity": "Ascended"
+    },
+    {
       "id": 57276,
       "name": "Bowl of Spiced Fruit Salad",
       "stats": ["-10% Incoming Damage", "+100 Healing Power", "+70 Concentration"],
-      "display": "Heal"
+      "display": "Heal",
+      "rarity": "Ascended"
+    },
+    {
+      "id": 57397,
+      "name": "Bowl of Fruit Salad with Orange-Clove Syrup",
+      "stats": ["-20% Incoming Condition Duration", "+100 Healing Power", "+70 Concentration"],
+      "display": "Heal",
+      "rarity": "Ascended"
+    },
+    {
+      "id": 57101,
+      "name": "Bowl of Sesame Fruit Salad",
+      "stats": ["Health every second", "+100 Healing Power", "+70 Concentration"],
+      "display": "Heal",
+      "rarity": "Ascended"
     },
     {
       "id": 57100,
       "name": "Bowl of Fruit Salad with Mint Garnish",
       "stats": ["+10% Outgoing Healing", "+100 Healing Power", "+70 Concentration"],
-      "display": "Heal"
+      "display": "Heal",
+      "rarity": "Ascended"
     },
     {
       "id": 67265,
       "name": "Plate of Imperial Palace Special",
       "stats": ["+150 Fishing Power", "+100 Healing Power", "+70 Concentration"],
-      "display": "Heal"
+      "display": "Heal",
+      "rarity": "Ascended"
     },
     {
       "id": 26529,
       "name": "Delicious Rice Ball",
       "stats": ["+10% Outgoing Healing", "+100 Healing Power"],
-      "display": "Heal"
+      "display": "Heal",
+      "rarity": "Fine"
     },
 
     // on kill
@@ -326,19 +418,22 @@
       "id": 9750,
       "name": "Dragon's Breath Bun",
       "stats": ["+200 Power on Kill", "+70 Ferocity"],
-      "display": "Kill"
-    },
-    {
-      "id": 9756, // same as karka omelet
-      "name": "Saffron Stuffed Mushroom",
-      "stats": ["+200 Condition Damage on Kill", "+70 Precision"],
-      "display": "Kill"
+      "display": "Kill",
+      "rarity": "Basic"
     },
     {
       "id": 65937,
       "name": "Block of Tofu",
       "stats": ["+100 Power & Ferocity on Kill", "+70 Precision"],
-      "display": "Kill"
+      "display": "Kill",
+      "rarity": "Fine"
+    },
+    {
+      "id": 9756, // same as karka omelet
+      "name": "Saffron Stuffed Mushroom",
+      "stats": ["+200 Condition Damage on Kill", "+70 Precision"],
+      "display": "Kill",
+      "rarity": "Fine"
     },
 
     // all stats
@@ -346,43 +441,50 @@
       "id": 57356,
       "name": "Spherified Cilantro Oyster Soup",
       "stats": ["66% Life Steal Chance", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 57165,
       "name": "Spherified Peppercorn-Spiced Oyster Soup",
       "stats": ["-10% Incoming Damage", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 57374,
       "name": "Spherified Clove-Spiced Oyster Soup",
       "stats": ["-20% Incoming Condition Duration", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 57037,
       "name": "Spherified Sesame Oyster Soup",
       "stats": ["Health every second", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 57201,
       "name": "Spherified Oyster Soup with Mint Garnish",
       "stats": ["+10% Outgoing Healing", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 67705,
       "name": "Flight of Sushi",
       "stats": ["+150 Fishing Power", "+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Ascended"
     },
     {
       "id": 19451,
       "name": "Dragon's Revelry Starcake",
       "stats": ["+45 All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Basic"
     },
 
     // other
@@ -390,19 +492,22 @@
       "id": 10096,
       "name": "Bowl of Orrian Truffle and Meat Stew",
       "stats": ["100% Might on Dodge", "+40% to Endurance Regeneration"],
-      "display": "Endu"
+      "display": "Endu",
+      "rarity": "Fine"
     },
     {
       "id": 33856,
       "name": "Jerk Poultry and Nopal Flatbread Sandwich",
       "stats": ["+200 Power on Heal", "+70 Precision"],
-      "display": "OnHeal"
+      "display": "OnHeal",
+      "rarity": "Masterwork"
     },
     {
       "id": 34570,
       "name": "Bowl of Bloodstone Bisque",
       "stats": ["Side effects may be unpredictable or fatal.", "Consult a healer if conditions deteriorate."],
-      "display": "Matt"
+      "display": "Matt",
+      "rarity": "Basic"
     }
   ],
 
@@ -419,19 +524,22 @@
       "id": 9963, // same as potent version
       "name": "Superior Sharpening Stone",
       "stats": ["3% Power from Precision", "6% Power from Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Fine"
     },
     {
       "id": 34211,
       "name": "Tin of Fruitcake",
       "stats": ["3% Power from Precision", "6% Power from Ferocity"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Fine"
     },
     {
       "id": 25882,
       "name": "Furious Sharpening Stone",
       "stats": ["3% Power from Precision", "3% Ferocity from Precision"],
-      "display": "Power"
+      "display": "Power",
+      "rarity": "Masterwork"
     },
 
     // condi
@@ -439,31 +547,36 @@
       "id": 21828,
       "name": "Toxic Focusing Crystal",
       "stats": ["3% Condition Damage from Power", "3% Condition Damage from Precision"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Fine"
     },
     {
       "id": 9967,
       "name": "Master Tuning Crystal",
       "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Fine"
     },
     {
       "id": 34206,
       "name": "Tuning Icicle",
       "stats": ["3% Condition Damage from Precision", "8% Condition Damage from Expertise"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Fine"
     },
     {
       "id": 25878,
       "name": "Furious Tuning Crystal",
       "stats": ["3% Condition Damage from Precision", "3% Expertise from Precision"],
-      "display": "Expert"
+      "display": "Expert",
+      "rarity": "Masterwork"
     },
     {
       "id": 38678,
       "name": "Magnanimous Tuning Crystal",
       "stats": ["3% Condition Damage from Vitality", "3% Condition Damage from Toughness"],
-      "display": "Condi"
+      "display": "Condi",
+      "rarity": "Masterwork"
     },
 
     // concentration
@@ -471,55 +584,64 @@
       "id": 53374,
       "name": "Potent Lucent Oil",
       "stats": ["3% Concentration from Power", "3% Concentration from Precision"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Masterwork"
     },
     {
       "id": 53304,
       "name": "Enhanced Lucent Oil",
       "stats": ["6% Concentration from Condition Damage", "3% Concentration from Precision"],
-      "display": "PConc"
+      "display": "PConc",
+      "rarity": "Masterwork"
+    },
+    {
+       "id": 50320,
+      "name": "Holographic Super Cheese",
+      "stats": ["8% Power from Concentration", "3% Concentration from Precision"],
+      "display": "PConc",
+      "rarity": "Masterwork"
     },
     {
       "id": 21827,
       "name": "Toxic Maintenance Oil",
       "stats": ["3% Concentration from Power", "6% Concentration from Condition Damage"],
-      "display": "CConc"
+      "display": "CConc",
+      "rarity": "Fine"
+    },
+    {
+       "id": 50307,
+      "name": "Holographic Super Apple",
+      "stats": ["8% Power from Condition Damage", "3% Concentration from Precision"],
+      "display": "CConc",
+      "rarity": "Masterwork"
     },
     {
       "id": 9968,
       "name": "Master Maintenance Oil",
       "stats": ["3% Concentration from Precision", "6% Concentration from Healing Power"],
-      "display": "HConc"
+      "display": "HConc",
+      "rarity": "Fine"
     },
     {
       "id": 34187,
       "name": "Peppermint Oil",
       "stats": ["3% Concentration from Precision", "6% Concentration from Healing Power"],
-      "display": "HConc"
+      "display": "HConc",
+      "rarity": "Fine"
+    },
+    {
+      "id": 50302,
+      "name": "Holographic Super Drumstick",
+      "stats": ["8% Healing Power from Concentration", "3% Concentration from Precision"],
+      "display": "HConc",
+      "rarity": "Masterwork"
     },
     {
       "id": 38605,
       "name": "Magnanimous Maintenance Oil",
       "stats": ["3% Concentration from Vitality", "3% Concentration from Toughness"],
-      "display": "TConc"
-    },
-    {
-       "id": 50320,
-      "name": "HolographicSuperCheese",
-      "stats": ["8% Power from Concentration", "3% Concentration from Precision"],
-      "display": "PConc"
-    },
-    {
-       "id": 50307,
-      "name": "HolographicSuperApple",
-      "stats": ["8% Power from Condition Damage", "3% Concentration from Precision"],
-      "display": "CConc"
-    },
-    {
-      "id": 50302,
-      "name": "HolographicSuperDrumstick",
-      "stats": ["8% Healing Power from Concentration", "3% Concentration from Precision"],
-      "display": "HConc"
+      "display": "TConc",
+      "rarity": "Masterwork"
     },
 
     // heal
@@ -527,7 +649,8 @@
       "id": 25879,
       "name": "Bountiful Maintenance Oil",
       "stats": ["0.6% Outgoing Healing for 100 Healing Power", "0.8% Outgoing Healing for 100 Concentration"],
-      "display": "Heal"
+      "display": "Heal",
+      "rarity": "Masterwork"
     },
 
     // writs
@@ -535,19 +658,22 @@
       "id": 33297,
       "name": "Writ of Masterful Strength",
       "stats": ["+200 Power above 90% Health"],
-      "display": "Writ"
+      "display": "Writ",
+      "rarity": "Fine"
     },
     {
       "id": 31970,
       "name": "Writ of Masterful Accuracy",
       "stats": ["+200 Precision above 90% Health"],
-      "display": "Writ"
+      "display": "Writ",
+      "rarity": "Fine"
     },
     {
       "id": 33836,
       "name": "Writ of Masterful Malice",
       "stats": ["+200 Condition Damage above 90% Health"],
-      "display": "Writ"
+      "display": "Writ",
+      "rarity": "Fine"
     },
 
     // slaying potions
@@ -555,103 +681,120 @@
       "id": 9837,
       "name": "Powerful Potion of Undead Slaying",
       "stats": ["+10% Damage against Undead", "-10% Damage from Undead"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9845,
       "name": "Powerful Potion of Centaur Slaying",
       "stats": ["+10% Damage against Centaur", "-10% Damage from Centaur"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9853,
       "name": "Powerful Potion of Grawl Slaying",
       "stats": ["+10% Damage against Grawl", "-10% Damage from Grawl"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9861,
       "name": "Powerful Potion of Ice Brood Slaying",
       "stats": ["+10% Damage against Ice Brood", "-10% Damage from Ice Brood"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9869,
       "name": "Powerful Potion of Destroyer Slaying",
       "stats": ["+10% Damage against Destroyers", "-10% Damage from Destroyers"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9877,
       "name": "Powerful Potion of Ogre Slaying",
       "stats": ["+10% Damage against Ogres", "-10% Damage from Ogres"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9885,
       "name": "Powerful Potion of Krait Slaying",
       "stats": ["+10% Damage against Krait", "-10% Damage from Krait"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9893,
       "name": "Powerful Potion of Elemental Slaying",
       "stats": ["+10% Damage against Elementals", "-10% Damage from Elementals"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9901,
       "name": "Powerful Potion of Demon Slaying",
       "stats": ["+10% Damage against Demons", "-10% Damage from Demons"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9909,
       "name": "Powerful Potion of Sons of Svanir Slaying",
       "stats": ["+10% Damage against Sons of Svanir", "-10% Damage from Sons of Svanir"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9917,
       "name": "Powerful Potion of Inquest Slaying",
       "stats": ["+10% Damage against Inquest", "-10% Damage from Inquest"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9925,
       "name": "Powerful Potion of Flame Legion Slaying",
       "stats": ["+10% Damage against Flame Legion", "-10% Damage from Flame Legion"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9933,
       "name": "Powerful Potion of Outlaw Slaying",
       "stats": ["+10% Damage against Outlaws", "-10% Damage from Outlaws"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9941,
       "name": "Powerful Potion of Nightmare Court Slaying",
       "stats": ["+10% Damage against Nightmare Court", "-10% Damage from Nightmare Court"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 9949,
       "name": "Powerful Potion of Dredge Slaying",
       "stats": ["+10% Damage against Dredge", "-10% Damage from Dredge"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 15279,
       "name": "Powerful Potion of Halloween Slaying",
       "stats": ["+10% Damage against Halloween Creatures", "-10% Damage from Halloween Creatures"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
     {
       "id": 23228,
       "name": "Powerful Potion of Slaying Scarlet's Armies",
       "stats": ["+10% Damage against Scarlet's Armies", "-10% Damage from Scarlet's Armies"],
-      "display": "Slay"
+      "display": "Slay",
+      "rarity": "Fine"
     },
 
     // resurrect
@@ -659,19 +802,22 @@
       "id": 25632,
       "name": "Flask of Pumpkin Oil",
       "stats": ["+100 Power, Toughness & Vitality after reviving"],
-      "display": "Res"
+      "display": "Res",
+      "rarity": "Masterwork"
     },
     {
       "id": 25631,
       "name": "Lump of Crystallized Nougat",
       "stats": ["+100 Condition Damage, Precision & Toughness after reviving"],
-      "display": "Res"
+      "display": "Res",
+      "rarity": "Masterwork"
     },
     {
       "id": 25630,
       "name": "Sharpening Skull",
       "stats": ["+75 All Attributes after reviving"],
-      "display": "Res"
+      "display": "Res",
+      "rarity": "Masterwork"
     },
 
     // all stats
@@ -679,7 +825,8 @@
       "id": 68235,
       "name": "Decade Enhancement",
       "stats": ["+3% All Attributes"],
-      "display": "All"
+      "display": "All",
+      "rarity": "Rare"
     }
   ],
 

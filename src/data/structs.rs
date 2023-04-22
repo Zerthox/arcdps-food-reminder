@@ -29,4 +29,22 @@ pub struct BuffData {
 
     /// Short display name in buff tracker table.
     pub display: String,
+
+    /// Rarity of the item applying the effect.
+    #[serde(default)]
+    pub rarity: Rarity,
+}
+
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize,
+)]
+pub enum Rarity {
+    #[default]
+    Basic,
+    Fine,
+    Masterwork,
+    Rare,
+    Exotic,
+    Ascended,
+    Legendary,
 }

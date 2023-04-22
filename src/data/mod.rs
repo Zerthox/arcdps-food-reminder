@@ -1,32 +1,13 @@
 mod constants;
+mod impls;
 mod structs;
 
 use crate::util::parse_jsonc;
 use std::{fs, io, path::Path};
 
 pub use self::constants::*;
+pub use self::impls::*;
 pub use self::structs::*;
-
-impl DefData {
-    /// Returns the default definitions data.
-    pub fn with_defaults() -> Self {
-        include!(concat!(env!("OUT_DIR"), "/definitions.rs"))
-    }
-
-    /// Returns the total number of definition entries.
-    pub fn len(&self) -> usize {
-        self.food.len() + self.utility.len() + self.ignore.len()
-    }
-
-    /// Converts this into an iterator over all entries.
-    pub fn into_entries(self) -> impl Iterator<Item = DefinitionEntry> {
-        self.food
-            .into_iter()
-            .map(DefinitionEntry::new_food)
-            .chain(self.utility.into_iter().map(DefinitionEntry::new_util))
-            .chain(self.ignore.into_iter().map(DefinitionEntry::new_ignore))
-    }
-}
 
 /// Shared buff definitions data.
 #[derive(Debug)]

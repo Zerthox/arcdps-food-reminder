@@ -24,6 +24,7 @@ pub struct BuffData {
     pub name: String,
 
     /// Buff stats.
+    // TODO: convert to option<string> when deserializing?
     #[serde(default)]
     pub stats: Vec<String>,
 

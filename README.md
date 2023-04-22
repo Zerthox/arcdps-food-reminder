@@ -28,7 +28,8 @@ Entries using the same id will overwrite the default definition for a Food/Utili
       "id": 57244,
       "name": "Cilantro Lime Sous-Vide Steak",
       "stats": ["66% Life Steal Chance", "+100 Power", "+70 Ferocity"],
-      "display": "PWR"
+      "display": "Power",
+      "rarity": "Ascended"
     }
   ],
   "utility": [
@@ -36,7 +37,7 @@ Entries using the same id will overwrite the default definition for a Food/Utili
       "id": 9963,
       "name": "Superior Sharpening Stone",
       "stats": ["3% Power from Precision", "6% Power from Ferocity"],
-      "display": "PWR"
+      "display": "Power"
     }
   ],
   "ignore": [10110]

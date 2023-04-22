@@ -8,11 +8,14 @@ use std::{env, fs, path::PathBuf};
 use structs::DefData;
 use util::parse_jsonc;
 
+const DEF_PATH: &str = "src/data/definitions.json";
+
 fn main() {
     let manifest = env::var_os("CARGO_MANIFEST_DIR").unwrap();
 
     // parse default definitions
-    let content = fs::read_to_string(PathBuf::from(manifest).join("src/data/definitions.json"))
+    println!("cargo:rerun-if-changed={DEF_PATH}");
+    let content = fs::read_to_string(PathBuf::from(manifest).join(DEF_PATH))
         .expect("failed to read definitions");
     let mut defs: DefData = parse_jsonc(&content).expect("failed to parse definitions");
 

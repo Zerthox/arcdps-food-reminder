@@ -166,6 +166,7 @@ impl DefinitionKind {
         }
     }
 
+    #[allow(unused)]
     pub fn data(&self) -> Option<&BuffData> {
         match self {
             Self::Food(data) | Self::Util(data) => Some(data),

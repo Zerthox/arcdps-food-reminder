@@ -49,9 +49,10 @@ impl HasSettings for Demo {
     }
 
     fn load_settings(&mut self, loaded: Self::Settings) {
-        for (i, loaded) in loaded.players.into_iter().enumerate() {
+        for loaded in loaded.players {
+            let id = loaded.player.id;
             self.tracker.add_player(loaded.player);
-            let Entry { data, .. } = self.tracker.players.player_mut(i).unwrap();
+            let Entry { data, .. } = self.tracker.players.player_mut(id).unwrap();
             data.food = TrackedBuff::new(loaded.food);
             data.util = TrackedBuff::new(loaded.util);
             data.custom = loaded

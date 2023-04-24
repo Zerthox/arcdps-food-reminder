@@ -31,7 +31,7 @@ dependencies = [
 [[package]]
 name = "arcdps"
 version = "0.10.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#eef3f6bcf2b9e724b040647a196048480ee653f6"
+source = "git+https://github.com/zerthox/arcdps-bindings#a4a56407b12b4c8b8c7633f5fe648035f78e1bfa"
 dependencies = [
  "arcdps-imgui",
  "arcdps_codegen",
@@ -68,7 +68,7 @@ dependencies = [
 [[package]]
 name = "arcdps_codegen"
 version = "0.10.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#eef3f6bcf2b9e724b040647a196048480ee653f6"
+source = "git+https://github.com/zerthox/arcdps-bindings#a4a56407b12b4c8b8c7633f5fe648035f78e1bfa"
 dependencies = [
  "cfg-if",
  "paste",
@@ -79,8 +79,8 @@ dependencies = [
 
 [[package]]
 name = "arcdps_evtc"
-version = "0.3.0"
-source = "git+https://github.com/zerthox/arcdps-bindings#eef3f6bcf2b9e724b040647a196048480ee653f6"
+version = "0.4.1"
+source = "git+https://github.com/zerthox/arcdps-bindings#a4a56407b12b4c8b8c7633f5fe648035f78e1bfa"
 dependencies = [
  "num_enum",
  "serde",
@@ -127,9 +127,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.1.0"
+version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c70beb79cbb5ce9c4f8e20849978f34225931f665bb49efa6982875a4d5facb3"
+checksum = "24a6904aef64d73cf10ab17ebace7befb918b82164785cb89907993be7f83813"
 
 [[package]]
 name = "bumpalo"
@@ -401,7 +401,7 @@ name = "gw2_mumble"
 version = "0.1.2"
 source = "git+https://github.com/zerthox/gw2-mumble-rs#409b30b5cc86816caa85478cd6db985da4b220a9"
 dependencies = [
- "bitflags 2.1.0",
+ "bitflags 2.2.1",
  "thiserror",
  "windows",
 ]

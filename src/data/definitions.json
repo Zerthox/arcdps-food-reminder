@@ -116,6 +116,13 @@
       "rarity": "Fine"
     },
     {
+      "id": 9769,
+      "name": "Steak with Winterberry Sauce",
+      "stats": ["+100 Power", "+70 Precision"],
+      "display": "Prec",
+      "rarity": "Masterwork"
+    },
+    {
       "id": 9805,
       "name": "Bowl of Fancy Potato and Leek Soup",
       "stats": ["+100 Precision", "+70 Condition Damage"],

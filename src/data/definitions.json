@@ -193,49 +193,49 @@
       "id": 57269,
       "name": "Salsa-Topped Veggie Flatbread",
       "stats": ["66% Life Steal Chance", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Ascended"
     },
     {
       "id": 57382,
       "name": "Peppercorn and Veggie Flatbread",
       "stats": ["-10% Incoming Damage", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Ascended"
     },
     {
       "id": 57344,
       "name": "Clove and Veggie Flatbread",
       "stats": ["-20% Incoming Condition Duration", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Ascended"
     },
     {
       "id": 57050,
       "name": "Sesame Veggie Flatbread",
       "stats": ["Health every second", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Ascended"
     },
     {
       "id": 57263,
       "name": "Mint and Veggie Flatbread",
       "stats": ["+10% Outgoing Healing", "+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Ascended"
     },
     {
       "id": 46273,
       "name": "Red Lentil Saobosa",
       "stats": ["+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Rare"
     },
     {
       "id": 10009, // same as koi cake and bowl of garlic kale sautee
       "name": "Rare Veggie Pizza",
       "stats": ["+100 Expertise", "+70 Condition Damage"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Fine"
     },
 
@@ -575,7 +575,7 @@
       "id": 25878,
       "name": "Furious Tuning Crystal",
       "stats": ["3% Condition Damage from Precision", "3% Expertise from Precision"],
-      "display": "Expert",
+      "display": "Exper",
       "rarity": "Masterwork"
     },
     {

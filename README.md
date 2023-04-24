@@ -5,6 +5,7 @@ Published releases can be found [here](../../releases). Click [here](../../relea
 
 ![Reminder screenshot](./screenshots/reminder.png)
 ![Tracker screenshot](./screenshots/tracker.png)
+![Tracker screenshot](./screenshots/settings.png)
 
 ## Buff database
 The default definitions for Food & Utility buffs are collected in [src/data/definitions.json](./src/data/definitions.json).

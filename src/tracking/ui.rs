@@ -1,4 +1,8 @@
-use super::{buff::Buffs, settings::Color, BuffState, Sorting, Tracker};
+use super::{
+    buff::Buffs,
+    settings::{Color, TrackerSettings},
+    BuffState, Sorting, Tracker,
+};
 use crate::{
     assets::{FOOD_ICON, UNKNOWN_ICON, UTIL_ICON},
     buff_ui,
@@ -56,13 +60,14 @@ impl Tracker {
 
     /// Renders a player entry in a table.
     fn render_table_entry(
-        &self,
         ui: &Ui,
         (defs, custom): Props,
+        settings: &TrackerSettings,
         colors: &exports::Colors,
         entry: TableEntry,
         show_sub: bool,
     ) {
+        let TableEntry { buffs, .. } = entry;
         let sub_color = colors
             .sub_base(entry.subgroup)
             .map(|color| render::with_alpha(color, 1.0));
@@ -80,7 +85,7 @@ impl Tracker {
         if show_sub {
             ui.table_next_column();
             let sub = format!("{:>2}", entry.subgroup);
-            match (self.settings.color_sub, sub_color, prof_color) {
+            match (settings.color_sub, sub_color, prof_color) {
                 (Color::Sub, Some(color), _) => ui.text_colored(color, sub),
                 (Color::Prof, _, Some(color)) => ui.text_colored(color, sub),
                 _ => ui.text(sub),
@@ -89,7 +94,7 @@ impl Tracker {
 
         // render name cell
         ui.table_next_column();
-        match (self.settings.color_name, sub_color, prof_color) {
+        match (settings.color_name, sub_color, prof_color) {
             (Color::Sub, Some(color), _) => ui.text_colored(color, entry.character),
             (Color::Prof, _, Some(color)) => ui.text_colored(color, entry.character),
             _ => ui.text(entry.character),
@@ -97,8 +102,22 @@ impl Tracker {
         if ui.is_item_hovered() {
             ui.tooltip_text(entry.account);
         }
-
-        let TableEntry { buffs, .. } = entry;
+        render::item_context_menu(format!("name-context-{}", entry.id), || {
+            let title = "Entry options";
+            match colors.core(CoreColor::MediumGrey) {
+                Some(color) => ui.text_colored(color, title),
+                None => ui.text(title),
+            }
+            if ui.small_button("Copy character") {
+                ui.set_clipboard_text(entry.character);
+            }
+            if ui.small_button("Copy account") {
+                ui.set_clipboard_text(entry.account);
+            }
+            if ui.small_button("Reset buffs") {
+                buffs.reset_buffs();
+            }
+        });
 
         // render food cell
         ui.table_next_column();
@@ -276,10 +295,11 @@ impl Tracker {
 
                 // render table content
                 let colors = exports::colors();
-                for entry in self.players.iter() {
-                    self.render_table_entry(
+                for entry in self.players.iter_mut() {
+                    Self::render_table_entry(
                         ui,
                         props,
+                        &self.settings,
                         &colors,
                         TableEntry::from_entry(entry.player.id, entry),
                         show_sub,
@@ -309,19 +329,21 @@ impl Tracker {
         ) {
             // render table content
             let colors = exports::colors();
-            if let Some(entry) = current {
-                self.render_table_entry(
+            if let Some(entry) = self.players.get_self_mut() {
+                Self::render_table_entry(
                     ui,
                     props,
+                    &self.settings,
                     &colors,
                     TableEntry::from_entry(usize::MAX, entry),
                     false,
                 );
             }
-            for (i, (player, buffs)) in self.players.cache_iter().enumerate() {
-                self.render_table_entry(
+            for (i, (player, buffs)) in self.players.cache_iter_mut().enumerate() {
+                Self::render_table_entry(
                     ui,
                     props,
+                    &self.settings,
                     &colors,
                     TableEntry {
                         id: i,
@@ -417,18 +439,18 @@ struct TableEntry<'a> {
     character: &'a str,
     profession: Profession,
     subgroup: usize,
-    buffs: &'a Buffs,
+    buffs: &'a mut Buffs,
 }
 
 impl<'a> TableEntry<'a> {
-    fn from_entry(id: usize, entry: &'a Entry<Buffs>) -> Self {
+    fn from_entry(id: usize, entry: &'a mut Entry<Buffs>) -> Self {
         Self {
             id,
             account: &entry.player.account,
             character: &entry.player.character,
             profession: entry.player.profession,
             subgroup: entry.player.subgroup,
-            buffs: &entry.data,
+            buffs: &mut entry.data,
         }
     }
 }

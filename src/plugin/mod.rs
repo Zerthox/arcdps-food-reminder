@@ -84,6 +84,7 @@ impl Plugin {
 
     /// Loads the plugin.
     pub fn load(&mut self) {
+        // TODO: update notification
         info!("v{} load", VERSION);
 
         let d3d_version = arcdps::d3d_version();

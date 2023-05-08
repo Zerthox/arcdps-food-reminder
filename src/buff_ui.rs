@@ -13,7 +13,9 @@ pub fn render_buff_tooltip(ui: &Ui, buff: &BuffData) {
                 Some(color) => ui.text_colored(color, &buff.name),
                 None => ui.text(&buff.name),
             }
-            ui.text(buff.stats.join("\n"));
+            if !buff.stats.is_empty() {
+                ui.text(buff.stats.join("\n"));
+            }
         });
     }
 }
@@ -33,16 +35,16 @@ pub fn render_buff_context_menu(
             None => ui.text(title),
         }
         if let Some(name) = name {
-            if ui.small_button("Copy Name") {
+            if ui.small_button("Copy name") {
                 ui.set_clipboard_text(name);
             }
-            if ui.small_button("Open Wiki") {
+            if ui.small_button("Open wiki") {
                 let _ = open::that(format!(
                     "https://wiki-en.guildwars2.com/wiki/Special:Search/{name}"
                 ));
             }
         }
-        if ui.small_button("Copy ID") {
+        if ui.small_button("Copy id") {
             ui.set_clipboard_text(buff_id.to_string());
         }
     });
@@ -59,7 +61,7 @@ pub fn render_food_context_menu(
     render_buff_context_menu(
         ui,
         format!("##food-context-{menu_id}"),
-        "Food Options",
+        "Food options",
         buff_id,
         name,
         colors,
@@ -77,7 +79,7 @@ pub fn render_util_context_menu(
     render_buff_context_menu(
         ui,
         format!("##util-context-{menu_id}"),
-        "Utility Options",
+        "Utility options",
         buff_id,
         name,
         colors,

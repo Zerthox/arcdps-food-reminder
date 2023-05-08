@@ -1,6 +1,6 @@
 [package]
 name = "arcdps_food_reminder"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 authors = ["Zerthox"]
 repository = "https://github.com/zerthox/arcdps-food-reminder"

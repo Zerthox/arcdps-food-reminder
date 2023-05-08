@@ -30,6 +30,18 @@ use arcdps::{
 pub type Props<'p> = (&'p Definitions, &'p [CustomReminder]);
 
 impl Tracker {
+    /// Calculates height for a table.
+    fn table_height(&self, ui: &Ui, row_count: usize) -> f32 {
+        let max = self.settings.max_entries_displayed;
+        if max > 0 {
+            let [_, pad] = ui.clone_style().cell_padding;
+            let row_size = ui.text_line_height() + 2.0 * pad;
+            (max.min(row_count) + 1) as f32 * row_size
+        } else {
+            0.0
+        }
+    }
+
     /// Renders reset buttons for squad & characters.
     pub fn render_reset_buttons(&mut self, ui: &Ui, same_line: bool) {
         const SPACING: f32 = 5.0;
@@ -259,13 +271,19 @@ impl Tracker {
                     TableColumnFlags::NO_SORT,
                 ),
             ];
+            let columns = if show_sub { &columns } else { &columns[1..] };
 
-            if let Some(_table) = render::table_with_icons(
+            if let Some(_table) = render::table_with_icons_sizing(
                 ui,
                 "##squad-table",
-                if show_sub { &columns } else { &columns[1..] },
-                TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SORTABLE,
+                columns,
+                TableFlags::SIZING_STRETCH_PROP
+                    | TableFlags::PAD_OUTER_X
+                    | TableFlags::SORTABLE
+                    | TableFlags::SCROLL_Y,
                 self.settings.show_icons,
+                [0.0, self.table_height(ui, self.players.len())],
+                0.0,
             ) {
                 // update sorting if necessary
                 if let Some(sort_specs) = ui.table_sort_specs_mut() {
@@ -312,10 +330,11 @@ impl Tracker {
     /// Renders the tracker tab for own characters.
     fn render_characters_tab(&mut self, ui: &Ui, props: Props) {
         let current = self.players.get_self();
+        let count = self.players.cache_len() + if current.is_some() { 1 } else { 0 };
 
         if current.is_none() && !self.players.cached() {
             ui.text("No characters found");
-        } else if let Some(_table) = render::table_with_icons(
+        } else if let Some(_table) = render::table_with_icons_sizing(
             ui,
             "##self-table",
             &[
@@ -324,8 +343,10 @@ impl Tracker {
                 TableIconColumn::new("Util", UTIL_ICON.as_ref()),
                 TableIconColumn::new("Buffs", UNKNOWN_ICON.as_ref()),
             ],
-            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X,
+            TableFlags::SIZING_STRETCH_PROP | TableFlags::PAD_OUTER_X | TableFlags::SCROLL_Y,
             self.settings.show_icons,
+            [0.0, self.table_height(ui, count)],
+            0.0,
         ) {
             // render table content
             let colors = exports::colors();
@@ -420,6 +441,11 @@ impl Windowable<Props<'_>> for Tracker {
             ui.checkbox("Show icons", &mut self.settings.show_icons);
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
             ui.checkbox("Show build notes", &mut self.builds.display_notes);
+
+            let mut displayed = self.settings.max_entries_displayed as i32;
+            if ui.input_int("Max displayed", &mut displayed).build() {
+                self.settings.max_entries_displayed = displayed.try_into().unwrap_or_default();
+            }
 
             let input_width = render::ch_width(ui, 16);
 

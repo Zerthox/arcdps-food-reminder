@@ -27,6 +27,9 @@ pub struct TrackerSettings {
     /// Whether to show the subgroup column.
     pub show_sub: bool,
 
+    /// Amount of entries displayed before scrolling.
+    pub max_entries_displayed: usize,
+
     /// Color for subgroup numbers.
     pub color_sub: Color,
 
@@ -41,6 +44,7 @@ impl TrackerSettings {
             hotkey: Some(Tracker::DEFAULT_HOTKEY),
             show_icons: true,
             show_sub: true,
+            max_entries_displayed: 10,
             color_sub: Color::Sub,
             color_name: Color::Prof,
         }

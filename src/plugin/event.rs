@@ -90,7 +90,7 @@ impl Plugin {
                                     event_id,
                                 ),
 
-                                BuffRemove::Single | BuffRemove::Unknown => {}
+                                BuffRemove::Single | BuffRemove::Unknown(_) => {}
                             }
                         }
                     }

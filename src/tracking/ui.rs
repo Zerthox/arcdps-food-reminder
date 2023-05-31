@@ -442,12 +442,13 @@ impl Windowable<Props<'_>> for Tracker {
             ui.checkbox("Show subgroup", &mut self.settings.show_sub);
             ui.checkbox("Show build notes", &mut self.builds.display_notes);
 
+            let input_width = render::ch_width(ui, 16);
+
             let mut displayed = self.settings.max_entries_displayed as i32;
+            ui.set_next_item_width(input_width);
             if ui.input_int("Max displayed", &mut displayed).build() {
                 self.settings.max_entries_displayed = displayed.try_into().unwrap_or_default();
             }
-
-            let input_width = render::ch_width(ui, 16);
 
             ui.set_next_item_width(input_width);
             render_enum_combo(ui, "Subgroup color", &mut self.settings.color_sub);

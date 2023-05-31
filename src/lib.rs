@@ -59,6 +59,7 @@ fn combat(
     revision: u64,
 ) {
     // TODO: put relevant event information in priority queue, update state in worker thread?
+    // or split into important (buff initial), unimportant (encounter start) and last seen time (atomic)
     PLUGIN
         .lock()
         .unwrap()

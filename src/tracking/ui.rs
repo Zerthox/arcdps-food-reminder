@@ -6,7 +6,6 @@ use super::{
 use crate::{
     assets::{FOOD_ICON, UNKNOWN_ICON, UTIL_ICON},
     buff_ui,
-    colors::{GREEN, RED, YELLOW},
     combo_ui::render_enum_combo,
     data::{
         DefinitionKind, Definitions, DIMINISHED, MALNOURISHED, NO_BUFF_TEXT, UNKNOWN_BUFF_TEXT,
@@ -15,6 +14,7 @@ use crate::{
     reminder::custom::CustomReminder,
 };
 use arc_util::{
+    colors::{GREEN, RED, YELLOW},
     tracking::Entry,
     ui::{
         render::{self, TableIconColumn},

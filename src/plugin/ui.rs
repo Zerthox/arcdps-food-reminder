@@ -1,12 +1,12 @@
 use super::Plugin;
 use crate::{
-    colors::{GREEN, GREY, RED, YELLOW},
     combo_ui::render_enum_combo,
     data::{Definitions, LoadError},
     plugin::{ExtrasState, DEFINITIONS_FILE},
     reminder::custom::CustomReminder,
 };
 use arc_util::{
+    colors::{GREEN, GREY, RED, YELLOW},
     settings::{HasSettings, Settings},
     ui::{action::Action, render, Component, Hideable},
 };

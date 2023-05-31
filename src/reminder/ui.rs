@@ -1,6 +1,8 @@
 use super::{custom::CustomReminder, Reminder};
-use crate::colors::RED;
-use arc_util::ui::{render, Component};
+use arc_util::{
+    colors::RED,
+    ui::{render, Component},
+};
 use arcdps::{
     exports::{self, CoreColor},
     imgui::{self, Ui},

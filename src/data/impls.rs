@@ -1,5 +1,5 @@
 use super::*;
-use crate::colors::{self, Color};
+use arc_util::colors::{self, Color};
 
 impl DefData {
     /// Returns the default definitions data.

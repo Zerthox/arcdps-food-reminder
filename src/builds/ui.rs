@@ -2,15 +2,17 @@ use super::{build::Build, Builds};
 use crate::{
     assets::{FOOD_ICON, UTIL_ICON},
     buff_ui,
-    colors::{GREEN, RED},
     combo_ui::render_prof_select,
     data::{DefinitionKind, Definitions},
     tracking::buff::BuffState,
 };
-use arc_util::ui::{
-    action::Action,
-    render::{self, TableIconColumn},
-    Component, Ui,
+use arc_util::{
+    colors::{GREEN, RED},
+    ui::{
+        action::Action,
+        render::{self, TableIconColumn},
+        Component, Ui,
+    },
 };
 use arcdps::{
     exports::{self, CoreColor},

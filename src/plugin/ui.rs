@@ -259,23 +259,25 @@ impl Plugin {
     }
 
     /// Callback for ArcDPS option checkboxes.
-    pub fn render_window_options(&mut self, ui: &Ui, option_name: Option<&str>) -> bool {
+    pub fn render_window_options(ui: &Ui, option_name: Option<&str>) -> bool {
         if option_name.is_none() {
-            ui.checkbox("Food Tracker", self.tracker.visible_mut());
+            let mut plugin = Self::lock();
+            ui.checkbox("Food Tracker", plugin.tracker.visible_mut());
 
             #[cfg(feature = "demo")]
-            ui.checkbox("Food Demo", self.demo.visible_mut());
+            ui.checkbox("Food Demo", plugin.demo.visible_mut());
         }
         false
     }
 
     /// Handles a key event.
-    pub fn key_event(&mut self, key: usize, down: bool, prev_down: bool) -> bool {
+    pub fn key_event(key: usize, down: bool, prev_down: bool) -> bool {
         // check for down
         if down && !prev_down {
             // check for hotkeys
-            if matches!(self.tracker.settings.hotkey, Some(hotkey) if hotkey as usize == key) {
-                self.tracker.toggle_visibility();
+            let mut plugin = Self::lock();
+            if matches!(plugin.tracker.settings.hotkey, Some(hotkey) if hotkey as usize == key) {
+                plugin.tracker.toggle_visibility();
                 return false;
             }
         }

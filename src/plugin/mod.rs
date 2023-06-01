@@ -11,8 +11,10 @@ use arc_util::{
     ui::{Window, WindowOptions},
 };
 use log::{info, warn};
+use once_cell::sync::Lazy;
 use semver::Version;
-use std::fs;
+use std::sync::Mutex;
+use std::{fs, sync::MutexGuard};
 
 #[cfg(feature = "demo")]
 use crate::demo::Demo;
@@ -25,6 +27,10 @@ const SETTINGS_FILE: &str = "arcdps_food_reminder.json";
 
 /// Definitions file name.
 const DEFINITIONS_FILE: &str = "arcdps_food_reminder_definitions.json";
+
+/// Main plugin instance.
+// FIXME: a single mutex for the whole thing is potentially inefficient
+static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 
 /// Main plugin.
 #[derive(Debug)]
@@ -80,6 +86,16 @@ impl Plugin {
 
             reset_confirm: false,
         }
+    }
+
+    /// Acquires access to the plugin instance.
+    pub fn lock() -> MutexGuard<'static, Self> {
+        PLUGIN.lock().unwrap()
+    }
+
+    /// Helper to convert [`MutexGuard`] to a mutable [`Plugin`] reference.
+    pub fn as_mut(&mut self) -> &mut Self {
+        self
     }
 
     /// Loads the plugin.

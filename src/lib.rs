@@ -16,13 +16,7 @@ use arcdps::{
     imgui::Ui,
     Agent, CombatEvent,
 };
-use once_cell::sync::Lazy;
 use plugin::Plugin;
-use std::sync::Mutex;
-
-/// Main plugin instance.
-// FIXME: a single mutex for the whole thing is potentially inefficient
-static PLUGIN: Lazy<Mutex<Plugin>> = Lazy::new(|| Mutex::new(Plugin::new()));
 
 // create exports for arcdps
 arcdps::export! {
@@ -41,12 +35,12 @@ arcdps::export! {
 
 fn init() -> Result<(), String> {
     // TODO: use error
-    PLUGIN.lock().unwrap().load();
+    Plugin::lock().load();
     Ok(())
 }
 
 fn release() {
-    PLUGIN.lock().unwrap().unload()
+    Plugin::lock().unload()
 }
 
 fn combat(
@@ -57,43 +51,29 @@ fn combat(
     id: u64,
     revision: u64,
 ) {
-    // TODO: put relevant event information in priority queue, update state in worker thread?
-    // or split into important (buff initial), unimportant (encounter start) and last seen time (atomic)
-    PLUGIN
-        .lock()
-        .unwrap()
-        .area_event(event, src, dest, skill_name, id, revision)
+    Plugin::area_event(event, src, dest, skill_name, id, revision)
 }
 
 fn imgui(ui: &Ui, not_loading_or_character_selection: bool) {
-    PLUGIN
-        .lock()
-        .unwrap()
-        .render_windows(ui, not_loading_or_character_selection)
+    Plugin::lock().render_windows(ui, not_loading_or_character_selection)
 }
 
 fn options_windows(ui: &Ui, window_name: Option<&str>) -> bool {
-    PLUGIN
-        .lock()
-        .unwrap()
-        .render_window_options(ui, window_name)
+    Plugin::render_window_options(ui, window_name)
 }
 
 fn options_end(ui: &Ui) {
-    PLUGIN.lock().unwrap().render_settings(ui)
+    Plugin::lock().render_settings(ui)
 }
 
 fn wnd_filter(key: usize, key_down: bool, prev_key_down: bool) -> bool {
-    PLUGIN
-        .lock()
-        .unwrap()
-        .key_event(key, key_down, prev_key_down)
+    Plugin::key_event(key, key_down, prev_key_down)
 }
 
 fn extras_init(addon_info: ExtrasAddonInfo, account_name: Option<&str>) {
-    PLUGIN.lock().unwrap().extras_init(addon_info, account_name)
+    Plugin::lock().extras_init(addon_info, account_name)
 }
 
 fn extras_squad_update(users: UserInfoIter) {
-    PLUGIN.lock().unwrap().extras_squad_update(users)
+    Plugin::lock().extras_squad_update(users)
 }

@@ -13,7 +13,6 @@ use log::{debug, info, log_enabled, Level};
 impl Plugin {
     /// Handles a combat event from area stats.
     pub fn area_event(
-        &mut self,
         event: Option<CombatEvent>,
         src: Option<Agent>,
         dst: Option<Agent>,
@@ -21,12 +20,17 @@ impl Plugin {
         event_id: u64,
         _revision: u64,
     ) {
+        // TODO: put relevant event information in priority queue, update state in worker thread?
+        // or split into important (buff initial), unimportant (encounter start) and last seen time (atomic)
+
         // ignore events without source
         if let Some(src) = src {
             // check for combat event
             if let Some(event) = event {
                 match event.is_statechange {
                     StateChange::LogStart => {
+                        let mut guard = Self::lock();
+                        let plugin = guard.as_mut();
                         let target_id = event.src_agent;
                         if log_enabled!(Level::Debug) {
                             let delta = calc_delta(&event);
@@ -34,34 +38,37 @@ impl Plugin {
                         }
 
                         // change buffs to none, initial buffs should be reported right after
-                        for entry in self.tracker.players.iter_mut() {
+                        for entry in plugin.tracker.players.iter_mut() {
                             entry.data.unset_to_none(
                                 event.time,
-                                self.reminder.all_custom().iter().map(|remind| remind.id),
+                                plugin.reminder.all_custom().iter().map(|remind| remind.id),
                             );
                         }
 
                         // refresh if food or util sorting
-                        self.tracker.refresh_sort_if(Sorting::Food);
-                        self.tracker.refresh_sort_if(Sorting::Util);
+                        plugin.tracker.refresh_sort_if(Sorting::Food);
+                        plugin.tracker.refresh_sort_if(Sorting::Util);
 
-                        self.reminder.start_encounter(target_id, event.time);
+                        plugin.reminder.start_encounter(target_id, event.time);
                     }
 
                     StateChange::LogNPCUpdate => {
+                        let mut plugin = Self::lock();
                         let target_id = event.src_agent;
                         debug!(
                             "Log changed from {:?} to id {}",
-                            self.reminder.current_encounter(),
+                            plugin.reminder.current_encounter(),
                             target_id
                         );
-                        self.reminder.change_encounter(target_id, event.time);
+                        plugin.reminder.change_encounter(target_id, event.time);
                     }
 
                     StateChange::LogEnd => {
+                        let mut guard = Self::lock();
+                        let plugin = guard.as_mut();
                         let target_id = event.src_agent;
                         debug!("Log for id {} ended", target_id);
-                        self.reminder.end_encounter(&self.tracker.players);
+                        plugin.reminder.end_encounter(&plugin.tracker.players);
                     }
 
                     StateChange::None | StateChange::ApiDelayed | StateChange::BuffInitial => {
@@ -70,7 +77,7 @@ impl Plugin {
                                 BuffRemove::None => {
                                     if event.buff != 0 && event.buff_dmg == 0 {
                                         if let Some(dst) = dst {
-                                            self.buff_apply(
+                                            Self::lock().buff_apply(
                                                 dst.id,
                                                 event.skill_id,
                                                 skill_name,
@@ -82,7 +89,7 @@ impl Plugin {
                                 }
 
                                 // remove on all or single manual
-                                BuffRemove::All | BuffRemove::Manual => self.buff_remove(
+                                BuffRemove::All | BuffRemove::Manual => Self::lock().buff_remove(
                                     src.id,
                                     event.skill_id,
                                     skill_name,
@@ -99,22 +106,26 @@ impl Plugin {
 
                 // buff initial events will happen at the start
                 if event.is_statechange != StateChange::BuffInitial {
-                    self.reminder
-                        .update_pending_check(&self.tracker.players, event.time);
+                    let mut guard = Self::lock();
+                    let plugin = guard.as_mut();
+                    plugin
+                        .reminder
+                        .update_pending_check(&plugin.tracker.players, event.time);
                 }
             } else {
                 // check for player tracking change
                 if src.elite == 0 {
+                    let mut plugin = Self::lock();
                     if src.prof != 0 {
                         // add player
                         if let Some(player) =
                             dst.and_then(|dst| Player::from_tracking_change(src, dst))
                         {
-                            self.tracker.add_player(player);
+                            plugin.tracker.add_player(player);
                         }
                     } else {
                         // remove player
-                        self.tracker.remove_player(src.id);
+                        plugin.tracker.remove_player(src.id);
                     }
                 }
             }

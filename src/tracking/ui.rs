@@ -78,7 +78,9 @@ impl Tracker {
         colors: &exports::Colors,
         entry: TableEntry,
         show_sub: bool,
-    ) {
+        allow_delete: bool,
+    ) -> bool {
+        let mut delete = false;
         let TableEntry { buffs, .. } = entry;
         let sub_color = colors
             .sub_base(entry.subgroup)
@@ -128,6 +130,9 @@ impl Tracker {
             }
             if ui.small_button("Reset buffs") {
                 buffs.reset_buffs();
+            }
+            if allow_delete && ui.small_button("Delete entry") {
+                delete = true;
             }
         });
 
@@ -236,6 +241,8 @@ impl Tracker {
                 }
             });
         }
+
+        delete
     }
 
     /// Renders the tracker tab for the squad.
@@ -321,6 +328,7 @@ impl Tracker {
                         &colors,
                         TableEntry::from_entry(entry.player.id, entry),
                         show_sub,
+                        false,
                     );
                 }
             }
@@ -358,10 +366,12 @@ impl Tracker {
                     &colors,
                     TableEntry::from_entry(usize::MAX, entry),
                     false,
+                    false,
                 );
             }
+            let mut delete = None;
             for (i, (player, buffs)) in self.players.cache_iter_mut().enumerate() {
-                Self::render_table_entry(
+                let should_delete = Self::render_table_entry(
                     ui,
                     props,
                     &self.settings,
@@ -375,7 +385,14 @@ impl Tracker {
                         subgroup: 0,
                     },
                     false,
+                    true,
                 );
+                if should_delete {
+                    delete = Some(player.character.clone());
+                }
+            }
+            if let Some(name) = delete {
+                self.players.remove_cache_entry(name);
             }
         }
     }

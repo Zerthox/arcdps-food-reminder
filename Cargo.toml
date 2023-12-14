@@ -35,7 +35,6 @@ demo = []
 
 [profile.release]
 lto = "thin"
-panic = "abort" # rust currently aborts across ffi boundaries anyway
 
 [profile.release-log]
 debug-assertions = true

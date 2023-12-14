@@ -419,6 +419,13 @@
       "display": "Heal",
       "rarity": "Fine"
     },
+    {
+      "id": 49296,
+      "name": "Bowl of Poultry Satay",
+      "stats": ["+100 Healing Power", "+70 Concentration"],
+      "display": "Heal",
+      "rarity": "Masterwork"
+    },
 
     // on kill
     {

@@ -1,21 +1,21 @@
 use super::{ExtrasState, Plugin};
 use crate::{data::BuffKind, tracking::Sorting};
 use arc_util::{
-    api::calc_delta,
+    api::delta_time,
     tracking::{Entry, Player},
 };
 use arcdps::{
     extras::{ExtrasAddonInfo, UserInfo, UserInfoIter, UserRole},
-    Activation, Agent, BuffRemove, CombatEvent, StateChange,
+    Activation, Agent, BuffRemove, Event, StateChange,
 };
 use log::{debug, info, log_enabled, Level};
 
 impl Plugin {
     /// Handles a combat event from area stats.
     pub fn area_event(
-        event: Option<CombatEvent>,
-        src: Option<Agent>,
-        dst: Option<Agent>,
+        event: Option<&Event>,
+        src: Option<&Agent>,
+        dst: Option<&Agent>,
         skill_name: Option<&str>,
         event_id: u64,
         _revision: u64,
@@ -27,13 +27,14 @@ impl Plugin {
         if let Some(src) = src {
             // check for combat event
             if let Some(event) = event {
-                match event.is_statechange {
+                let statechange = event.get_statechange();
+                match statechange {
                     StateChange::LogStart => {
                         let mut guard = Self::lock();
                         let plugin = guard.as_mut();
                         let target_id = event.src_agent;
                         if log_enabled!(Level::Debug) {
-                            let delta = calc_delta(&event);
+                            let delta = delta_time(event);
                             debug!("Log for id {} started with {:?} delta", target_id, delta);
                         }
 
@@ -72,8 +73,8 @@ impl Plugin {
                     }
 
                     StateChange::None | StateChange::ApiDelayed | StateChange::BuffInitial => {
-                        if event.is_activation == Activation::None {
-                            match event.is_buff_remove {
+                        if event.get_activation() == Activation::None {
+                            match event.get_buffremove() {
                                 BuffRemove::None => {
                                     if event.buff != 0 && event.buff_dmg == 0 {
                                         if let Some(dst) = dst {
@@ -81,7 +82,7 @@ impl Plugin {
                                                 dst.id,
                                                 event.skill_id,
                                                 skill_name,
-                                                &event,
+                                                event,
                                                 event_id,
                                             );
                                         }
@@ -93,7 +94,7 @@ impl Plugin {
                                     src.id,
                                     event.skill_id,
                                     skill_name,
-                                    &event,
+                                    event,
                                     event_id,
                                 ),
 
@@ -105,7 +106,7 @@ impl Plugin {
                 }
 
                 // buff initial events will happen at the start
-                if event.is_statechange != StateChange::BuffInitial {
+                if statechange != StateChange::BuffInitial {
                     let mut guard = Self::lock();
                     let plugin = guard.as_mut();
                     plugin
@@ -138,9 +139,10 @@ impl Plugin {
         player_id: usize,
         buff_id: u32,
         buff_name: Option<&str>,
-        event: &CombatEvent,
+        event: &Event,
         event_id: u64,
     ) {
+        let statechange = event.get_statechange();
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
@@ -148,7 +150,7 @@ impl Plugin {
                     remind.display_name(),
                     event_id,
                     event.time,
-                    event.is_statechange
+                    statechange
                 );
                 if data.apply_custom(buff_id, event.time) {
                     info!(
@@ -163,7 +165,7 @@ impl Plugin {
                     BuffKind::Food(food) => {
                         debug!(
                             "Food apply id {} time {} statechange {}",
-                            event_id, event.time, event.is_statechange
+                            event_id, event.time, statechange
                         );
                         if data.apply_food(buff_id, event.time) {
                             if let Some(food) = food {
@@ -185,7 +187,7 @@ impl Plugin {
                     BuffKind::Util(util) => {
                         debug!(
                             "Util apply id {} time {} statechange {}",
-                            event_id, event.time, event.is_statechange
+                            event_id, event.time, statechange
                         );
                         if data.apply_util(buff_id, event.time) {
                             if let Some(util) = util {
@@ -222,9 +224,11 @@ impl Plugin {
         player_id: usize,
         buff_id: u32,
         buff_name: Option<&str>,
-        event: &CombatEvent,
+        event: &Event,
         event_id: u64,
     ) {
+        let statechange = event.get_statechange();
+        let buffremove = event.get_buffremove();
         if let Some(Entry { player, data }) = self.tracker.players.player_mut(player_id) {
             if let Some(remind) = self.reminder.custom(buff_id) {
                 debug!(
@@ -232,8 +236,8 @@ impl Plugin {
                     remind.display_name(),
                     event_id,
                     event.time,
-                    event.is_statechange,
-                    event.is_buff_remove
+                    statechange,
+                    buffremove
                 );
                 if data.remove_custom(buff_id, event.time) {
                     info!(
@@ -253,7 +257,7 @@ impl Plugin {
                     BuffKind::Food(food) => {
                         debug!(
                             "Food remove id {} time {} statechange {} kind {}",
-                            event_id, event.time, event.is_statechange, event.is_buff_remove
+                            event_id, event.time, statechange, buffremove
                         );
                         if data.remove_food(buff_id, event.time) {
                             if let Some(food) = food {
@@ -276,7 +280,7 @@ impl Plugin {
                     BuffKind::Util(util) => {
                         debug!(
                             "Utility remove id {} time {} statechange {} kind {}",
-                            event_id, event.time, event.is_statechange, event.is_buff_remove
+                            event_id, event.time, statechange, buffremove
                         );
                         if data.remove_util(buff_id, event.time) {
                             if let Some(util) = util {
@@ -321,24 +325,24 @@ impl Plugin {
     pub fn extras_squad_update(&mut self, users: UserInfoIter) {
         for user in users {
             if let UserInfo {
-                account_name: Some(name),
                 role: UserRole::SquadLeader | UserRole::Lieutenant | UserRole::Member,
-                subgroup,
                 ..
             } = user
             {
-                if let Some(Entry { player, .. }) = self
-                    .tracker
-                    .players
-                    .iter_mut()
-                    .find(|entry| entry.player.account == name)
-                {
-                    player.subgroup = subgroup as usize + 1;
+                if let Some(name) = user.account_name() {
+                    if let Some(Entry { player, .. }) = self
+                        .tracker
+                        .players
+                        .iter_mut()
+                        .find(|entry| entry.player.account == name)
+                    {
+                        player.subgroup = user.subgroup as usize + 1;
 
-                    debug!(
-                        "Updated subgroup {} for {}",
-                        player.subgroup, player.character
-                    );
+                        debug!(
+                            "Updated subgroup {} for {}",
+                            player.subgroup, player.character
+                        );
+                    }
                 }
             }
         }

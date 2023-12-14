@@ -28,11 +28,12 @@ impl Demo {
             all_utils: Vec::new(),
             reminder: Reminder::new(),
             tracker: Window::new(
+                "FoodTracker###demo",
+                Tracker::new(),
                 WindowOptions {
                     auto_resize: true,
-                    ..WindowOptions::new("Food Tracker##demo")
+                    ..Default::default()
                 },
-                Tracker::new(),
             ),
         }
     }

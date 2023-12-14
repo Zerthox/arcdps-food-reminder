@@ -68,20 +68,22 @@ impl Plugin {
             reminder: Reminder::new(),
 
             tracker: Window::new(
+                "Food Tracker",
+                Tracker::new(),
                 WindowOptions {
                     auto_resize: true,
-                    ..WindowOptions::new("Food Tracker")
+                    ..Default::default()
                 },
-                Tracker::new(),
             ),
 
             #[cfg(feature = "demo")]
             demo: Window::new(
+                "Food Demo",
+                Demo::new(),
                 WindowOptions {
                     auto_resize: true,
-                    ..WindowOptions::new("Food Demo")
+                    ..Default::default()
                 },
-                Demo::new(),
             ),
 
             reset_confirm: false,

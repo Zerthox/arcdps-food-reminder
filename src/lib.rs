@@ -14,7 +14,7 @@ mod demo;
 use arcdps::{
     extras::{ExtrasAddonInfo, UserInfoIter},
     imgui::Ui,
-    Agent, CombatEvent,
+    Agent, Event,
 };
 use plugin::Plugin;
 
@@ -44,9 +44,9 @@ fn release() {
 }
 
 fn combat(
-    event: Option<CombatEvent>,
-    src: Option<Agent>,
-    dest: Option<Agent>,
+    event: Option<&Event>,
+    src: Option<&Agent>,
+    dest: Option<&Agent>,
     skill_name: Option<&str>,
     id: u64,
     revision: u64,

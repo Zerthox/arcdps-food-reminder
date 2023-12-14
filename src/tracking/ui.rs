@@ -417,7 +417,7 @@ impl Component<Props<'_>> for Tracker {
 impl Windowable<Props<'_>> for Tracker {
     const CONTEXT_MENU: bool = true;
 
-    fn render_menu(&mut self, ui: &Ui, _: &(&Definitions, &[CustomReminder])) {
+    fn render_menu(&mut self, ui: &Ui, _: &mut (&Definitions, &[CustomReminder])) {
         let colors = exports::colors();
         let grey = colors
             .core(CoreColor::MediumGrey)

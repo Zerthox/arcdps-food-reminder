@@ -31,17 +31,10 @@ end
 """
 ]
 
-[tasks.build]
-script = "cargo build --release"
-clear = true
-
 [tasks.build-demo]
 script = "cargo build --release --features demo"
 
-[tasks.build-dev]
-script = "cargo build"
-
-[tasks.copy]
+[tasks.copy-release]
 script = "cp \"${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/release/${CARGO_MAKE_CRATE_NAME}.dll\" \"${GW2_PATH}\""
 script_runner = "@shell"
 
@@ -54,14 +47,14 @@ script = "rm \"${GW2_PATH}/${CARGO_MAKE_CRATE_NAME}.dll\""
 script_runner = "@shell"
 
 [tasks.install]
-run_task = { name = ["build", "copy"] }
+run_task = { name = ["build-release", "copy-release"] }
 
 [tasks.uninstall]
 alias = "remove"
 
 [tasks.demo]
-run_task = { name = ["build-demo", "copy"] }
+run_task = { name = ["build-demo", "copy-release"] }
 
 [tasks.dev]
-run_task = { name = ["build-dev", "copy-debug"] }
+run_task = { name = ["build", "copy-debug"] }
 watch = true

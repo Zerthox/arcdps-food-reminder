@@ -14,10 +14,10 @@ fn init_icon(data: &'static [u8]) -> Option<Icon> {
     let device = d3d11_device()?;
     let format = DXGI_FORMAT_R8G8B8A8_UNORM;
     let texture =
-        create_texture2d_from_mem(device, data, 32, 32, 32 * 4, format, D3D11_USAGE_IMMUTABLE)
+        create_texture2d_from_mem(&device, data, 32, 32, 32 * 4, format, D3D11_USAGE_IMMUTABLE)
             .map_err(|err| error!("failed to create texture: {err}"))
             .ok()?;
-    create_texture2d_view(device, &texture, format)
+    create_texture2d_view(&device, &texture, format)
         .map_err(|err| error!("failed to create texture view: {err}"))
         .ok()
 }

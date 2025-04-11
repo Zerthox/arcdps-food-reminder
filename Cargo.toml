@@ -1,6 +1,6 @@
 [package]
 name = "arcdps_food_reminder"
-version = "0.6.4"
+version = "0.6.5"
 edition = "2021"
 authors = ["Zerthox"]
 repository = "https://github.com/zerthox/arcdps-food-reminder"
@@ -10,18 +10,22 @@ arc_util = { git = "https://github.com/zerthox/arcdps-utils", features = ["serde
 arcdps = { git = "https://github.com/zerthox/arcdps-rs", features = ["extras", "log", "serde", "strum"] }
 gw2_mumble = { git = "https://github.com/zerthox/gw2-mumble-rs" }
 include_img = { git = "https://github.com/zerthox/include-img" }
-jsonc-parser = { version = "0.23.0", features = ["serde"] }
+jsonc-parser = { version = "0.26.2", features = ["serde"] }
 log = { version = "0.4.17", features = ["release_max_level_info"] }
 once_cell = "1.17.0"
 open = "5.0.1"
 semver = { version = "1.0.16", features = ["serde"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.92"
-strum = { version = "0.25.0", features = ["derive"] }
-windows = { version = "0.52.0", features = ["System"] }
+strum = { version = "0.27.1", features = ["derive"] }
+windows = { version = "0.59.0", features = [
+    "System",
+    "Win32_Graphics",
+    "Win32_Graphics_Dxgi_Common",
+] }
 
 [build-dependencies]
-jsonc-parser = { version = "0.23.0", features = ["serde"] }
+jsonc-parser = { version = "0.26.0", features = ["serde"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.92"
 uneval = "0.2.4"

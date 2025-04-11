@@ -29,7 +29,7 @@ impl Plugin {
             if let Some(event) = event {
                 let statechange = event.get_statechange();
                 match statechange {
-                    StateChange::LogStart => {
+                    StateChange::SquadCombatStart => {
                         let mut guard = Self::lock();
                         let plugin = guard.as_mut();
                         let target_id = event.src_agent;
@@ -64,7 +64,7 @@ impl Plugin {
                         plugin.reminder.change_encounter(target_id, event.time);
                     }
 
-                    StateChange::LogEnd => {
+                    StateChange::SquadCombatEnd => {
                         let mut guard = Self::lock();
                         let plugin = guard.as_mut();
                         let target_id = event.src_agent;
@@ -314,7 +314,7 @@ impl Plugin {
 
     /// Handles initialization from unofficial extras.
     pub fn extras_init(&mut self, extras_info: ExtrasAddonInfo, _account_name: Option<&str>) {
-        self.extras = if extras_info.is_compatible() {
+        self.extras = if extras_info.version().is_compatible() {
             ExtrasState::Found
         } else {
             ExtrasState::Incompatible

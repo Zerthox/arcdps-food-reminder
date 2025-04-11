@@ -4,6 +4,7 @@ version = "0.6.5"
 edition = "2021"
 authors = ["Zerthox"]
 repository = "https://github.com/zerthox/arcdps-food-reminder"
+rust-version = "1.82.0"
 
 [dependencies]
 arc_util = { git = "https://github.com/zerthox/arcdps-utils", features = ["serde", "settings"] }

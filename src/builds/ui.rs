@@ -66,7 +66,7 @@ impl Builds {
             for (i, build) in self.entries.iter_mut().enumerate() {
                 // check if filters match
                 let prof_matches =
-                    !self.filter_prof || current_prof.map_or(true, |prof| prof == build.prof);
+                    !self.filter_prof || current_prof.is_none_or(|prof| prof == build.prof);
 
                 if build.visible && prof_matches {
                     ui.table_next_row();
